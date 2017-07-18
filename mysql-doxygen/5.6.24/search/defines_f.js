@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['read_5fbuffer_5fhighwat',['READ_BUFFER_HIGHWAT',['../memcached_8h.html#a14d2f1d60a85984e1e0667cbefb620fc',1,'memcached.h']]],
+  ['rec_5f1byte_5fsql_5fnull_5fmask',['REC_1BYTE_SQL_NULL_MASK',['../rem0rec_8h.html#a8c57bc22396a4ac5fdb43af5c6eb54c4',1,'rem0rec.h']]],
+  ['rec_5f2byte_5fextern_5fmask',['REC_2BYTE_EXTERN_MASK',['../rem0rec_8h.html#acefca3561719837cb5296a60685bbe0e',1,'rem0rec.h']]],
+  ['rec_5f2byte_5fsql_5fnull_5fmask',['REC_2BYTE_SQL_NULL_MASK',['../rem0rec_8h.html#ae1191c9023430e7b275328830db53958',1,'rem0rec.h']]],
+  ['rec_5fversion_5f56_5fmax_5findex_5fcol_5flen',['REC_VERSION_56_MAX_INDEX_COL_LEN',['../rem0types_8h.html#aa043bb14d99d367ce27b119106b44579',1,'rem0types.h']]],
+  ['recv_5fdata_5fblock_5fsize',['RECV_DATA_BLOCK_SIZE',['../log0recv_8cc.html#a599884251054cd22af6500c6fbe03eb8',1,'log0recv.cc']]],
+  ['recv_5fis_5ffrom_5fbackup',['recv_is_from_backup',['../log0recv_8cc.html#af03f8edafc9d1b7a63fc100dc3301039',1,'log0recv.cc']]],
+  ['recv_5fis_5fmaking_5fa_5fbackup',['recv_is_making_a_backup',['../log0recv_8cc.html#a5e0143b997363d0ce9283e4f81e4181e',1,'log0recv.cc']]],
+  ['recv_5fparsing_5fbuf_5fsize',['RECV_PARSING_BUF_SIZE',['../log0recv_8h.html#a3bd85278988f4344ef4d339eb491ec18',1,'log0recv.h']]],
+  ['recv_5fread_5fahead_5farea',['RECV_READ_AHEAD_AREA',['../log0recv_8cc.html#a3295cbcda6a620a2751dc47206d6a02c',1,'log0recv.cc']]],
+  ['recv_5frecover_5fpage',['recv_recover_page',['../log0recv_8h.html#acfba28514ab74f04842e7c79174a5754',1,'log0recv.h']]],
+  ['recv_5frecovery_5ffrom_5fcheckpoint_5fstart',['recv_recovery_from_checkpoint_start',['../log0recv_8h.html#aaf5c2f5c1d19e49e67766247c62dfd53',1,'log0recv.h']]],
+  ['recv_5fscan_5fsize',['RECV_SCAN_SIZE',['../log0recv_8h.html#ab45e229060b2dd637a566107fc7806c7',1,'log0recv.h']]],
+  ['row_5fevaluate_5fcost',['ROW_EVALUATE_COST',['../sql__const_8h.html#a9666601b78fa739e78acbbbee5ddd041',1,'sql_const.h']]],
+  ['row_5flog_5fheader_5fsize',['ROW_LOG_HEADER_SIZE',['../row0log_8cc.html#afd6f1557fde01b3cb3f86976454e8101',1,'row0log.cc']]],
+  ['row_5fmerge_5fread_5fget_5fnext',['ROW_MERGE_READ_GET_NEXT',['../row0ftsort_8cc.html#ab544e149441e21338ba3f45bea35c0ea',1,'row0ftsort.cc']]],
+  ['row_5fmerge_5ftuple_5fcmp_5fctx',['row_merge_tuple_cmp_ctx',['../row0merge_8cc.html#ab7eec3234cbef87015f6e5d83f44e624',1,'row0merge.cc']]],
+  ['row_5fmerge_5ftuple_5fsort_5fctx',['row_merge_tuple_sort_ctx',['../row0merge_8cc.html#add9dd4c11b3d94994d501c14adcdcb74',1,'row0merge.cc']]],
+  ['row_5fmerge_5fwrite_5fget_5fnext',['ROW_MERGE_WRITE_GET_NEXT',['../row0merge_8cc.html#aee5fc7c310bde7aaaabcfc2f710a5703',1,'row0merge.cc']]],
+  ['row_5fsel_5ffield_5fstore_5fin_5fmysql_5fformat',['row_sel_field_store_in_mysql_format',['../row0sel_8cc.html#add9dbb30dac5d479cf56da67ac8b51f0',1,'row0sel.cc']]],
+  ['row_5fsel_5fstore_5fmysql_5ffield',['row_sel_store_mysql_field',['../row0sel_8cc.html#a99c84cc74addd917a2ce4fa1b75efe19',1,'row0sel.cc']]],
+  ['rowid_5fcompare_5fcost',['ROWID_COMPARE_COST',['../sql__const_8h.html#a33dfbba54a46693e1510b02f9f6d1273',1,'sql_const.h']]]
+];

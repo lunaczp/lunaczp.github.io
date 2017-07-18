@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['xdes',['xdes',['../class_abstract_callback.html#aa43e9597d24f56ea30a153e6651c4f3d',1,'AbstractCallback']]],
+  ['xdes_5fcalc_5fdescriptor_5findex',['xdes_calc_descriptor_index',['../fsp0fsp_8h.html#a93b1d32d3a54b9468dd41327417250f5',1,'fsp0fsp.h']]],
+  ['xdes_5fcalc_5fdescriptor_5fpage',['xdes_calc_descriptor_page',['../fsp0fsp_8h.html#a2d6ac50b9eb3713adb7982e1e9cbbab7',1,'fsp0fsp.h']]],
+  ['xdes_5ffind_5fbit',['xdes_find_bit',['../fsp0fsp_8cc.html#a16b7f2822e3e23466374ae486ad6dedd',1,'fsp0fsp.cc']]],
+  ['xdes_5fget_5fbit',['xdes_get_bit',['../fsp0fsp_8h.html#a20764a847678855a6dd88f45b8d88e17',1,'fsp0fsp.h']]],
+  ['xdes_5fget_5fn_5fused',['xdes_get_n_used',['../fsp0fsp_8cc.html#a64f29d492039ab6bd9fa3408b9a20056',1,'fsp0fsp.cc']]],
+  ['xdes_5fget_5foffset',['xdes_get_offset',['../fsp0fsp_8cc.html#aab3c246e8f86d3d784f92538c711916c',1,'fsp0fsp.cc']]],
+  ['xdes_5fget_5fstate',['xdes_get_state',['../fsp0fsp_8cc.html#a3112b68a6aecde76e8f42405152ee673',1,'fsp0fsp.cc']]],
+  ['xdes_5finit',['xdes_init',['../fsp0fsp_8cc.html#a9a25848103da9d0354b7558bb48a6aa4',1,'fsp0fsp.cc']]],
+  ['xdes_5fis_5ffree',['xdes_is_free',['../fsp0fsp_8cc.html#a09a40c104599a3b433dacf02c8442a90',1,'fsp0fsp.cc']]],
+  ['xdes_5fis_5ffull',['xdes_is_full',['../fsp0fsp_8cc.html#a45b1c61387c588e9feb7c812efb47a1c',1,'fsp0fsp.cc']]],
+  ['xdes_5flst_5fget_5fdescriptor',['xdes_lst_get_descriptor',['../fsp0fsp_8cc.html#a0a2aa6c65a4cee4302c5c5dca0a8920a',1,'fsp0fsp.cc']]],
+  ['xdes_5fmtr_5fget_5fbit',['xdes_mtr_get_bit',['../fsp0fsp_8cc.html#ac74ac9cf95883ec1d5d06d2841c312e7',1,'fsp0fsp.cc']]],
+  ['xdes_5fset_5fbit',['xdes_set_bit',['../fsp0fsp_8cc.html#ae9ad7c8974c00d5f7e30842a82dd7039',1,'fsp0fsp.cc']]],
+  ['xdes_5fset_5fstate',['xdes_set_state',['../fsp0fsp_8cc.html#af785ee4585efa65188a829af006ebade',1,'fsp0fsp.cc']]],
+  ['xid_5flog_5fevent',['Xid_log_event',['../class_xid__log__event.html#a10952002c0492d7a075e4458e8dd3abc',1,'Xid_log_event']]],
+  ['xid_5fto_5fstr',['xid_to_str',['../handler_8cc.html#a8a4064ce527ce80a30b230ca7d52af14',1,'handler.cc']]]
+];
