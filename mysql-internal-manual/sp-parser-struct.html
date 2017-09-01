@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 15.4.1 Parser Structure</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="sp-parser.html" title="15.4 Stored Program Parser"/><link rel="next" href="sp-parser-codegen.html?ff=nopfpls" title="15.4.2 Single-Pass Code Generation"/><link rel="up" href="sp-parser.html" title="15.4 Stored Program Parser"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fsp-parser-struct.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="stored-programs.html">15 Stored Programs</a> :: <a href="sp-parser.html">15.4 Stored Program Parser</a> :: 15.4.1 Parser Structure</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="sp-parser.html" title="Previous Section">&laquo; 15.4 Stored Program Parser</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="sp-parser-codegen.html" title="Next Section">15.4.2 Single-Pass Code Generation  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="sp-parser.html">15.4 Stored Program Parser</a></li><li class="self">15.4.1 Parser Structure</li>
+<li><a href="sp-parser-codegen.html">15.4.2 Single-Pass Code Generation</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="sp-parser-struct"></a>15.4.1 Parser Structure</h3>
+</div>
+</div>
+</div>
+<p>
+        Conceptually, there are many different layers involved during
+        parsing:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Lexical analysis (making words or tokens from a character
+            stream),
+          </p></li><li class="listitem"><p>
+            Syntactic analysis (making "sentences" or an abstract syntax
+            tree from the tokens),
+          </p></li><li class="listitem"><p>
+            Semantic analysis (making sure these sentences do make
+            sense),
+          </p></li><li class="listitem"><p>
+            Code generation (for compilers) or evaluation (for
+            interpreters).
+</p></li></ul>
+</div>
+<p>
+        From the implementation point or view, many different concepts
+        from different layers actually collide in the same code base, so
+        that the actual code organization is as follows:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            The lexical analysis is implemented in
+            <code class="filename">sql/sql_lex.cc</code>, as when parsing regular
+            statements.
+          </p></li><li class="listitem"><p>
+            Syntactic analysis, semantic analysis, and code generation
+            -- <span class="emphasis"><em>all of them</em></span> -- are done at
+            <span class="emphasis"><em>once</em></span>, during parsing of the code. From
+            that perspective, the parser behaves as a single pass
+            compiler. In other words, both the code and the symbol table
+            for the final result are generated on the fly, interleaved
+            with syntactic analysis.
+</p></li></ul>
+</div>
+<p>
+        This is both very efficient from a performance point of view,
+        but difficult to understand, from a maintenance point of view.
+      </p><p>
+        Let's illustrate for example how the following SQL statement is
+        parsed:
+      </p><pre class="programlisting">
+ DECLARE my_cursor CURSOR FOR SELECT col1 FROM t1; </pre><p>
+        The corresponding part of the grammar in the parser for DECLARE
+        CURSOR statements is the following (with annotated line
+        numbers):
+      </p><pre class="programlisting">
+[ 1] sp_decl:
+[ 2]   DECLARE_SYM ident CURSOR_SYM FOR_SYM sp_cursor_stmt
+[ 3]   {
+[ 4]     LEX *lex= Lex;
+[ 5]     sp_head *sp= lex-&gt;sphead;
+[ 6]     sp_pcontext *ctx= lex-&gt;spcont;
+[ 7]     uint offp;
+[ 8]     sp_instr_cpush *i;
+[ 9]
+[10]     if (ctx-&gt;find_cursor(&amp;$2, &amp;offp, TRUE))
+[11]     {
+[12]       my_error(ER_SP_DUP_CURS, MYF(0), $2.str);
+[13]       delete $5;
+[14]       MYSQL_YYABORT;
+[15]     }
+[16]     i= new sp_instr_cpush(sp-&gt;instructions(), ctx, $5,
+[17]                           ctx-&gt;current_cursor_count());
+[18]     sp-&gt;add_instr(i);
+[19]     ctx-&gt;push_cursor(&amp;$2);
+[20]     $$.vars= $$.conds= $$.hndlrs= 0;
+[21]     $$.curs= 1;
+[22]   }
+[23] ; 
+</pre><p>
+        The lines [1], [2] and [23] are bison code that express the
+        structure of the grammar. These lines belong to the syntactic
+        parsing realm.
+      </p><p>
+        The lines [3] and [22] are bison delimiters for the associated
+        action to execute, when parsing of the syntax succeeds.
+        Everything between lines [3] and [22] is C++ code, executed when
+        the parser finds a syntactically correct <code class="literal">DECLARE
+        CURSOR</code> statement.
+      </p><p>
+        The lines [4] to [8] could be considered syntactic parsing: what
+        the code does is find what is the current Stored Program being
+        parsed, find the associated part of the syntax tree under
+        construction (<code class="literal">sp_head</code>), and find the
+        associated current context in the symbol table
+        (<code class="literal">sp_pcontext</code>).
+      </p><p>
+        Note that there is some black magic here: since we are still
+        currently parsing the <span class="emphasis"><em>content</em></span> of a Stored
+        Program (the <code class="literal">DECLARE CURSOR</code> statement), the
+        final <span class="quote">“<span class="quote">syntax</span>”</span> tree for the Stored Program
+        (<code class="literal">sp_head</code>) is not supposed to exist yet. The
+        reason the <code class="literal">sp_head</code> object is already
+        available is that the actions in the <code class="literal">CREATE
+        PROCEDURE</code>, <code class="literal">CREATE FUNCTION</code>,
+        <code class="literal">CREATE TRIGGER</code>, or <code class="literal">CREATE
+        EVENT</code> are implemented as a
+        <span class="emphasis"><em>descendant</em></span> parser (it created an empty
+        <code class="literal">sp_head</code> object first, filling the content
+        later). Mixing code that way (descendant actions with ascendant
+        parsing) is extremely sensitive to changes.
+      </p><p>
+        The line [10] is a semantic check. The statement might be
+        syntactically correct (it parsed), but to be semantically
+        correct, the <span class="emphasis"><em>name</em></span> or the cursor must be
+        unique in the symbol table.
+      </p><p>
+        Line [12] is reporting a semantic error back to the client
+        (duplicate cursor). The code at line [14] forces the syntactic
+        parser (bison) to abort.
+      </p><p>
+        By line [16], we have verified that the code is syntactically
+        valid, and semantically valid: it's now time for code
+        generation, implemented by creating a new
+        <code class="literal">sp_instr_cpush</code> to represent the cursor in the
+        compiled code. Note that variable allocation is done on the fly,
+        by looking up the current cursor count in the symbol table
+        (<code class="literal">sp_pcontext::current_cursor_count()</code>).
+      </p><p>
+        Line [18] adds the generated code to the object representing the
+        stored program (code generation).
+      </p><p>
+        Line [19] maintains the symbol table (semantic parsing) by
+        adding the new cursor in the current local context.
+      </p><p>
+        Lines [20] and [21] return to bison a fragment of a fake syntax
+        tree, indicating that one cursor was found.
+      </p><p>
+        By looking at the complete implementation of this action in
+        bison, one should note that the target code was generated, the
+        symbol table for the Stored Program was looked up and updated,
+        while at no point in time a syntax node was even created. Note
+        that the <code class="literal">sp_instr_cpush</code> object should really
+        be considered generated code: the fact that there is a
+        one-to-one correspondence with the syntax is incidental.
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="sp-parser.html" title="15.4 Stored Program Parser">Previous</a> / <a rel="next" href="sp-parser-codegen.html" title="15.4.2 Single-Pass Code Generation">Next</a> / <a rel="up" href="sp-parser.html" title="15.4 Stored Program Parser">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="sp-parser-struct" />
+          <input type="hidden" name="return" value="/doc/internals/en/sp-parser-struct.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="sp-parser.html" title="15.4 Stored Program Parser">Previous</a> / <a rel="next" href="sp-parser-codegen.html" title="15.4.2 Single-Pass Code Generation">Next</a> / <a rel="up" href="sp-parser.html" title="15.4 Stored Program Parser">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

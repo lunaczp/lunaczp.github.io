@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 14.8 Stored Procedures</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="com-stmt-reset.html" title="14.7.8 COM_STMT_RESET"/><link rel="next" href="multi-resultset.html?ff=nopfpls" title="14.8.1 Multi-Resultset"/><link rel="up" href="client-server-protocol.html" title="14 MySQL Client/Server Protocol"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a> :: 14.8 Stored Procedures</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="com-stmt-reset.html" title="Previous Section">&laquo; 14.7.8 COM_STMT_RESET</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="multi-resultset.html" title="Next Section">14.8.1 Multi-Resultset  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a></li><li><a href="overview.html">14.1 Overview</a></li>
+<li><a href="connection-phase.html">14.2 Connection Phase</a></li>
+<li><a href="authentication-method.html">14.3 Authentication Method</a></li>
+<li><a href="compression.html">14.4 Compression</a></li>
+<li><a href="ssl.html">14.5 SSL</a></li>
+<li><a href="text-protocol.html">14.6 Text Protocol</a></li>
+<li><a href="prepared-statements.html">14.7 Prepared Statements</a></li>
+<li class="self">14.8 Stored Procedures
+<ul class="children">
+<li><a href="multi-resultset.html">14.8.1 Multi-Resultset</a></li>
+<li><a href="multi-statement.html">14.8.2 Multi-Statement</a></li>
+<li><a href="com-set-option.html">14.8.3 COM_SET_OPTION</a></li>
+<li><a href="com-stmt-fetch.html">14.8.4 COM_STMT_FETCH</a></li>
+</ul>
+</li>
+<li><a href="replication-protocol.html">14.9 Replication Protocol</a></li>
+<li><a href="row-based-replication.html">14.10 Row-Based Replication</a></li>
+<li><a href="semi-sync-replication.html">14.11 Semi-Synchronous Replication</a></li>
+<li><a href="protocol-examples.html">14.12 Protocol Examples</a></li>
+<li><a href="source-code-locations.html">14.13 Source Code Locations</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="stored-procedures"></a>14.8 Stored Procedures</h2>
+
+</div>
+
+</div>
+
+</div>
+<div class="toc">
+<p><small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-0'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-0'); return false;}">+/-</a>]</small></p>
+<dl id="tocdetail-0"><dt><span class="section"><a href="multi-resultset.html">14.8.1 Multi-Resultset</a></span></dt><dt><span class="section"><a href="multi-statement.html">14.8.2 Multi-Statement</a></span></dt><dt><span class="section"><a href="com-set-option.html">14.8.3 COM_SET_OPTION</a></span></dt><dt><span class="section"><a href="com-stmt-fetch.html">14.8.4 COM_STMT_FETCH</a></span></dt></dl>
+</div>
+<p>
+      In MySQL 5.0 the protocol was extended to handle:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <a class="link" href="multi-resultset.html" title="14.8.1 Multi-Resultset">multi-resultset</a>
+        </p></li><li class="listitem"><p>
+          <a class="link" href="multi-statement.html" title="14.8.2 Multi-Statement">multi-statement</a>
+</p></li></ul>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="com-stmt-reset.html" title="14.7.8 COM_STMT_RESET">Previous</a> / <a rel="next" href="multi-resultset.html" title="14.8.1 Multi-Resultset">Next</a> / <a rel="up" href="client-server-protocol.html" title="14 MySQL Client/Server Protocol">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><table id="c4825" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Tsoi Pui Hang on August 12 2004 5:17am</td><td align="right">[<a href="/doc/mysql/comment.php?id=4825&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=4825&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">There are too few examples about stored procedures up to now. I post a simple example here and I hope it is useful to beginners of MySQL like me :)<br /><br />create table catagory<br />(<br />catagory_id int unsigned not null auto_increment,<br />name varchar(50) not null,<br />description text,<br />primary key (catagory_id)<br /><br />) type=innodb;<br /><br />create table catagory_set<br />(<br />master_id int unsigned not null,<br />slave_id int unsigned not null,<br />index(master_id),<br />index(slave_id),<br />primary key (master_id,slave_id),<br />foreign key (master_id) references catagory (catagory_id) on delete cascade,<br />foreign key (slave_id) references catagory (catagory_id) on delete cascade<br />	 <br />) type=innodb;<br /><br />drop procedure add_catagory;<br />delimiter ?<br />create procedure add_catagory (IN param1 int, IN param2 char(50),<br />	IN param3 text, OUT cid int, OUT error_msg char(80))<br />begin<br />	declare master_id, master_exist, name_exist int;<br />	set cid = -1;<br />	set name_exist = 0, master_exist = 0;<br /><br /># Insert a subcatagory #<br />if param1 &gt; 0 then<br />	<br />	# Check if the master catagory ID is valid #	<br />	select count(catagory_id), catagory_id into master_exist, master_id<br />	  from catagory where catagory_id=param1 group by catagory_id;<br />	<br />	# Check if the same catagory name exist and the master catagory #  <br />	select count(catagory_id) into name_exist from catagory, catagory_set<br />	 where catagory.name=param2 and catagory.catagory_id=catagory_set.slave_id<br />	 and catagory_set.master_id=master_id;<br />	<br />	if master_exist &gt; 0 and name_exist = 0 then<br />		<br />		lock tables catagory write, catagory_set write;<br />		flush table catagory, catagory_set;<br />		insert into catagory values (null, param2, param3);<br />		select last_insert_id() into cid;<br />		insert into catagory_set values (param1, cid);<br />		unlock tables;<br /><br />	elseif master_exist = 0 then<br />		set error_msg = 'The master catagory ID provided does not exist';<br /><br />	elseif name_exist &gt; 0 then<br />		set error_msg = 'The catagory name already exist, please choose another name'; <br /><br />	end if;<br /># Insert a primary catagory #<br />else<br />	# Search and compare the name of all primary catagory #<br />	select count(catagory_id) into name_exist from catagory<br />	where name = param2 and not exists(<br />		select * from catagory_set<br />		where catagory_set.slave_id = catagory.catagory_id<br />		);<br />	if name_exist &gt; 0 then<br />		set error_msg = 'The catagory name already exist, please choose another name'; <br />	else<br />		insert into catagory values (null, param2, param3);<br />		select last_insert_id() into cid;<br />	end if;<br /><br />end if;<br />end	?<br />delimiter ;<br /><br />call add_catagory(1,'Planet','Earth',@cid,@error);<br />select @cid, @error;<br /><br /></p><table id="c4982" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Nathan Wallbridge on September 17 2004 6:59am</td><td align="right">[<a href="/doc/mysql/comment.php?id=4982&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=4982&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">Here is some code I used to geocode a dataset based on the NG Field and parcel number (UK Ordinance survey) Useful if you are working with GIS data.<br /><br />I have cut out some of the case statement as it is very repetitive and you can easily look it up, mainly this example show how you can manipulate data then use your result to update existing tables.<br /><br />delimiter //<br /><br />CREATE PROCEDURE GEOCODE03()<br />BEGIN<br />DECLARE X_digit_one CHAR(1);<br />DECLARE Y_digit_one CHAR(1);<br />DECLARE INTOSSHEET INT;<br />DECLARE INTNGFIELD INT;<br />DECLARE strOSSHEET CHAR(50);<br />DECLARE strNGFIELD CHAR(50);<br />DECLARE lngGeoLoop INT;<br />DECLARE lngXINT INT;<br />DECLARE lngYINT INT;<br />DECLARE INTCOUNT INT;<br />DECLARE INTNUMROWS INT;<br />DECLARE intMIKEY INT;<br />DECLARE STRXINT CHAR(50);<br />DECLARE STRYINT CHAR(50);<br />DECLARE FIRSTDIG CHAR(2);<br />DECLARE GeoCodeCUR CURSOR FOR SELECT lpaSheetReference,lpaFieldNumber,UID FROM MIXCheckDB.IACS2003GIS;<br />OPEN GeoCodeCUR;<br />SELECT COUNT(*) INTO INTNUMROWS FROM MIXCheckDB.IACS2003GIS;<br />SET INTCOUNT = INTNUMROWS;<br />WHILE INTCOUNT &gt; 0 DO<br />FETCH GeoCodeCUR INTO strOSSHEET,strNGFIELD,intMIKEY;<br />SET FIRSTDIG = LEFT(strOSSHEET,2);<br />CASE FIRSTDIG<br />        WHEN &quot;SR&quot; THEN<br />            SET X_digit_one = &quot;1&quot;;<br />            SET Y_digit_one = &quot;1&quot;;<br />        WHEN &quot;SM&quot; THEN<br />	    SET X_digit_one = &quot;1&quot;;<br />            SET Y_digit_one = &quot;2&quot;;<br />        WHEN &quot;SS&quot; THEN<br />            SET X_digit_one = &quot;2&quot;;<br />            SET Y_digit_one = &quot;1&quot;;<br />        WHEN &quot;SN&quot; THEN<br />            SET X_digit_one = &quot;2&quot;;<br />            SET Y_digit_one = &quot;2&quot;;<br />....(Lots more of the case statement here)...<br />        ELSE<br />            SET X_digit_one = &quot;0&quot;;<br />            SET Y_digit_one = &quot;0&quot;;<br />END CASE;<br />SET STRXINT = CONCAT(X_digit_one, MID(strOSSHEET,3,2), LEFT(strNGFIELD,2), '0');<br />SET STRYINT = CONCAT(Y_digit_one, RIGHT(strOSSHEET,2), RIGHT(strNGFIELD,2),'0');<br />SET lngXINT = STRXINT;<br />SET lngYINT = STRYINT;<br />UPDATE MIXCheckDB.IACS2003GIS SET xcoord = lngXINT, ycoord = lngYINT WHERE MIXCheckDB.IACS2003GIS.UID = intMIKEY;<br />SET INTCOUNT = INTCOUNT - 1;<br />END WHILE;<br />CLOSE GeoCodeCUR;<br />END<br /></p><table id="c6758" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Mike Heath on October 26 2005 10:31pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=6758&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=6758&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">MySQL as of version 5.0.15 does not support recursive stored procedures.  This is contrary to the 'hierarchy2' example found here <a href="http://dev.mysql.com/tech-resources/articles/mysql-storedprocedures.pdf">http://dev.mysql.com/tech-resources/articles/mysql-storedprocedures.pdf</a><br /><br /></p><table id="c8175" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Graham Jordan on November 16 2006 1:17pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=8175&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=8175&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">HERE IT IS:<br />For all of you getting &quot;can't return a result set in the given context&quot; errors when using PHP to execute stored procedures,<br />the mysql_connect flag is: <br /><br />mysql_connect( host, databaseuser,password,TRUE, 131074)<br /><br />Worked with mysql 5.0.20 and PHP 5.1.4<br />Also, stored procedures seem to close the connection when they've finished running in PHP. <br />Can be fixed using mysql_ping( db_resource_id ) to reinstate lost connections<br /><br /></p><table id="c8816" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Christian Kurmann on August 14 2007 2:54pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=8816&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=8816&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">Thanks for the great comments and example of the people posting here. As my predecessor has already noted, this seems to be the best place for information about MySQL SPs by far.<br /><br />I would also like to join the spirit and add an example of how to create an MySQL Stored Procedure Insert command for use by a vb.net dataadaptor which can use the parameter output value of the auto incremented Primary key to update the underlying dataset. (This is a Standard procedure for using datasets and dataadapters with cached Data inserts.)<br /><br />First I would like to point out a few tripwires along the way.<br />The MS-SQL SCOPE_IDENTITY() and the @@IDENTITY do not work in MySQL. There is also a MySQL_Insert_ID command which also can not be used in Stored procedures<br />You have to use LAST_INSERT_ID();<br /><br />The usual @Parametername denomination using a @ to define a paramter which is standard in .net, can not be used as the @ is not recognised by MySQL as procedure parameter. Use ? instead! However use the ? only in the .net parameter declaration and leave it away when defining the stored procedure in MySQL. Also beware not to use a valid field name as parameter name as this will result in false values.<br /><br />Now to get on to the example:<br />I want to create a vb.net dataadapter (following an example from the excellent ADO book PRO ADO.NET 2.0 by Sahil Malik for APRESS) to insert new values in a dataset table into a MySQL table and at the same time retrieve the auto created Primary keys and update the dataset table with these accordingly.<br /><br />The Following table was used:<br />--------------------------------------------<br />DROP TABLE IF EXISTS `test`.`animals`;<br />CREATE TABLE  `test`.`animals` (<br />  `AnimalID` int(10) unsigned NOT NULL auto_increment,<br />  `AnimalType` varchar(45) NOT NULL,<br />  `TimeStamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,<br />  PRIMARY KEY  (`AnimalID`)<br />) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;<br />--------------------------------------------<br /><br />Create the Following Procedure:<br />--------------------------------------------<br />DELIMITER $$<br /><br />DROP PROCEDURE IF EXISTS `test`.`UP_ANIMALSINSERT`$$<br />CREATE DEFINER=`root`@`localhost` PROCEDURE  `test`.`UP_ANIMALSINSERT`(OUT _AnimalID INT,_AnimalType VARCHAR(45))<br />BEGIN<br />INSERT INTO animals<br />(AnimalType)<br />VALUES<br />(_AnimalType);<br />SET _AnimalID=LAST_INSERT_ID();<br />END $$<br /><br />DELIMITER ;<br />------------------------------------------<br />Please note that some examples create stored procedures with SELECT LAST_INSERT_ID() INTO _NewID;<br />While this should also return the correct new value, this can not be used for the dataadapter example as this expects the value as a parameter.<br /><br />Here the VB.Net Code to use the Stored Procedure:<br />------------------------------------------<br />Public Shared Sub SaveData()<br />    'Create new MySQL Connection with connectionstring from Application Settings<br />    Using con As New MySqlConnection(My.Settings.testConnectionString)<br />      Dim myDA As MySqlDataAdapter<br />      con.Open()<br />      'Begin Transaction<br />      Dim myTrans As MySqlTransaction = con.BeginTransaction<br />      Dim myparam As MySqlParameter<br /><br />      'Create New Insertcommand with Paramters to this table. Please note the Paramterdirection and the &quot;?_&quot; used to name the paramters<br />      'Animals<br />      Dim myInsertAnimals As MySqlCommand = New MySqlCommand<br />      myInsertAnimals.Connection = con<br />      myInsertAnimals = New MySqlCommand(&quot;UP_ANIMALSINSERT&quot;)<br />      myInsertAnimals.CommandType = CommandType.StoredProcedure<br /><br />      myparam = New MySqlParameter(&quot;?_AnimalID&quot;, MySqlDbType.Int32, 5, &quot;AnimalID&quot;)<br />      myparam.Direction = ParameterDirection.Output<br />      myInsertAnimals.Parameters.Add(myparam)<br /><br />      myparam = New MySqlParameter(&quot;?_AnimalType&quot;, MySqlDbType.VarChar, 45, &quot;AnimalType&quot;)<br />      myparam.Direction = ParameterDirection.Input<br />      myInsertAnimals.Parameters.Add(myparam)<br /><br />      myInsertAnimals.Transaction = myTrans<br /><br />      Try<br />        'Create new Dataadapter with select do define correct table.<br />        myDA = New MySqlDataAdapter(&quot;Select * from Animals&quot;, con)<br />        myDA.InsertCommand = myInsertAnimals<br />        myDA.InsertCommand.Connection = con<br />        'Insert the Data by calling Update and supplying only the new (Added) records in the datatable<br />        myDA.Update(ds.animals.Select(&quot;&quot;, &quot;&quot;, DataViewRowState.Added))<br /><br />        myTrans.Commit()<br />      Catch ex As Exception<br />        myTrans.Rollback()<br />      Finally<br />        con.Close()<br />      End Try<br />    End Using<br />  End Sub<br />------------------------------------------<br />Please note that using the transaction is not required in this example but when using this sort of update for hierarchical data where the ident field of added records in the cached dataset are used as foreign key in a second table.<br /><br />Hope this helps someone, as I have just spent a day trying this stuff out.<br /></p><table id="c8829" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Geoffrey Hoffman on August 21 2007 4:39am</td><td align="right">[<a href="/doc/mysql/comment.php?id=8829&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=8829&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">In trying to learn Stored Procedures, I discovered that you can use variables easily in the WHERE clause but it's more tricky to use them in LIMIT clause. If you want to use variables in the LIMIT clause (for dynamic pagination, for example) you have to use PREPARE statement, EXECUTE statement, and DEALLOCATE PREPARE statement within the SP.<br /><br />For example, this works fine:<br /><br />DELIMITER //<br />DROP PROCEDURE IF EXISTS DATA.GETCATEGORYFORPARENTID //<br />CREATE PROCEDURE DATA.GETCATEGORYFORPARENTID ( IN _parentId INT(3) UNSIGNED ) <br />BEGIN<br />   SELECT * FROM category WHERE parent_id = _parentId ;<br />END;<br />//<br /><br />But, if you want to pass in the LIMIT values _start and _limit you have to do:<br /><br />DROP PROCEDURE IF EXISTS DATA.GETCATEGORY//<br />CREATE PROCEDURE DATA.GETCATEGORY(_start INT(2), _limit INT(2))<br />BEGIN<br /> SET @_start = _start, @_limit = _limit;<br /> PREPARE stmt FROM 'SELECT * FROM category WHERE parent_id = 0 ORDER BY ord ASC LIMIT ?, ?';<br /> EXECUTE stmt USING @_start, @_limit;<br /> DEALLOCATE PREPARE stmt;<br />END;<br />//<br /><br />(Thanks to William C on the SP forum for the tip.)<br /><br />If you try to do...<br /><br />SELECT * FROM category WHERE parent_id = 0 LIMIT _start, _limit<br /><br />...mysql5 generates an error. <br /><br />The documentation for SELECT Syntax states &quot;LIMIT takes one or two numeric arguments, which must both be non-negative integer constants (except when using prepared statements)&quot; but it's not obvious when using variables inside a SP.<br /></p><table id="c8958" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Chris Shattock on October 6 2007 6:46pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=8958&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=8958&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">Coming from an MSSQL background from 1995 and prior to that DB2 and SQL/DS I only use MySQL now becuase of SP's and Functions in &gt;= 5. However, the &quot;can't return a result set...&quot; issue really &quot;bugs&quot; me - it is almost as if the stored, optimised procedure cannot tell the parser what the nature of the expected output is! I find that for scalar procedures and singletons this makes their use tiresome - and dynamic SQL within a &quot;high-performance&quot; procedure is unacceptable.<br /><br />Notwithstanding - I find functions in MySQL useful and better than MSSQL. For example, having given up on returning a boolean after checking the existence of an email address in a table column via a &quot;scalar&quot; SP I tried a function and was pleasantly surprised that the following worked (which in MSSQL it won't):<br /><br />Create Function fn_UserEmailExists (<br />   _Email VarChar(255)<br />  )<br />  Returns Boolean<br />  Begin<br />    Declare _Exists Boolean Default If(Exists(Select `id` From `table` Where `column` = _Email), true, false);<br />    Return _Exists;<br />  End;<br /><br />Invocation is then simply via;<br /><br />Select fn_UserEmailExists('user@domain.com');<br /><br />I like this in MySQL and will have to revise my (historical)  prediliction for scalar stored procedures.<br /></p><table id="c8996" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Steve Morgan on October 22 2007 9:10pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=8996&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=8996&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">After an hour of pondering, I have finally clocked why my php code was failing to return records via my newly created stored procedure - user did not have access to execute stored procs.  <br /><br />Look up the syntax to add privileges.  <br /><br /></p><table id="c9105" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Ivan Grinkin on November 29 2007 10:56am</td><td align="right">[<a href="/doc/mysql/comment.php?id=9105&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9105&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">HELLO...<br /><br />I have some comments to split_string array-to-SP hack.<br /><br />I'm use 5.0.44-log mysql server on gentoo linux.<br /><br />When I'm trying to use split_string, I obtain this bug:<br /><br />mysql&gt; call split_string('a,b,c,d,e,f',',');<br />Query OK, 1 row affected (0.00 sec)<br /><br />mysql&gt; select * from SplitValues limit 50;<br /><pre>+-------+<br />| value |<br />+-------+<br />| a     |<br />|   c   |<br />| d     |<br />| e     |<br />| f     |<br />+-------+<br /></pre>5 rows in set (0.00 sec)<br /><br />So, 'b' character can't splitted, and c character was insert to table with spaces.<br /><br />When I was test with many characters words - SP works properly.<br /><br />For fix this bug I do this:<br /><br />SET remainder = SUBSTRING(input,1,CHAR_LENGTH(input));<br /><br />instead<br /><br />SET remainder = input;<br /><br />Any comments?<br /><br />wbr, Ivan<br /><br /></p><table id="c9217" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Christopher Hallam on January 18 2008 2:55am</td><td align="right">[<a href="/doc/mysql/comment.php?id=9217&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9217&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">I am rather new to development and databases.<br />My only comment is that it seems quite amazing that MySQL has only recently implemented SPROCS, Functions, etc into their databases. But one thing I am learning very rapidly is that if you can master how to effectively create and use Sprocs and Functions, you can eliminate a lot of painful front-end application code. This, of course, is relative to the workflow you expect the server to receive and be able to handle. In large user environments (the web for example) it would potentially detract from performance to rely too heavily on server side routines in this manner.  But for personal, or small scale intranet environments, this seems ideal.<br /></p><table id="c9333" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Matus Ivanecky on April 6 2008 8:57am</td><td align="right">[<a href="/doc/mysql/comment.php?id=9333&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9333&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">Here is example of STORED procedure for pagination traversal of recordset for specified SQL Query:<br /><br />[* Please post optimisation hints if you can find some]<br /><br />CREATE DEFINER = CURRENT_USER <br />PROCEDURE example.executeSQLwithScrolling(<br />              IN    sqlQuery TEXT,    -- sql query for execution<br />              INOUT pageSize INT,     -- from: 0 - m<br />              INOUT pagePosition INT, -- from: 1 - n<br />              OUT   recordsCount INT, -- total records count for specified query <br />              OUT   pagesCount INT    -- total pages count for specified query<br />)<br />BEGIN<br /><br /> set @recCount    = 0;<br /> set @pageSizeDef = 25;<br /><br /> set pageSize     = ifnull(pageSize,@pageSizeDef);<br /> set pagePosition = ifnull(pagePosition,0);<br /><br /> if( pageSize &lt;= 0 ) then<br />    set pageSize = @pageSizeDef;<br /> end if;<br /><br /> if( pagePosition &lt;= 0 ) then<br />    set pagePosition = 0;<br /> else <br />    set pagePosition = pagePosition - 1;<br /> end if;<br /><br /> <br /> set @sqlFromPart = substring( sqlQuery , locate('from',sqlQuery));   <br /> set @sqlTemp     = concat('select count(*) into @recCount ',  @sqlFromPart);<br /> <br /> prepare stfm1 from @sqlTemp;<br /> execute stfm1;<br /> deallocate PREPARE stfm1;<br /><br /> set recordsCount =  @recCount;<br /> set pagesCount   =  @recCount DIV pageSize;<br /> if (@recCount%pageSize &gt; 0) then<br />   set pagesCount   = pagesCount + 1;<br /> end if;<br /><br /> set @startPos    =  pageSize * (pageposition -1);<br /> set @pageSize    =  pageSize;<br /> <br /> set @sqlTemp = concat(sqlQuery, ' LIMIT ?,?' );<br /> prepare stfm1 from @sqlTemp;<br /> execute stfm1 using @startPos, @pageSize  ;<br /><br /> deallocate PREPARE stfm1;<br /><br />END<br /></p><table id="c9438" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Nigel Croft on July 31 2008 12:35pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=9438&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9438&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">This takes a standard URL and splits it down into it's component parts (scheme, host, path (including filename), and query string). Any port number present is discarded.<br /><br />mysql&gt; delimiter ;;<br />mysql&gt; create procedure uri(in url VARCHAR(512))<br />    -&gt; BEGIN<br />    -&gt;   SELECT substring(url,1,locate('://',url)-1) AS scheme,<br />    -&gt;          substring_index(substring_index(substring_index(url,'://',-1),'/', 1),':',1) AS host,<br />    -&gt;          substring_index(substring(substring_index(url,'://',-1),locate('/',substring_index(url,'://',-1))),'?',1) AS path,<br />    -&gt;          substring(substring(url,locate('?',url)),2) AS query;<br />    -&gt; END;;<br />Query OK, 0 rows affected (1.09 sec)<br /><br />mysql&gt; delimiter ;<br />mysql&gt; CALL uri('<a href="http://www.chocolate-now.co.uk">http://www.chocolate-now.co.uk</a> ');<br /><pre>+--------+-------------------------+------+-------+<br />| scheme | host                    | path | query |<br />+--------+-------------------------+------+-------+<br />| http   | www.chocolate-now.co.uk |      |       |<br />+--------+-------------------------+------+-------+<br /></pre>1 row in set (0.56 sec)<br /><br />Query OK, 0 rows affected (0.56 sec)<br /><br />mysql&gt; CALL uri('<a href="http://www.chocolate-now.co.uk/chocolate_delivery">http://www.chocolate-now.co.uk/chocolate_delivery</a> ');<br /><pre>+--------+-------------------------+---------------------+-------+<br />| scheme | host                    | path                | query |<br />+--------+-------------------------+---------------------+-------+<br />| http   | www.chocolate-now.co.uk | /chocolate_delivery |       |<br />+--------+-------------------------+---------------------+-------+<br /></pre>1 row in set (0.07 sec)<br /><br />Query OK, 0 rows affected (0.15 sec)<br /><br />mysql&gt; CALL uri('<a href="http://www.chocolate-now.co.uk/cgi-bin/shop-cart/ShopCart.pl?mainframe=view_main">http://www.chocolate-now.co.uk/cgi-bin/shop-cart/ShopCart.pl?mainframe=view_main</a> ');<br /><pre>+--------+-------------------------+--------------------------------+---------------------+<br />| scheme | host                    | path                           | query               |<br />+--------+-------------------------+--------------------------------+---------------------+<br />| http   | www.chocolate-now.co.uk | /cgi-bin/shop-cart/ShopCart.pl | mainframe=view_main |<br />+--------+-------------------------+--------------------------------+---------------------+<br /></pre>1 row in set (0.04 sec)<br /><br />Query OK, 0 rows affected (0.04 sec)<br /><br />mysql&gt;<br /></p><table id="c9639" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Michael Jenkinson on July 31 2008 9:51pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=9639&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9639&amp;return=%2Fdoc%2Finternals%2Fen%2Fstored-procedures.html">Edit</a>]</td></tr></table><p class="commenttext">Hi<br /><br />sp = stored procedure<br />mis = query (management information system)<br /><br />At this moment I haven't got to stored procs in mysql but I do have lots of experience in Oracle and SQL server. even some in msaccess.<br /><br />1. use sp to stop direct access to all tables, in oracle this does help speed up database transactions because the sp is precompiled. a stored proc should be devised for every table definition for select, update and delete.<br /><br />I would also advise creating a class in your programming language too using private variables for each field.<br /><br />eg<br /><br />table atable fields a, b, c<br /><br />sp selectfromatable (filter)<br /> select a,b,c from atable where filter<br />end sp<br /><br />sp updatetoatable(filter, fieldvaluea, ....)<br /> <br />sp insertintotoatable(filter, fieldvaluea, ....)<br /><br />sp deletefromatable(filter)<br /><br />class atableclass<br />{<br />private;<br />  var m_a<br />  var m_b<br />  var m_c<br />public:<br />  bool connecttotable(){m_a=a m_b-b...<br /><br />  void seta()<br />  void setb()<br />  void setc()<br /><br />  var geta()<br />  var getb()<br />  var getc()<br /><br />  bool update()<br />  bool insert()<br />  bool delete()<br /><br />  bool update(v_a, v_b, v_c)<br />  bool insert(v_a, v_b, v_c)<br />  bool delete(v_a, v_b, v_c)<br /><br />  bool select()<br /><br />.....<br /><br />I could go on. What this allows is the choice of server side or client side processing or a mix of both while still preserving the integrity of the underlying database.<br /><br />you can either add more queries into the dbms or query the received dataset if it is quite small, or some combination of both.<br /><br />2. try wherever possible when there are regular change transactions like update and delete to move the MIS into a separate database fed by triggers say overnight from the transaction database.<br /><br />static databases dont necessarily need this but if the databases are big then it would still be a good idea.<br /><br />3. clients will pretty much always understate their requirements regarding reporting. that is until  they realise just how much they can have. try to ensure that they get summaries unless actual transaction data is the only thing that fills their need. lots of reporting can bring a dbms to its knees if not organised properly.<br /><br />4. data should only ever move if it absolutely has to, by this i mean reduce the network traffic to a minimum, try and avoid an automatic transfer of data at program startup especially, if 250 people start it at 9am then thats 250 big datasets crossing then network.<br /><br />the above are just a few ideas that may help some off you. I am not an expert but have done this before and if my experience is of use then please do ask. <br /><br />you can ask here or email me on mikejenkinson@yahoo.com<br /><br />thanks for your time<br /><br />michael<br /><br /></p><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="stored-procedures" />
+          <input type="hidden" name="return" value="/doc/internals/en/stored-procedures.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="com-stmt-reset.html" title="14.7.8 COM_STMT_RESET">Previous</a> / <a rel="next" href="multi-resultset.html" title="14.8.1 Multi-Resultset">Next</a> / <a rel="up" href="client-server-protocol.html" title="14 MySQL Client/Server Protocol">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

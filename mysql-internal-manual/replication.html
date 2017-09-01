@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 18 Replication</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="procedure-calltrace.html" title="17.5.2 PROCEDURE CALLTRACE(): Simple Trace of Procedure Member Function Calls"/><link rel="next" href="replication-organization.html?ff=nopfpls" title="18.1 Chapter Organization"/><link rel="up" href="index.html" title="MySQL Internals Manual"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Freplication.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.7/en/replication.html" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.6/en/replication.html" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.5/en/replication.html" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.1/en/replication.html" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.0/en/replication.html" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/4.1/en/replication.html" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: 18 Replication</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="procedure-calltrace.html" title="Previous Section">&laquo; 17.5.2 PROCEDURE CALLTRACE(): Simple Trace of Procedure Member Function Calls</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="replication-organization.html" title="Next Section">18.1 Chapter Organization  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li><a href="preface.html"> Preface and Legal Notice</a></li>
+<li><a href="guided-tour.html">1 A Guided Tour Of The MySQL Source Code</a></li>
+<li><a href="coding-guidelines.html">2 Coding Guidelines</a></li>
+<li><a href="reusable-classes-and-templates.html">3 Reusable Classes and Templates</a></li>
+<li><a href="cmake.html">4 Building MySQL Server with CMake</a></li>
+<li><a href="plugins.html">5 Plugins</a></li>
+<li><a href="transaction-management.html">6 Transaction Handling in the Server</a></li>
+<li><a href="optimizer.html">7 The Optimizer</a></li>
+<li><a href="optimizer-tracing.html">8 Tracing the Optimizer</a></li>
+<li><a href="memory-allocation.html">9 Memory Allocation</a></li>
+<li><a href="algorithms.html">10 Important Algorithms and Structures</a></li>
+<li><a href="fileformats.html">11 File Formats</a></li>
+<li><a href="selects.html">12 How MySQL Performs Different Selects</a></li>
+<li><a href="transformations.html">13 How MySQL Transforms Subqueries</a></li>
+<li><a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a></li>
+<li><a href="stored-programs.html">15 Stored Programs</a></li>
+<li><a href="prepared-stored.html">16 Prepared Statement and Stored Routine Re-Execution</a></li>
+<li><a href="result-postprocessing-procedures.html">17 Writing a Procedure</a></li>
+<li class="self">18 Replication
+<ul class="children">
+<li><a href="replication-organization.html">18.1 Chapter Organization</a></li>
+<li><a href="replication-source-code-files.html">18.2 Source Code Files</a></li>
+<li><a href="replication-principles.html">18.3 Principles</a></li>
+<li><a href="replication-rules.html">18.4 Rules</a></li>
+</ul>
+</li>
+<li><a href="binary-log.html">19 The Binary Log</a></li>
+<li><a href="myisam.html">20 MyISAM Storage Engine</a></li>
+<li><a href="innodb.html">21 InnoDB Storage Engine</a></li>
+<li><a href="custom-engine.html">22 Writing a Custom Storage Engine</a></li>
+<li><a href="test-synchronization.html">23 Test Synchronization</a></li>
+<li><a href="test-faults.html">24 Injecting Test Faults</a></li>
+<li><a href="good-tests.html">25 How to Create Good Test Cases</a></li>
+<li><a href="error-messages.html">26 Error Messages</a></li>
+<li><a href="files-in-mysql-sources.html">A MySQL Source Code Distribution</a></li>
+<li><a href="files-in-innodb-sources.html">B InnoDB Source Code Distribution</a></li>
+<li><a href="ix01.html"> Index</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="chapter">
+<div class="titlepage">
+<div>
+<div>
+<h1 class="title"><a name="replication"></a>Chapter 18 Replication</h1>
+
+</div>
+
+</div>
+
+</div>
+<div class="toc">
+<p><b>Table of Contents</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-1'); toggle('tocdetail-2'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-1'); toggle('tocdetail-2'); return false; } ">+/-</a>]</small></p><dl id="tocdetail"><dt><span class="section"><a href="replication-organization.html">18.1 Chapter Organization</a></span></dt><dt><span class="section"><a href="replication-source-code-files.html">18.2 Source Code Files</a></span></dt><dt><span class="section"><a href="replication-principles.html">18.3 Principles</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-1'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-1'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-1"><dl><dt><span class="section"><a href="binlog-formats.html">18.3.1 Binlog Formats</a></span></dt><dt><span class="section"><a href="differences-master-slave.html">18.3.2 Differences Between Master and Slave</a></span></dt><dt><span class="section"><a href="replication-crashes.html">18.3.3 Crashes</a></span></dt><dt><span class="section"><a href="binlog-files-and-indexes.html">18.3.4 Binlog Files and Indexes</a></span></dt></dl></dd><dt><span class="section"><a href="replication-rules.html">18.4 Rules</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-2'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-2'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-2"><dl><dt><span class="section"><a href="determining-logging-format.html">18.4.1 Determining the Logging Format</a></span></dt><dt><span class="section"><a href="unsafe-statements.html">18.4.2 Unsafe Statements</a></span></dt><dt><span class="section"><a href="logging-transactions.html">18.4.3 Logging Transactions</a></span></dt><dt><span class="section"><a href="logging-updates-auto-incement-columns.html">18.4.4 Logging Updates to auto_increment Columns</a></span></dt><dt><span class="section"><a href="logging-access-variables-functions.html">18.4.5 Logging Access to Variables and Functions</a></span></dt><dt><span class="section"><a href="other-unsafe-statements.html">18.4.6 Other Unsafe Statements</a></span></dt><dt><span class="section"><a href="binlog-row-image.html">18.4.7 binlog_row_image</a></span></dt><dt><span class="section"><a href="replication-locks.html">18.4.8 Replication Locks</a></span></dt></dl></dd></dl>
+</div>
+<p>
+    <span class="emphasis"><em>Status of this section: up to date 2009-10-21</em></span>
+  </p><p>
+    This chapter describes MySQL replication principles, rules, and
+    code, as it is supposed to work in version 5.1.
+  </p><p>
+    The MySQL replication feature allows a server - the
+    <span class="bold"><strong>master</strong></span> - to send all changes to
+    another server - the <span class="bold"><strong>slave</strong></span> - and
+    the slave tries to apply all changes to keep up-to-date with the
+    master. Replication works as follows:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+        Whenever the master's database is modified, the change is
+        written to a file, the so-called <span class="bold"><strong>binary
+        log</strong></span>, or <span class="bold"><strong>binlog</strong></span>. This
+        is done by the client thread that executed the query that
+        modified the database.
+      </p></li><li class="listitem"><p>
+        The master has a thread, called the <span class="bold"><strong>dump
+        thread</strong></span>, that continuously reads the master's binlog
+        and sends it to the slave.
+      </p></li><li class="listitem"><p>
+        The slave has a thread, called the <span class="bold"><strong>IO
+        thread</strong></span>, that receives the binlog that the master's
+        dump thread sent, and writes it to a file: the
+        <span class="bold"><strong>relay log</strong></span>.
+      </p></li><li class="listitem"><p>
+        The slave has another thread, called the
+        <span class="bold"><strong>SQL thread</strong></span>, that continuously
+        reads the relay log and applies the changes to the slave server.
+</p></li></ul>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="procedure-calltrace.html" title="17.5.2 PROCEDURE CALLTRACE(): Simple Trace of Procedure Member Function Calls">Previous</a> / <a rel="next" href="replication-organization.html" title="18.1 Chapter Organization">Next</a> / <a rel="up" href="index.html" title="MySQL Internals Manual">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><table id="c616" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by [name withheld] on December 18 2002 3:27pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=616&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=616&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html">Edit</a>]</td></tr></table><p class="commenttext">Handy mysql log rotation script. For those not<br />using any chroot environements, comment out both<br />lines in #chroot section. Set MYSQL_HOME QUERYLOG<br />SLOWLOG ERRLOG appropiately.<br /><br />#!/bin/sh<br />###############################################<br /># MySQL log rotation<br /># mjaw@ipartners.pl<br />###############################################<br /><br /># chroot<br />VIRTUAL=&quot;/virtual&quot;<br />VIRTUAL_HOME=&quot;${VIRTUAL}/mysql&quot;<br /><br /># mysql<br />MYSQL_HOME=&quot;${VIRTUAL_HOME}/usr/local/mysql&quot;<br />DATADIR=&quot;${MYSQL_HOME}/var&quot;<br />LOGDIR=&quot;${MYSQL_HOME}/log&quot;<br />QUERYLOG=&quot;${LOGDIR}/querylog&quot;<br />SLOWLOG=&quot;${LOGDIR}/slowlog&quot;<br />ERRLOG=&quot;${LOGDIR}/errlog&quot;<br /><br /># most universal method for calculating<br />yesterday's date in YYYYMMDD format<br />DATE=`/usr/bin/perl -e<br />&quot;@a=localtime(time-86400);printf('%02d%02d%02d',@a[5]+1900,@a[4]+1,@a[3])&quot;`<br /><br />PID_FILE=$DATADIR/`/bin/hostname`.pid<br /><br />if ! [ -s ${PID_FILE} ]; then<br />        echo &quot; Error: pid file not found.&quot;<br />        exit 1;<br />fi<br /><br />PID=`cat $PID_FILE`<br /><br />echo -n &quot;Rotating logs: &quot;<br /><br />if [ -e ${QUERYLOG} ]; then<br />        echo -n &quot;querylog &quot;<br />        /bin/mv ${QUERYLOG} ${QUERYLOG}.${DATE}<br />fi<br />if [ -e ${SLOWLOG} ]; then<br />        echo -n &quot;slowlog &quot;<br />        /bin/mv ${SLOWLOG} ${SLOWLOG}.${DATE}<br />fi<br />if [ -e ${ERRLOG} ]; then<br />        echo -n &quot;errlog &quot;<br />        /bin/mv ${ERRLOG} ${ERRLOG}.${DATE}<br />fi<br /><br />/bin/kill -1 $PID<br />&lt;/PRE&gt;<br />Run from cron at midnight.<br /></p><table id="c4212" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by S Harper on June 19 2008 8:03am</td><td align="right">[<a href="/doc/mysql/comment.php?id=4212&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=4212&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html">Edit</a>]</td></tr></table><p class="commenttext">To answer the above question, in the current version, replication supports parallel processing for reads, but you have to be extremely careful for writes.<br /><br />There is, however, a way around the write limitations in most application situations.<br /><br />Let's say you have two websites: Each site _could_ be (and in many default situations is) hosted on its own server with its own cpu and MySQL database.<br /><br />The problems inherent in that situation are reliability (uptime), waste of system resources and lack of flexibility with system resources.<br /><br />So instead you setup both websites to run on both servers. (Details of IP level load balancing are beyond the scope of this post, but there are lots of options available.) Now, if you've limited your application appropriately, you could setup both servers to write to each other, but I personally wouldn't recommend that you accept that limitation, as it can be fraught with hidden dangers.<br /><br />Besides, in most applications, the vast majority of the load is reads, not writes.<br /><br />The language your application is written in is probably implemented with pools of database connectors to service application threads. Using that model, you would setup a pool of read threads on each server to balance their reads from their local MySQL database and the replicated one on the other server.<br /><br />For writes, you would setup your connectors on both servers to use the master MySQL database for writes, then setup a different pool of connectors for writes to use the slave database. You'll have to handle the error at your application level, but when the master is unavailable, then you switch your application to start writing to the slave instead.<br /><br />You'll need to write some explicit error handling to tell the slave it's now the master and prevent the original master from being used for reads or writes until it has become the slave in turn and refreshed itself from the slave.<br /><br />Writing a record to the database immediately after a transition from slave to master to use as a locking mechanism can help ensure that your application always knows what state the two (or more) MySQL databases are in with regards to which pool of connectors writes should be sent to.<br /><br />A cleaner solution, but much more expensive option in terms of hardware, would be to use two database servers with a hardware IP level load balancer between them and the application servers. In that case, use the same method of using different connection pools for reads and writes, but configure them to hit one IP for each, then configure the load balancer to send the read IP address to both database servers, while only sending the write IP address to one database server at a time. The other database server(s) would be configured to only have traffic sent to them for the write IP address if the original has failed.<br /><br />You could then safely chain multiple databases to each other for circular writing, but still ensure that all writes only originate in the correct sequence because unless there is a database failure, they are only performed on one database server.<br /><br />Of course, before you try any replication scheme, be sure to read <a href="http://dev.mysql.com/doc/refman/5.0/en/replication-howto.html">http://dev.mysql.com/doc/refman/5.0/en/replication-howto.html</a> and the rest of this section of the manual looking for gotchas!<br /></p><table id="c6072" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Achilleterzo  on May 7 2005 3:52pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=6072&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=6072&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html">Edit</a>]</td></tr></table><p class="commenttext">Im testing replication structured master to cascade of slave servers but i got sync problem if a client use a slave to insert/update data.<br />Waiting for a master-2-master replication i solved this issue by a little cron in php:<br /><br />$db = mysql_connect(&quot;master-host&quot;,&quot;master-user&quot;,&quot;master-pwd&quot;) or $db = false;<br />if ($db!=false) {<br />    mysql_close($db);<br />    $db = mysql_connect(&quot;localhost&quot;,&quot;local-user&quot;,&quot;local-pwd&quot;) or die (&quot;Could not connect to MySQL&quot;);<br />		mysql_select_db(&quot;my_database&quot;,$db);<br />		mysql_query(&quot;stop slave; DROP DATABASE my_database; load data from master; start slave;&quot;);  <br />    mysql_close($db);<br />}<br /></p><table id="c6111" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Jerome Davies on May 19 2005 10:46am</td><td align="right">[<a href="/doc/mysql/comment.php?id=6111&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=6111&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html">Edit</a>]</td></tr></table><p class="commenttext">If you are using InnoDB tables, remember that nothing is replicated until the transaction is completed, so if you need to read information to complete the transaction that is dependent upon what has been written eg the value of an auto_increment field, you need to read it from the master.<br /></p><table id="c12256" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Nick Doyle on April 10 2012 11:25pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=12256&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=12256&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html">Edit</a>]</td></tr></table><p class="commenttext">For anyone looking to add databases (not just slaves) to running replication, I wrote the following script which works pretty well:<br /><a href="http://rdkls.blogspot.com.au/2011/04/adding-new-database-to-running-mysql.html">http://rdkls.blogspot.com.au/2011/04/adding-new-database-to-running-mysql.html</a><br /><br />It's useful in a number of scenarios, but for me mainly if<br />1. Your server has many DBs, and you want to bring slave DBs online one-by-one while having replication continue to run<br />2. One database on the slave gets out of sync with the master and it is faster to recreate from backups<br /></p><table id="c12410" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Lasantha Aberathna on September 13 2012 5:48pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=12410&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=12410&amp;return=%2Fdoc%2Finternals%2Fen%2Freplication.html">Edit</a>]</td></tr></table><p class="commenttext">If you are looking for step by step explanation about replication setup. Please follow <a href="http://lasanthals.blogspot.com/2012/09/mysql-replication-server-configuration.html">http://lasanthals.blogspot.com/2012/09/mysql-replication-server-configuration.html</a><br /></p><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="replication" />
+          <input type="hidden" name="return" value="/doc/internals/en/replication.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="procedure-calltrace.html" title="17.5.2 PROCEDURE CALLTRACE(): Simple Trace of Procedure Member Function Calls">Previous</a> / <a rel="next" href="replication-organization.html" title="18.1 Chapter Organization">Next</a> / <a rel="up" href="index.html" title="MySQL Internals Manual">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

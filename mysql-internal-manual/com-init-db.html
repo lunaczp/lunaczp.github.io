@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 14.6.3 COM_INIT_DB</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="com-quit.html" title="14.6.2 COM_QUIT"/><link rel="next" href="com-query.html?ff=nopfpls" title="14.6.4 COM_QUERY"/><link rel="up" href="text-protocol.html" title="14.6 Text Protocol"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fcom-init-db.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a> :: <a href="text-protocol.html">14.6 Text Protocol</a> :: 14.6.3 COM_INIT_DB</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="com-quit.html" title="Previous Section">&laquo; 14.6.2 COM_QUIT</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="com-query.html" title="Next Section">14.6.4 COM_QUERY  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="text-protocol.html">14.6 Text Protocol</a></li><li><a href="com-sleep.html">14.6.1 COM_SLEEP</a></li>
+<li><a href="com-quit.html">14.6.2 COM_QUIT</a></li>
+<li class="self">14.6.3 COM_INIT_DB</li>
+<li><a href="com-query.html">14.6.4 COM_QUERY</a></li>
+<li><a href="com-field-list.html">14.6.5 COM_FIELD_LIST</a></li>
+<li><a href="com-create-db.html">14.6.6 COM_CREATE_DB</a></li>
+<li><a href="com-drop-db.html">14.6.7 COM_DROP_DB</a></li>
+<li><a href="com-refresh.html">14.6.8 COM_REFRESH</a></li>
+<li><a href="com-shutdown.html">14.6.9 COM_SHUTDOWN</a></li>
+<li><a href="com-statistics.html">14.6.10 COM_STATISTICS</a></li>
+<li><a href="com-process-info.html">14.6.11 COM_PROCESS_INFO</a></li>
+<li><a href="com-connect.html">14.6.12 COM_CONNECT</a></li>
+<li><a href="com-process-kill.html">14.6.13 COM_PROCESS_KILL</a></li>
+<li><a href="com-debug.html">14.6.14 COM_DEBUG</a></li>
+<li><a href="com-ping.html">14.6.15 COM_PING</a></li>
+<li><a href="com-time.html">14.6.16 COM_TIME</a></li>
+<li><a href="com-delayed-insert.html">14.6.17 COM_DELAYED_INSERT</a></li>
+<li><a href="com-change-user.html">14.6.18 COM_CHANGE_USER</a></li>
+<li><a href="com-reset-connection.html">14.6.19 COM_RESET_CONNECTION</a></li>
+<li><a href="com-daemon.html">14.6.20 COM_DAEMON</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="com-init-db"></a>14.6.3 COM_INIT_DB</h3>
+
+</div>
+
+</div>
+
+</div>
+<div class="variablelist">
+<dl class="variablelist"><dt><span class="term"><a name="packet-COM_INIT_DB"></a>
+            <code class="literal">COM_INIT_DB</code>:
+          </span></dt><dd><p>
+              change the default schema of the connection
+</p>
+<div class="variablelist">
+<dl class="variablelist"><dt><span class="term">
+                  Returns
+                </span></dt><dd><p>
+                    <a class="link" href="packet-OK_Packet.html" title="14.1.3.1 OK_Packet"><code class="literal">OK_Packet</code></a>
+                    or
+                    <a class="link" href="packet-ERR_Packet.html" title="14.1.3.2 ERR_Packet"><code class="literal">ERR_Packet</code></a>
+                  </p></dd><dt><span class="term">
+                  Payload
+                </span></dt><dd><pre class="programlisting">
+1              [02] COM_INIT_DB
+string[EOF]    schema name
+</pre></dd><dt><span class="term">
+                  Fields
+</span></dt><dd>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+                        <span class="strong"><strong>command</strong></span>
+                        (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>)
+                        -- <code class="literal">0x02</code>
+                        <code class="literal">COM_INIT_DB</code>
+                      </p></li><li class="listitem"><p>
+                        <span class="strong"><strong>schema_name</strong></span>
+                        (<a class="link" href="describing-packets.html#type-string.EOF"><span class="emphasis"><em>string.EOF</em></span></a>)
+                        -- name of the schema to change to
+</p></li></ul>
+</div>
+</dd><dt><span class="term">
+                  Example
+                </span></dt><dd><pre class="programlisting">
+05 00 00 00 02 74 65 73    74                         .....test
+</pre></dd></dl>
+</div>
+</dd></dl>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="com-quit.html" title="14.6.2 COM_QUIT">Previous</a> / <a rel="next" href="com-query.html" title="14.6.4 COM_QUERY">Next</a> / <a rel="up" href="text-protocol.html" title="14.6 Text Protocol">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="com-init-db" />
+          <input type="hidden" name="return" value="/doc/internals/en/com-init-db.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="com-quit.html" title="14.6.2 COM_QUIT">Previous</a> / <a rel="next" href="com-query.html" title="14.6.4 COM_QUERY">Next</a> / <a rel="up" href="text-protocol.html" title="14.6 Text Protocol">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

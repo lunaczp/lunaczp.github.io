@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 10.8 FLOAT and DOUBLE Data Type Representation</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="full-text-search.html" title="10.7 Full-Text Search"/><link rel="next" href="date-and-time-data-type-representation.html?ff=nopfpls" title="10.9 Date and Time Data Type Representation"/><link rel="up" href="algorithms.html" title="10 Important Algorithms and Structures"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Ffloating-point-types.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.7/en/floating-point-types.html" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.6/en/floating-point-types.html" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.5/en/floating-point-types.html" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.1/en/floating-point-types.html" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.0/en/floating-point-types.html" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/4.1/en/floating-point-types.html" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="algorithms.html">10 Important Algorithms and Structures</a> :: 10.8 FLOAT and DOUBLE Data Type Representation</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="full-text-search.html" title="Previous Section">&laquo; 10.7 Full-Text Search</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="date-and-time-data-type-representation.html" title="Next Section">10.9 Date and Time Data Type Representation  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="algorithms.html">10 Important Algorithms and Structures</a></li><li><a href="item-class.html">10.1 The Item Class</a></li>
+<li><a href="filesort.html">10.2 How MySQL Does Sorting (filesort)</a></li>
+<li><a href="bulk-insert.html">10.3 Bulk Insert</a></li>
+<li><a href="caching.html">10.4 How MySQL Does Caching</a></li>
+<li><a href="join-buffer-size.html">10.5 How MySQL Uses the Join Buffer Cache</a></li>
+<li><a href="flush-tables.html">10.6 How MySQL Handles FLUSH TABLES</a></li>
+<li><a href="full-text-search.html">10.7 Full-Text Search</a></li>
+<li class="self">10.8 FLOAT and DOUBLE Data Type Representation</li>
+<li><a href="date-and-time-data-type-representation.html">10.9 Date and Time Data Type Representation</a></li>
+<li><a href="threads.html">10.10 Threads</a></li>
+<li><a href="charsets.html">10.11 Character Sets and Collations</a></li>
+<li><a href="error-flags.html">10.12 Error Flags and Functions</a></li>
+<li><a href="mysys-functions.html">10.13 Functions in the mysys Library</a></li>
+<li><a href="bitmaps.html">10.14 Bitmaps</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="floating-point-types"></a>10.8 FLOAT and DOUBLE Data Type Representation</h2>
+
+</div>
+
+</div>
+
+</div>
+<p>
+      The MySQL Reference Manual has a discussion of floating-point
+      numbers in Section 11.2 Numeric Types, including details about the
+      storage. Let us now take up the story from where the MySQL
+      Reference Manual leaves off.
+    </p><p>
+      The following discussion concentrates on the case where no display
+      width and decimals are given. This means that
+      <code class="literal">FLOAT</code> is stored as whatever the C type
+      <code class="literal">float</code> is and <code class="literal">REAL</code> or
+      <code class="literal">DOUBLE [PRECISION]</code> is stored as whatever the C
+      type <code class="literal">double</code> is. The field length is selected by
+      the MySQL code.
+    </p><p>
+      This document was created when
+      <a class="ulink" href="http://bugs.mysql.com/4457" target="_top">http://bugs.mysql.com/4457</a> (Different results in
+      SQL-Statements for the same record) was fixed at the end of August
+      2004. Until then there was some confusion in the double-to-string
+      conversion at different places in the code.
+    </p><p>
+      The bugfix for <a class="ulink" href="http://bugs.mysql.com/4937" target="_top">http://bugs.mysql.com/4937</a>
+      (<code class="literal">INSERT + SELECT + UNION ALL + DATE to
+      VARCHAR(8)</code> conversion problem) produced a conversion
+      function which was a promising approach to the conversion
+      problems. Unfortunately it was only used for direct field
+      conversions and not for function results etc. It did not take
+      small numbers (absolute value less than 1) and negative numbers
+      into account. It did not take the limited precision of
+      <code class="literal">float</code> and <code class="literal">double</code> data types
+      into account. The bugfix was developed in two steps: The first
+      attempt looked like this (in principle):
+    </p><pre class="programlisting">
+length= sprintf(buff, "%.*g", field_length, nr);
+if (length &gt; field_length)
+  length= sprintf(buff, "%.*g", field_length-5, nr);
+</pre><p>
+      If the <code class="literal">libc</code> conversion produces too many
+      characters, the precision is reduced by the space required for the
+      scientific notation (1.234e+05). Thus the
+      <code class="literal">printf()</code> conversion is forced to switch to the
+      scientific notation, since the value would not fit otherwise. Or,
+      if it was scientific already, the precision is reduced and also
+      uses less space. I left out some important stuff around limit
+      checking just to show the idea. This simple algorithm should work
+      quite well in most cases, but has been discarded for the sake of
+      performance. The double call to the slow
+      <code class="literal">printf()</code> conversion <code class="literal">%g</code>
+      didn't seem reasonable, though it would only be used for extreme
+      values and small fields. During my explorations of the code I
+      didn't find places where <code class="literal">float</code> or
+      <code class="literal">double</code> were to be converted into small fields.
+      Remember that I talk only of conversions where field length and
+      precision are not given. In this case a sufficient field length is
+      selected at several places, except for a bug where it was selected
+      wrongly. If a field length is given, a different conversion is
+      used anyway. But since the code is quite complex, I don't claim to
+      grasp it in full, and therefore may be in error. So let us look
+      further:
+    </p><p>
+      The second attempt to fix the bug looked like this:
+    </p><pre class="programlisting">
+bool use_scientific_notation=TRUE;
+if (field_length &lt; 32 &amp;&amp; nr &gt; 1)
+{
+  double e[]={1, 1e1, 1e2, 1e4, 1e8, 1e16 }, p=1;
+  for (int i=sizeof(e), j=1&lt;&lt;i-- ; j; i--,  j&gt;&gt;=1 )
+  {
+    if (field_length &amp; j)
+      p*=e[i];
+  }
+  use_scientific_notation=(p &lt; nr);
+}
+length= sprintf(buff, "%.*g", use_scientific_notation ?
+                              field_length-5 : field_length, nr);
+</pre><p>
+      Here we evaluate if the string representation of a given number
+      fits into field_length characters. If not, we reduce the precision
+      to make it fit. Again, I left out important details. For example,
+      the evaluation is done only once per field for the sake of
+      performance. The downside here is the unconditional reduction of
+      precision for field length &gt; 31 (which doesn't really matter),
+      for negative numbers and for small numbers (absolute value less
+      than 1).
+    </p><p>
+      Both algorithms do not take the limited precision of
+      <code class="literal">float</code> and <code class="literal">double</code> values into
+      account. This could lead to conversions with ridiculous bogus
+      precision output. For example a value of 0.7 converted with
+      <code class="literal">%.30g</code> will give a lot of digits, which pretend
+      to tell about deviations from the value 0.7 and are completely
+      absurd: 0.699999988079071044921875. To understand more about the
+      <code class="literal">%g</code> conversion, I quote from a comment
+      introduced in the source at the beginning of bugfixing #4937 (this
+      comment was removed because it mainly describes, how the
+      <code class="literal">printf()</code> conversion works, but I think it's
+      valuable enough to include it here):
+    </p><pre class="programlisting">
+/*
+  Let's try to pretty print a floating point number. Here we use
+  '%-*.*g' conversion string:
+    '-' stands for right-padding with spaces, if such padding will take
+  place
+    '*' is a placeholder for the first argument, field_length, and
+  signifies minimal width of result string. If result is less than
+  field length it will be space-padded. Note, however, that we'll not
+  pass spaces to Field_string::store(const char *, ...), due to
+  strcend in the next line.
+    '.*' is a placeholder for DBL_DIG and defines maximum number of
+  significant digits in the result string. DBL_DIG is a hardware
+  specific C define for maximum number of decimal digits of a floating
+  point number, such that rounding to hardware floating point
+  representation and back to decimal will not lead to loss of
+  precision. That is: if DBL_DIG is 15, number 123456789111315 can be
+  represented as double without precision loss.  As one can judge from
+  this description, choosing DBL_DIG here is questionable, especially
+  because it introduces a system dependency.
+    'g' means that conversion will use [-]ddd.ddd (conventional) style,
+  and fall back to [-]d.ddde[+|i]ddd (scientific) style if there is not
+  enough space for all digits.
+  Maximum length of result string (not counting spaces) is (I guess)
+  DBL_DIG + 8, where 8 is 1 for sign, 1 for decimal point, 1 for
+  exponent sign, 1 for exponent, and 4 for exponent value.
+  XXX: why do we use space-padding and trim spaces in the next line?
+*/
+sprintf(to,"%-*.*g",(int) field_length,DBL_DIG,nr);
+to=strcend(to,' ');
+</pre><p>
+      There is one small misapprehension in the comment.
+      <code class="literal">%g</code> does not switch to scientific notation when
+      there is 'not enough space for all digits'. As the commentator
+      says, the field length gives the minimal output length.
+      <code class="literal">printf()</code> happily outputs more characters if
+      required to produce a result with 'precision' digits. In fact it
+      switches to scientific when the value can no longer be represented
+      by 'precision' digits in conventional notation. The man page says
+      "Style e is used if the exponent from its conversion is less than
+      -4 or greater than or equal to the precision." In explanation, a
+      precision of 3 digits can print a value of 345 in conventional
+      notation, but 3456 needs scientific notation, as it would require
+      4 digits (a precision of 4) in conventional notation. Thus, it is
+      printed as 3.46e+03 (rounded).
+    </p><p>
+      Since we don't want spaces in the output, we should not give a
+      field length, but always use <code class="literal">"%.*g"</code>. However,
+      the precision matters, as seen above. It is worth its own
+      paragraph.
+    </p><p>
+      Since MySQL uses the machine-dependent binary representation of
+      <code class="literal">float</code> and <code class="literal">double</code> to store
+      values in the database, we have to care about these. Today, most
+      systems use the IEEE standard 754 for binary floating-point
+      arithmetic. It describes a representation for single precision
+      numbers as 1 bit for sign, 8 bits for biased exponent and 23 bits
+      for fraction and for double precision numbers as 1-bit sign,
+      11-bit biased exponent and 52-bit fraction. However, we can not
+      rely on the fact that every system uses this representation.
+      Luckily, the ISO C standard requires the standard C library to
+      have a header <code class="literal">float.h</code> that describes some
+      details of the floating point representation on a machine. The
+      comment above describes the value <code class="literal">DBL_DIG</code>.
+      There is an equivalent value <code class="literal">FLT_DIG</code> for the C
+      data type <code class="literal">float</code>.
+    </p><p>
+      So, whenever we print a floating-point value, we must not specify
+      a precision above <code class="literal">DBL_DIG</code> or
+      <code class="literal">FLT_DIG</code> respectively. Otherwise we produce a
+      bogus precision, which is wrong. For the honor of the writer of
+      the first attempt above, I must say that his complete algorithm
+      took <code class="literal">DBL_DIG</code> into account, if however only for
+      the second call to <code class="literal">sprintf()</code>. But
+      <code class="literal">FLT_DIG</code> has never been accounted for. At the
+      conversion section of the code, it was not even known whether the
+      value came from a <code class="literal">float</code> or
+      <code class="literal">double</code> field.
+    </p><p>
+      My attempt to solve the problems tries to take all this into
+      account. I tried to concentrate all
+      <code class="literal">float</code>/<code class="literal">double</code>-to-string
+      conversions in one function, and to bring the knowledge about
+      <code class="literal">float</code> versus <code class="literal">double</code> to this
+      function wherever it is called. This solution managed to keep the
+      test suite happy while solving the new problem of
+      <a class="ulink" href="http://bugs.mysql.com/4457" target="_top">[http://bugs.mysql.com/4457
+      Bug#4457</a>]. Luckily the first problem was not big, as the
+      test cases have been very carefully selected, so that they succeed
+      as long as the machine uses IEEE 754.
+    </p><p>
+      Nevertheless, the function is still not perfect. It is not
+      possible to guess how many significant digits a number has. Given
+      that, it is not simple to tell how long the resulting string would
+      be. This applies to numbers with an absolute value smaller then 1.
+      There are probably ways to figure this out, but I doubt that we
+      would win in terms of performance over the simple solution of the
+      first attempt, and besides we might cause new bugs. The compromise
+      taken here is to accept that the resulting string may exceed the
+      destination field length by five characters in the worst case.
+    </p><pre class="programlisting">
+if (nr &lt; 0.0)
+{
+  abs_nr= -nr;
+  extra_space= 1;
+}
+else
+{
+  abs_nr= nr;
+  extra_space= 0;
+}
+precision= is_float ? FLT_DIG : DBL_DIG;
+if (precision &gt; field_length)
+  precision= field_length;
+   
+if (! initialized)
+{
+  /* Better switch to scientific too early than too late. */
+  double mult;
+  mult= 1e0;
+  for (length= 0; length &lt; DBL_DIG; length++)
+    mult/= 1e1;
+  mult= 1e1 - mult;
+   
+  double val;
+  val= 1.0;
+  for (int idx= 0; idx &lt; DBL_DIG+1; idx++)
+  {
+    DBUG_PRINT("info",("double_to_string_conv: big[%d] %.*g",
+                       idx, DBL_DIG+3, val));
+    big_number[idx]= val;
+    val*= mult;
+  }
+  small_number[0]= 1e0;
+  small_number[1]= 1e0;
+  small_number[2]= 1e0;
+  small_number[3]= 1e-1;
+  small_number[4]= 1e-2;
+  small_number[5]= 1e-3;
+  small_number[6]= 1e-4;
+  /* %g switches to scientific when exponent &lt; -4. */
+  for (int idx= 7; idx &lt; DBL_DIG+1; idx++)
+    small_number[idx]= 1e-4;
+  initialized= TRUE;
+}
+   
+use_scientific_notation= (abs_nr != 0.0) &amp;&amp;
+ ((abs_nr &gt;   big_number[precision]) ||
+                          (abs_nr &lt; small_number[precision]));
+   
+if (use_scientific_notation)
+{
+  if (((nr &gt;= 0.0) &amp;&amp; ((nr &gt;= 1e+100) || (nr &lt;= 1e-100))) ||
+      ((nr &lt; 0.0) &amp;&amp; ((nr &lt;= -1e+100) || (nr &gt;= -1e-100))))
+    extra_space+= 6; /* .e+100 or .e-100 */
+  else
+    extra_space+= 5; /* .e+99  or .e-99 */
+}
+   
+if (field_length &lt; extra_space)
+  precision= 0;
+else if (precision &gt; (field_length - extra_space))
+  precision= field_length - extra_space;
+   
+length= sprintf(buff, "%.*g", precision, nr);
+</pre><p>
+      This solution takes performance into account by initializing the
+      limiting numbers arrays only once into static space. It copes with
+      negative numbers and tries to decide even over small numbers. The
+      latter has only small implications, as the prefix 0.000 is exactly
+      the same size as the postfix e-100. But knowing if scientific
+      notation will be selected by <code class="literal">sprintf()</code> allows
+      for saving one digit when the exponent is larger than -100.
+    </p><p>
+      The calculations for the big number array are less precise than in
+      the second attempt, but faster. The precision is sufficient for
+      the guess whether <code class="literal">sprintf()</code> uses scientific
+      notation. There may be number to field length combinations which
+      exploit the gap, but these won't emerge anyway as I found no
+      situation where this function is called with small field lengths.
+      Remember again that it is not called with user-supplied field
+      lengths.
+    </p><p>
+      However in the current stable releases (including gamma) we have
+      some places where the field length is too small by one character.
+      Thus, the precision is sometimes one digit smaller than
+      <code class="literal">DBL_DIG</code> would allow for. Consequently, we
+      cannot use the simple algorithm in the stable releases. There is a
+      chance of doing it in a development release, though.
+    </p><p>
+      <span class="bold"><strong>Addendum:</strong></span>
+    </p><p>
+      There turned out to be a new solution to the "big number array"
+      problem. We have a statically initialized array
+      <code class="literal">log_10</code>, which holds the necessary values. But I
+      did not check whether these values are safe. Even if computed by
+      the compiler, they could carry values slightly above the decimal
+      powers, which would be bad. In this case we needed to initialize
+      by 9.99999999e+xxx, where the number of nines is equal to
+      <code class="literal">DBL_DIG</code>. This must be protected by <code class="literal">#if
+      DBL_DIG == yy</code>, so that a new <code class="literal">DBL_DIG</code>
+      on a new platform is detected. And the array is of limited length.
+      We must at least protect it by a
+      <code class="literal">DBUG_ASSERT(sizeof(log_10)/sizeof(log_10[0]) &gt;
+      DBL_DIG</code>).
+    </p><p>
+      But all of this is probably completely unnecessary, since we are
+      only speaking of cases where no user-supplied field length is
+      given. So MySQL selects the field length on its own. So it is
+      totally possible, indeed highly desirable, that MySQL selects a
+      field length, which allows for a maximum of precision for all
+      possible values. And these are <code class="literal">DBL_DIG+7</code> or
+      <code class="literal">FLT_DIG+6</code> respectively as far as IEEE 754 is
+      used. In this case we can have values of about +/-1e-307 to
+      +/-1e+308 for <code class="literal">double</code> and +/-1e-37 to +/-1e+38
+      for <code class="literal">float</code>. That is, for example
+      -1.&lt;DBL_DIG-1 digits&gt;e+100. For cases where a precision
+      above IEEE 754 is possible, we may need +8 instead. We can detect
+      this with <code class="literal">#if DBL_MAX_10_EXP &gt;=</code> So using a
+      field length of <code class="literal">DBL_DIG+8</code> in all cases should
+      be sufficient for a simple <code class="literal">sprintf(buff, "%.*g", DBL_DIG,
+      nr)</code> or <code class="literal">sprintf(buff, "%.*g", FLT_DIG,
+      nr)</code>, respectively. To be safe, we should not use the
+      machine dependent constants everywhere, but instead concentrate
+      them into definitions like these:
+    </p><pre class="programlisting">
+ #if (DBL_MAX_10_EXP &gt; 9999) || (DBL_MIN_10_EXP &lt; -9999)
+#  error "Need new definition for UNSPECIFIED_DOUBLE_FIELD_LENGTH"
+#elif (DBL_MAX_10_EXP &gt; 999) || (DBL_MIN_10_EXP &lt; -999)
+#  define UNSPECIFIED_DOUBLE_FIELD_LENGTH (DBL_DIG+8)
+#else
+#  define UNSPECIFIED_DOUBLE_FIELD_LENGTH (DBL_DIG+7)
+#endif
+
+#if (FLT_MAX_10_EXP &gt; 999) || (FLT_MIN_10_EXP &lt; -999)
+#error "Need new definition for UNSPECIFIED_FLOAT_FIELD_LENGTH"
+#elif (FLT_MAX_10_EXP &gt; 99) || (FLT_MIN_10_EXP &lt; -99)
+#  define UNSPECIFIED_FLOAT_FIELD_LENGTH (FLT_DIG+7)
+#else
+#  define UNSPECIFIED_FLOAT_FIELD_LENGTH (FLT_DIG+6)
+#endif
+</pre><p>
+      These definitions should be used wherever an item or field of type
+      <code class="literal">float</code> or <code class="literal">double</code> without an
+      explicit field length specification is encountered. We have to
+      propagate these lengths though all derived items and fields and we
+      have to select the maximum of all field lengths wherever in two or
+      more of them are used in an expression or a function.
+    </p><p>
+      We need to treat the precision
+      (<code class="literal">DBL_DIG</code>/<code class="literal">FLT_DIG</code>) similarly,
+      but have to select the minimum in expressions or functions.
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="full-text-search.html" title="10.7 Full-Text Search">Previous</a> / <a rel="next" href="date-and-time-data-type-representation.html" title="10.9 Date and Time Data Type Representation">Next</a> / <a rel="up" href="algorithms.html" title="10 Important Algorithms and Structures">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><table id="c12352" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Kevin Benton on July 10 2012 9:56pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=12352&amp;return=%2Fdoc%2Finternals%2Fen%2Ffloating-point-types.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=12352&amp;return=%2Fdoc%2Finternals%2Fen%2Ffloating-point-types.html">Edit</a>]</td></tr></table><p class="commenttext">So - what this doesn't cover currently is how precise FLOAT and DOUBLE values are by default. If no (m,n) value is specified, what is the default m,n? Personally, I prefer to use DECIMAL(m,n) more because it isn't an estimate especially when dealing with financial information and not theory.<br /><br /></p><table id="c12529" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Ariell David on December 21 2012 8:29am</td><td align="right">[<a href="/doc/mysql/comment.php?id=12529&amp;return=%2Fdoc%2Finternals%2Fen%2Ffloating-point-types.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=12529&amp;return=%2Fdoc%2Finternals%2Fen%2Ffloating-point-types.html">Edit</a>]</td></tr></table><p class="commenttext">@Kevin<br />DOUBLE[(M,D)] [ZEROFILL] holds double-precision numeric values, pretty similar to FLOAT double-precision, except for its allowable range, which is -1.7976931348623157E+308 to -2.2250738585072014E-308, 0, and 2.2250738585072014E-308 to 1.7976931348623157E+308.<br /><br />FLOAT[(M[,D])] [ZEROFILL] stores floating point numbers in the range of -3.402823466E+38 to -1.175494351E-38 and 1.175494351E-38 to 3.402823466E+38. If precision isn't specified, or &lt;= 24, it's SINGLE precision, otherwise FLOAT is DOUBLE precision. When specified alone, precision can range from 0 to 53. If the scale is defined, too, precision may be up to 255, scale up to 253.<br /></p><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="floating-point-types" />
+          <input type="hidden" name="return" value="/doc/internals/en/floating-point-types.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="full-text-search.html" title="10.7 Full-Text Search">Previous</a> / <a rel="next" href="date-and-time-data-type-representation.html" title="10.9 Date and Time Data Type Representation">Next</a> / <a rel="up" href="algorithms.html" title="10 Important Algorithms and Structures">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

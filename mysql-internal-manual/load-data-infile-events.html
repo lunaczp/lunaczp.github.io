@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 19.9.1 LOAD DATA INFILE Events</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="event-data-for-specific-event-types.html" title="19.9 Event Data for Specific Event Types"/><link rel="next" href="row-based-binary-logging.html?ff=nopfpls" title="19.10 Row-Based Binary Logging"/><link rel="up" href="event-data-for-specific-event-types.html" title="19.9 Event Data for Specific Event Types"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fload-data-infile-events.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="binary-log.html">19 The Binary Log</a> :: <a href="event-data-for-specific-event-types.html">19.9 Event Data for Specific Event Types</a> :: 19.9.1 LOAD DATA INFILE Events</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="event-data-for-specific-event-types.html" title="Previous Section">&laquo; 19.9 Event Data for Specific Event Types</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="row-based-binary-logging.html" title="Next Section">19.10 Row-Based Binary Logging  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="event-data-for-specific-event-types.html">19.9 Event Data for Specific Event Types</a></li><li class="self">19.9.1 LOAD DATA INFILE Events</li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="load-data-infile-events"></a>19.9.1 LOAD DATA INFILE Events</h3>
+</div>
+</div>
+</div>
+<p>
+        <code class="literal">LOAD DATA INFILE</code> is not written to the binary
+        log like other statements. It is written as one or more events
+        in a packed format, not as a cleartext statement in the binary
+        log. The events indicate what options are present in the
+        statement and how to process the data file.
+      </p><p>
+        Historically, there seem to have been at least four event
+        sequences for representing <code class="literal">LOAD DATA INFILE</code>
+        operations.
+      </p><p>
+        1) In MySQL 3.23, there was only one event:
+        <code class="literal">Load_log_event</code> (type code
+        <code class="literal">LOAD_EVENT</code> = 6).
+        <code class="literal">Load_log_event</code> only contains the filename,
+        not the file itself. When the slave sees a
+        <code class="literal">Load_log_event</code>, it requests that the master
+        send the file in a separate connection. This has the drawback
+        that the binary log is not self-contained: If the file has been
+        removed on the master or the slave cannot access the master, the
+        file transfer fails.
+      </p><p>
+        2) In MySQL 4.0.0, the file contents were included in the binary
+        log. Several new event types were introduced:
+        <code class="literal">Create_file_log_event</code> (type code
+        <code class="literal">CREATE_FILE_EVENT</code> = 8),
+        <code class="literal">Append_block_log_event</code> (type code
+        <code class="literal">APPEND_BLOCK_EVENT</code> = 9),
+        <code class="literal">Execute_load_log_event</code> (type code
+        <code class="literal">EXEC_LOAD_EVENT</code> = 10), and
+        <code class="literal">Delete_file_log_event</code> (type code
+        <code class="literal">DELETE_FILE_EVENT</code> = 11). The event sequence
+        is:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">Create_file_log_event</code> : 1 instance
+          </p></li><li class="listitem"><p>
+            <code class="literal">Append_block_log_event</code> : 0 or more
+            instances
+          </p></li><li class="listitem"><p>
+            <code class="literal">Execute_load_log_event</code> (success) or
+            <code class="literal">Delete_file_log_event</code> (failure): 1
+            instance
+</p></li></ul>
+</div>
+<p>
+        The <code class="literal">Create_file_log_event</code> contains the
+        options to <code class="literal">LOAD DATA INFILE</code>. This was a
+        design flaw since the file cannot be loaded until the
+        <code class="literal">Exec_load_log_event</code> is seen. To work around
+        this, the slave, when executing the
+        <code class="literal">Create_file_log_event</code>, wrote the
+        <code class="literal">Create_file_log_event</code> to a temporary file.
+        When the <code class="literal">Execute_load_log_event</code> was seen,
+        this temporary file was read back so that the <code class="literal">LOAD DATA
+        INFILE</code> statement could be constructed.
+      </p><p>
+        <code class="literal">Append_block_log_event</code> is used for files
+        larger than a threshold. In this case, the file is split and the
+        pieces are sent in separate events. The threshold is around 2^17
+        = 131072 bytes.
+      </p><p>
+        <code class="literal">CREATE_FILE_EVENT</code> tells the slave to create a
+        temporary file and fill it with a first data block. Later, zero
+        or more <code class="literal">APPEND_BLOCK_EVENT</code> events append
+        blocks to this temporary file.
+        <code class="literal">EXEC_LOAD_EVENT</code> tells the slave to load the
+        temporary file into the table, or
+        <code class="literal">DELETE_FILE_EVENT</code> tells the slave not to do
+        the load and to delete the temporary file.
+        <code class="literal">DELETE_FILE_EVENT</code> occurs when the
+        <code class="literal">LOAD DATA</code> failed on the master: On the master
+        we start to write loaded blocks to the binary log before the end
+        of the statement. If for some reason there is an error, we must
+        tell the slave to abort the load.
+      </p><p>
+        MySQL 4.0.0 also introduced the
+        <code class="literal">NEW_LOAD_EVENT</code> = 12 type code.
+      </p><p>
+        If a slave reads a <code class="literal">NEW_LOAD_EVENT</code> from a
+        binlog, it will use it as a <code class="literal">LOAD_EVENT</code> (but
+        allowing longer separator names). Lost in the mysteries of time
+        is the knowledge of whether there was ever a server version
+        capable of writing <code class="literal">NEW_LOAD_EVENT</code>.
+      </p><p>
+        3) The original <code class="literal">Load_log_event</code> used one
+        character for each of the delimiters (<code class="literal">FIELDS TERMINATED
+        BY</code>, and so forth). At an unknown point in the version
+        history, the format was modified to allow multiple-character
+        strings as separators. This uses the same class,
+        <code class="literal">Load_log_event</code>, but has the type code
+        <code class="literal">NEW_LOAD_EVENT</code> = 12. This affects
+        <code class="literal">Create_file_log_event, since that inherits from
+        &lt;code class="literal"&gt;Load_log_event</code>. So the new
+        feature in <code class="literal">Load_log_event</code> allows
+        <code class="literal">Create_file_log_event</code> to use
+        multiple-character delimiters.
+      </p><p>
+        [A guess for when this occurred would be MySQL 4.0.0: That is
+        when the <code class="literal">sql_ex</code> structure that holds the
+        single-character field/line options was renamed to
+        <code class="literal">old_sql_ex</code> and a new
+        <code class="literal">sql_ex</code> structure was created that allows
+        multiple-character values.]
+      </p><p>
+        4) In 5.0.3, the event sequence was changed again with the
+        addition of two new event types:
+        <code class="literal">Begin_load_query_log_event</code> (type code
+        <code class="literal">BEGIN_LOAD_QUERY_EVENT</code> = 17) and
+        <code class="literal">Execute_load_query_log_event</code> (type code
+        <code class="literal">EXECUTE_LOAD_QUERY_EVENT</code> = 18). The event
+        sequence is:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">Begin_load_query_log_event</code> : 1 instance
+          </p></li><li class="listitem"><p>
+            <code class="literal">Append_block_log_event</code> : 0 or more
+            instances
+          </p></li><li class="listitem"><p>
+            <code class="literal">Execute_load_query_log_event</code> (success) or
+            <code class="literal">Delete_file_log_event</code> (failure): 1
+            instance
+</p></li></ul>
+</div>
+<p>
+        With the new sequence, information about the options to
+        <code class="literal">LOAD DATA INFILE</code> is moved from the first
+        event to the last event. Consequently,
+        <code class="literal">Begin_load_query_log_event</code> is almost the same
+        as <code class="literal">Append_file_log_event</code> (it contains only
+        file data), whereas
+        <code class="literal">Execute_load_query_log_event</code> contains the
+        text of the <code class="literal">LOAD DATA INFILE</code> statement. The
+        revised event sequence fixes the design flaw in the 4.0 format.
+      </p><p>
+        Also, the temp file that stores the parameters to <code class="literal">LOAD
+        DATA INFILE</code> is not needed anymore. There is still a
+        temp file containing all the data to be loaded.
+      </p><p>
+        Here is a concrete example (it applies to MySQL 4.0 and 4.1):
+      </p><p>
+        On the master we have a file named
+        <code class="literal">/m/tmp/u.txt</code> that contains these lines:
+      </p><pre class="programlisting">
+&gt;1,2,3
+&gt;4,5,6
+&gt;7,8,9
+&gt;10,11,12
+</pre><p>
+        And we issue this statement on the master while the default
+        database is <code class="literal">test</code>:
+      </p><pre class="programlisting">
+load data infile '/m/tmp/u.txt' replace into table x fields
+terminated by ',' optionally enclosed by '"' escaped by '\\'
+lines starting by '&gt;' terminated by '\n' ignore 2 lines (a,b,c);
+</pre><p>
+        Then in the master's binary log we have this
+        <code class="literal">CREATE_FILE_EVENT</code> (hexadecimal dump):
+      </p><pre class="programlisting">
+00000180:                     db4f 153f 0801 0000  .........O.?....
+00000190: 006f 0000 0088 0100 0000 0004 0000 0000  .o..............
+000001a0: 0000 0002 0000 0001 0403 0000 0003 0000  ................
+000001b0: 0001 2c01 2201 0a01 3e01 5c06 0101 0161  ..,."...&gt;.\....a
+000001c0: 0062 0063 0078 0074 6573 7400 2f6d 2f74  .b.c.x.test./m/t
+000001d0: 6d70 2f75 2e74 7874 003e 312c 322c 330a  mp/u.txt.&gt;1,2,3.
+000001e0: 3e34 2c35 2c36 0a3e 372c 382c 390a 3e31  &gt;4,5,6.&gt;7,8,9.&gt;1
+000001f0: 302c 3131 2c31 32db 4f15 3f0a 0100 0000  0,11,12.O.?.....
+00000200: 1700 0000 f701 0000 0000 0300 0000       ..............
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Line 180:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Timestamp (db4f 153f)
+              </p></li><li class="listitem"><p>
+                Event type (08)
+              </p></li><li class="listitem"><p>
+                Server ID (01 0000 00)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            Line 190:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Event size (6f 0000 00)
+              </p></li><li class="listitem"><p>
+                Position in the binary log (88 0100 00) (that's 392 in
+                decimal base)
+              </p></li><li class="listitem"><p>
+                Flags (00 00)
+              </p></li><li class="listitem"><p>
+                Thread ID (04 0000 00)
+              </p></li><li class="listitem"><p>
+                Time it took (00 0000 00)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            Line 1a0:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Number of lines to skip at the beginning of the file (02
+                0000 00)
+              </p></li><li class="listitem"><p>
+                Length of the table name (01)
+              </p></li><li class="listitem"><p>
+                Length of the database name (04)
+              </p></li><li class="listitem"><p>
+                Number of columns to load (03 0000 00)
+              </p></li><li class="listitem"><p>
+                The file ID (03 0000 00)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            Line 1b0:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Length of the field terminating string (01)
+              </p></li><li class="listitem"><p>
+                Field terminating string (2c = ,)
+              </p></li><li class="listitem"><p>
+                Length of the field enclosing string (01)
+              </p></li><li class="listitem"><p>
+                Field enclosing string (22 = ")
+              </p></li><li class="listitem"><p>
+                Length of the line terminating string (01)
+              </p></li><li class="listitem"><p>
+                Line terminating string (0a = newline)
+              </p></li><li class="listitem"><p>
+                Length of the line starting string (01)
+              </p></li><li class="listitem"><p>
+                Line starting string (3e = &gt;)
+              </p></li><li class="listitem"><p>
+                Length of the escaping string (01)
+              </p></li><li class="listitem"><p>
+                Escaping string (5c = \)
+              </p></li><li class="listitem"><p>
+                Flags (06) (that's <code class="literal">OPT_ENCLOSED_FLAG</code>
+                | <code class="literal">REPLACE_FLAG</code>)
+              </p></li><li class="listitem"><p>
+                Length of the name of the first column to load (01)
+              </p></li><li class="listitem"><p>
+                Length of the name of the second column to load (01)
+              </p></li><li class="listitem"><p>
+                Length of the name of the third column to load (01)
+              </p></li><li class="listitem"><p>
+                Name of the first column to load (61 00 = "a")
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            Line 1c0:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Name of the second column to load (62 00 = "b")
+              </p></li><li class="listitem"><p>
+                Name of the third column to load (63 00 = "c")
+              </p></li><li class="listitem"><p>
+                Name of the table to load (78 00 = "x"), name of the
+                database that contains the table (74 6573 7400 = "test")
+              </p></li><li class="listitem"><p>
+                Name of the file on the master (2f6d 2f74 6d70 2f75 2e74
+                7874 00 = "/m/tmp/u.txt")
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            Line 1d0 and following:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Raw data to load (3e 312c 322c 330a 3e34 2c35 2c36 0a3e
+                372c 382c 390a 3e31 302c 3131 2c31 32)
+</p></li></ul>
+</div>
+</li></ul>
+</div>
+<p>
+        The next byte in the file is the beginning of the
+        <code class="literal">EXEC_LOAD_EVENT</code> event.
+</p>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="event-data-for-specific-event-types.html" title="19.9 Event Data for Specific Event Types">Previous</a> / <a rel="next" href="row-based-binary-logging.html" title="19.10 Row-Based Binary Logging">Next</a> / <a rel="up" href="event-data-for-specific-event-types.html" title="19.9 Event Data for Specific Event Types">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="load-data-infile-events" />
+          <input type="hidden" name="return" value="/doc/internals/en/load-data-infile-events.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="event-data-for-specific-event-types.html" title="19.9 Event Data for Specific Event Types">Previous</a> / <a rel="next" href="row-based-binary-logging.html" title="19.10 Row-Based Binary Logging">Next</a> / <a rel="up" href="event-data-for-specific-event-types.html" title="19.9 Event Data for Specific Event Types">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

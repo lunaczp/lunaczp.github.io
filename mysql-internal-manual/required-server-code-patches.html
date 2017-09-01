@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 17.4 Required Server Code Patches</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="calling-sequence.html" title="17.3 Calling Sequence"/><link rel="next" href="result-postprocessing-procedures-examples.html?ff=nopfpls" title="17.5 Examples"/><link rel="up" href="result-postprocessing-procedures.html" title="17 Writing a Procedure"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Frequired-server-code-patches.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="result-postprocessing-procedures.html">17 Writing a Procedure</a> :: 17.4 Required Server Code Patches</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="calling-sequence.html" title="Previous Section">&laquo; 17.3 Calling Sequence</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="result-postprocessing-procedures-examples.html" title="Next Section">17.5 Examples  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="result-postprocessing-procedures.html">17 Writing a Procedure</a></li><li><a href="class-procedure.html">17.1 Extend Class Procedure</a></li>
+<li><a href="initialization-callback.html">17.2 Initialization Callback</a></li>
+<li><a href="calling-sequence.html">17.3 Calling Sequence</a></li>
+<li class="self">17.4 Required Server Code Patches</li>
+<li><a href="result-postprocessing-procedures-examples.html">17.5 Examples</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="required-server-code-patches"></a>17.4 Required Server Code Patches</h2>
+
+</div>
+
+</div>
+
+</div>
+<p>
+      Currently procedures can only be compiled into the server
+      staticly. There is no dynamic procedure for loading them dynamicly
+      yet like we have for UDFs and plugins.
+    </p><p>
+      So you have to perform the following steps to register your
+      procedure with the server:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          register the <span class="bold"><strong>.cc</strong></span> and
+          <span class="bold"><strong>.h</strong></span> file in the
+          <span class="bold"><strong>mysqld_SOURCES</strong></span> list in
+          <span class="bold"><strong>sql/Makefile.am</strong></span>, for example,
+          right after the line that the
+          <span class="bold"><strong>sql_analyse.*</strong></span> files are on:
+</p></li></ul>
+</div>
+<pre class="programlisting">
+diff -ruN 5.0/sql/Makefile.am 5.0-myproc/sql/Makefile.am
+ --- 5.0/sql/Makefile.am	2007-08-09 12:11:16.000000000 +0200
+ +++ 5.0-myproc/sql/Makefile.am	2007-08-09 00:22:19.000000000 +0200
+ @@ -94,6 +94,7 @@
+  			sql_db.cc sql_table.cc sql_rename.cc sql_crypt.cc \
+  			sql_load.cc mf_iocache.cc field_conv.cc sql_show.cc \
+  			sql_udf.cc sql_analyse.cc sql_analyse.h sql_cache.cc \
+ +			procedure_rownum.cc procedure_rownum.h \
+  			slave.cc sql_repl.cc sql_union.cc sql_derived.cc \
+  			client.c sql_client.cc mini_client_errors.c pack.c\
+  			stacktrace.c repl_failsafe.h repl_failsafe.cc \
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          register the <span class="bold"><strong>.cc</strong></span> source file
+          in the <span class="bold"><strong>sqlsources</strong></span> list in
+          <span class="bold"><strong>libmysqld/Makefile.am</strong></span>
+</p></li></ul>
+</div>
+<pre class="programlisting">
+diff -ruN 5.0/libmysqld/Makefile.am 5.0-myproc/libmysqld/Makefile.am
+ --- 5.0/libmysqld/Makefile.am	2007-08-09 12:18:16.000000000 +0200
+ +++ 5.0-myproc/libmysqld/Makefile.am	2007-08-09 00:21:55.000000000 +0200
+ @@ -54,6 +54,7 @@
+  	opt_sum.cc procedure.cc records.cc sql_acl.cc \
+  	sql_load.cc discover.cc sql_locale.cc \
+  	sql_analyse.cc sql_base.cc sql_cache.cc sql_class.cc \
+ +	procedure_rownum.cc \
+  	sql_crypt.cc sql_db.cc sql_delete.cc sql_error.cc sql_insert.cc \
+  	sql_lex.cc sql_list.cc sql_manager.cc sql_map.cc sql_parse.cc \
+  	sql_prepare.cc sql_derived.cc sql_rename.cc \
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          include your <span class="bold"><strong>.h</strong></span> file in
+          <span class="bold"><strong>sql/procedure.cc</strong></span>
+</p></li></ul>
+</div>
+<pre class="programlisting">
+diff -ruN 5.0/sql/procedure.cc 5.0-myproc/sql/procedure.cc
+ --- 5.0/sql/procedure.cc	2007-08-09 12:11:16.000000000 +0200
+ +++ 5.0-myproc/sql/procedure.cc	2007-08-09 00:21:04.000000000 +0200
+ @@ -23,6 +23,7 @@
+  #include "mysql_priv.h"
+  #include "procedure.h"
+  #include "sql_analyse.h"			// Includes procedure
+ +#include "procedure_rownum.h"		// Includes procedure
+  #ifdef USE_PROC_RANGE
+  #include "proc_range.h"
+  #endif
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          register your procedures init callback in the
+          <span class="bold"><strong>sql_procs</strong></span> array in
+          <span class="bold"><strong>sql/procedure.cc</strong></span>
+</p></li></ul>
+</div>
+<pre class="programlisting">
+diff -ruN 5.0/sql/procedure.cc 5.0-myproc/sql/procedure.cc
+ --- 5.0/sql/procedure.cc	2007-08-09 12:11:16.000000000 +0200
+ +++ 5.0-myproc/sql/procedure.cc	2007-08-09 00:21:04.000000000 +0200
+ @@ -37,6 +38,7 @@
+    { "split_count",proc_count_range_init },	// Internal procedure at TCX
+    { "matris_ranges",proc_matris_range_init },	// Internal procedure at TCX
+  #endif
+ +  { "rownum", proc_rownum_init }, 		// Add RowNum column to result
+    { "analyse",proc_analyse_init }		// Analyse a result
+  };
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          run <span class="bold"><strong>automake</strong></span> and
+          <span class="bold"><strong>autoconf</strong></span> to regenerate the
+          <span class="bold"><strong>Makefile.in</strong></span>
+</p></li></ul>
+</div>
+<pre class="programlisting">
+files and the <span class="command"><strong>configure</strong></span> script
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          run <span class="bold"><strong>configure</strong></span> or refresh your
+          previous configuration by running
+          <span class="bold"><strong>config.status</strong></span>
+</p></li></ul>
+</div>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          run <span class="bold"><strong>make</strong></span>
+</p></li></ul>
+</div>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          if your build fails with <span class="bold"><strong>don't know how
+          to make xxx.cc required by xxx.o</strong></span> in the
+          <span class="bold"><strong>libmysqld/</strong></span> directory you
+          might need to create a symlink from
+          <span class="bold"><strong>libmysqld/xxx.cc</strong></span> to
+          <span class="bold"><strong>sql/xxx.cc</strong></span> yourself. The
+          build system is not too clever about creating these symlinks
+          for files added after the first compile ...
+</p></li></ul>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="calling-sequence.html" title="17.3 Calling Sequence">Previous</a> / <a rel="next" href="result-postprocessing-procedures-examples.html" title="17.5 Examples">Next</a> / <a rel="up" href="result-postprocessing-procedures.html" title="17 Writing a Procedure">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="required-server-code-patches" />
+          <input type="hidden" name="return" value="/doc/internals/en/required-server-code-patches.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="calling-sequence.html" title="17.3 Calling Sequence">Previous</a> / <a rel="next" href="result-postprocessing-procedures-examples.html" title="17.5 Examples">Next</a> / <a rel="up" href="result-postprocessing-procedures.html" title="17 Writing a Procedure">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

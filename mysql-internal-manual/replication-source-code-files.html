@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 18.2 Source Code Files</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="replication-organization.html" title="18.1 Chapter Organization"/><link rel="next" href="replication-principles.html?ff=nopfpls" title="18.3 Principles"/><link rel="up" href="replication.html" title="18 Replication"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Freplication-source-code-files.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="replication.html">18 Replication</a> :: 18.2 Source Code Files</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="replication-organization.html" title="Previous Section">&laquo; 18.1 Chapter Organization</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="replication-principles.html" title="Next Section">18.3 Principles  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="replication.html">18 Replication</a></li><li><a href="replication-organization.html">18.1 Chapter Organization</a></li>
+<li class="self">18.2 Source Code Files</li>
+<li><a href="replication-principles.html">18.3 Principles</a></li>
+<li><a href="replication-rules.html">18.4 Rules</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="replication-source-code-files"></a>18.2 Source Code Files</h2>
+
+</div>
+
+</div>
+
+</div>
+<p>
+      <span class="emphasis"><em>Status of this section: up to date 2009-12-16</em></span>
+    </p><p>
+      Files in the <span class="bold"><strong>sql</strong></span> directory:
+</p>
+<div class="informaltable">
+<table border="1"><colgroup><col class="c1"><col class="c2"></colgroup><tbody><tr><td scope="row"><p>
+                <span class="bold"><strong>File </strong></span>
+              </p></td><td><p>
+                <span class="bold"><strong>Description </strong></span>
+              </p></td></tr><tr><td scope="row"><p>
+                slave.h/.cc
+              </p></td><td><p>
+                Contains the slave <span class="bold"><strong>IO and SQL
+                threads</strong></span>. This is the high-level
+                administrative logic for the slave threads - that is,
+                not the low-level functions for parsing the dump from
+                the net, parsing the relay log, formatting the relay
+                log, or executing events. Also contains the code to
+                execute <span class="bold"><strong>SHOW SLAVE
+                STATUS</strong></span>.
+              </p></td></tr><tr><td scope="row"><p>
+                log.h/.cc
+              </p></td><td><p>
+                The high-level binary
+                <span class="bold"><strong>logging</strong></span> mechanism for
+                organizing events into a sequence so that it becomes a
+                binary log. Routines for creating, writing, and deleting
+                binary log files. Also the handler callbacks for the
+                binlog.
+              </p></td></tr><tr><td scope="row"><p>
+                log_event.h/.cc
+              </p></td><td><p>
+                The <span class="bold"><strong>Log_event</strong></span> class and
+                subclasses, for creating, writing, reading, printing,
+                and applying events of every event type. Reading and
+                writing here is at a low level, that is, serializing
+                values into records.
+              </p></td></tr><tr><td scope="row"><p>
+                old_log_event.h/.cc
+              </p></td><td><p>
+                Contains classes to read and execute
+                <span class="bold"><strong>old versions</strong></span> of the row
+                log events.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_rli.h/.cc
+              </p></td><td><p>
+                Implementation of the data structure
+                <span class="bold"><strong>Relay_log_info</strong></span> that
+                holds the state of the SQL thread, and also some
+                auxiliary methods used by the slave SQL thread. (The
+                slave SQL thread is in slave.cc and it also uses other
+                auxiliary functions.)
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_mi.h/.cc
+              </p></td><td><p>
+                Contains the data structure
+                <span class="bold"><strong>Master_info</strong></span> that holds
+                some state of the IO thread (the IO thread is in
+                slave.cc and it also uses other auxiliary functions).
+              </p></td></tr><tr><td scope="row"><p>
+                sql_repl.cc
+              </p></td><td><p>
+                The <span class="bold"><strong>dump thread</strong></span>, where
+                the master sends its binary log to the slave. This is
+                also where the code resides for
+                <span class="bold"><strong>RESET SLAVE</strong></span>,
+                <span class="bold"><strong>CHANGE MASTER</strong></span>,
+                <span class="bold"><strong>RESET MASTER</strong></span>,
+                <span class="bold"><strong>SHOW BINLOG EVENTS</strong></span>,
+                <span class="bold"><strong>SHOW MASTER STATUS</strong></span>,
+                <span class="bold"><strong>SHOW BINARY LOGS</strong></span>,
+                <span class="bold"><strong>PURGE BINARY LOGS</strong></span>, as
+                well as some replication-related system variables.
+              </p></td></tr><tr><td scope="row"><p>
+                sql_binlog.cc
+              </p></td><td><p>
+                Contains code to execute
+                <span class="bold"><strong>BINLOG</strong></span> statements (that
+                is, the base64-encoded things that mysqlbinlog prints
+                when it sees row events).
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_record.h/.cc
+              </p></td><td><p>
+                Utilities for encoding and decoding table rows into and
+                out of the <span class="bold"><strong>row event
+                format</strong></span>.
+              </p></td></tr><tr><td scope="row"><p>
+                repl_failsafe.h/.cc
+              </p></td><td><p>
+                Utilities to initialize and
+                <span class="bold"><strong>register slaves on the
+                master</strong></span>. Also unfinished and unused code
+                dealing with "failsafe" (master election if the primary
+                master fails).
+              </p></td></tr><tr><td scope="row"><p>
+                replication.h
+              </p></td><td><p>
+                Observer class declarations, which together constitute
+                the <span class="bold"><strong>binary log
+                interface</strong></span>.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_constants.h
+              </p></td><td><p>
+                Enumeration of
+                <span class="bold"><strong>incidents</strong></span> (events that
+                occur during replication). Also some constants that are
+                local to the replication code.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_filter.h/.cc
+              </p></td><td><p>
+                Implements the <span class="bold"><strong>table and database
+                filters</strong></span> used by the
+                --{binlog,replicate}-{do,ignore}-db,
+                --replicate[-wild]-{do,ignore}-table, and
+                --replicate-rewrite-db flags.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_handler.h/.cc
+              </p></td><td><p>
+                Coordination classes used by
+                <span class="bold"><strong>plugins</strong></span> to register to
+                the binary log interface.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_injector.h/.cc
+              </p></td><td><p>
+                The <span class="bold"><strong>injector class</strong></span> that
+                allows external insertions into the binary log. This is
+                used for cluster replication binary logging.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_reporting.h/.cc
+              </p></td><td><p>
+                Utilities for reporting replication conditions and
+                <span class="bold"><strong>reporting errors, warnings, and
+                informational messages</strong></span> on the slave.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_tblmap.h/.cc
+              </p></td><td><p>
+                Utilities to generate a <span class="bold"><strong>mapping
+                from numbers to tables</strong></span>. The mapping is used
+                by the row logging system to identify tables.
+              </p></td></tr><tr><td scope="row"><p>
+                rpl_utility.h/.cc
+              </p></td><td><p>
+                <span class="bold"><strong>Auxiliary classes</strong></span> and
+                functions used for Table_map_events, and also an
+                auxiliary class for smart pointers.
+              </p></td></tr><tr><td scope="row"><p>
+                sql_base.cc
+              </p></td><td><p>
+                Prior to
+                <a class="ulink" href="http://bugs.mysql.com/39934" target="_top">Bug#39934</a>,
+                the function
+                <span class="bold"><strong>decide_logging_format()</strong></span>
+                that determines if statements should be written
+                row-based or statement-based to the binlog. After
+                <a class="ulink" href="http://bugs.mysql.com/39934" target="_top">Bug#39934</a>,
+                there is nothing related to replication here.
+              </p></td></tr><tr><td scope="row"><p>
+                sql_class.cc
+              </p></td><td><p>
+                The function
+                <span class="bold"><strong>binlog_query()</strong></span>, called
+                from commands that need to log a query_log_event. After
+                <a class="ulink" href="http://bugs.mysql.com/39934" target="_top">Bug#39934</a>,
+                also
+                <span class="bold"><strong>decide_logging_format()</strong></span>.
+              </p></td></tr><tr><td scope="row"><p>
+                sql_lex.h/.cc
+              </p></td><td><p>
+                List of all types of <span class="bold"><strong>unsafe
+                statements</strong></span>, and functions for marking
+                statements unsafe.
+</p></td></tr></tbody></table>
+</div>
+<p>
+      Files in the <span class="bold"><strong>client</strong></span> directory:
+</p>
+<div class="informaltable">
+<table border="1"><colgroup><col class="c1"><col class="c2"></colgroup><tbody><tr><td scope="row"><p>
+                <span class="bold"><strong>File </strong></span>
+              </p></td><td><p>
+                <span class="bold"><strong>Description </strong></span>
+              </p></td></tr><tr><td scope="row"><p>
+                mysqlbinlog.cc
+              </p></td><td><p>
+                The mysqlbinlog program. This file mainly contains a
+                loop that calls auxiliary functions (members of
+                Log_event defined in log_event.cc) that read and print
+                events.
+</p></td></tr></tbody></table>
+</div>
+<p>
+      Files in the <span class="bold"><strong>plugin/semisync</strong></span>
+      directory:
+</p>
+<div class="informaltable">
+<table border="1"><colgroup><col class="c1"><col class="c2"></colgroup><tbody><tr><td scope="row"><p>
+                <span class="bold"><strong>File </strong></span>
+              </p></td><td><p>
+                <span class="bold"><strong>Description </strong></span>
+              </p></td></tr><tr><td scope="row"><p>
+                semisync.h/.cc
+              </p></td><td><p>
+                Auxiliary code, particularly for tracing, that is used
+                by both the master semisync module and the slave
+                semisync module.
+              </p></td></tr><tr><td scope="row"><p>
+                semisync_master.h/.cc
+              </p></td><td><p>
+                The master semisync module.
+              </p></td></tr><tr><td scope="row"><p>
+                semisync_master_plugin.cc
+              </p></td><td><p>
+                The callbacks invoked by the server to use the master
+                semisync module, as well as code to register the master
+                semisync module.
+              </p></td></tr><tr><td scope="row"><p>
+                semisync_slave.h/.cc
+              </p></td><td><p>
+                The slave semisync module.
+              </p></td></tr><tr><td scope="row"><p>
+                semisync_slave_plugin.cc
+              </p></td><td><p>
+                The callbacks invoked by the server to use the slave
+                semisync module, as well as code to register the master
+                semisync module.
+</p></td></tr></tbody></table>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="replication-organization.html" title="18.1 Chapter Organization">Previous</a> / <a rel="next" href="replication-principles.html" title="18.3 Principles">Next</a> / <a rel="up" href="replication.html" title="18 Replication">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="replication-source-code-files" />
+          <input type="hidden" name="return" value="/doc/internals/en/replication-source-code-files.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="replication-organization.html" title="18.1 Chapter Organization">Previous</a> / <a rel="next" href="replication-principles.html" title="18.3 Principles">Next</a> / <a rel="up" href="replication.html" title="18 Replication">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: A.1.28 The sql Directory</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="server-tools-directory.html" title="A.1.27 The server-tools Directory"/><link rel="next" href="sql-bench-directory.html?ff=nopfpls" title="A.1.29 The sql-bench Directory"/><link rel="up" href="source-directory-listing.html" title="A.1 Directory Listing"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fsql-directory.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="files-in-mysql-sources.html">A MySQL Source Code Distribution</a> :: <a href="source-directory-listing.html">A.1 Directory Listing</a> :: A.1.28 The sql Directory</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="server-tools-directory.html" title="Previous Section">&laquo; A.1.27 The server-tools Directory</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="sql-bench-directory.html" title="Next Section">A.1.29 The sql-bench Directory  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="source-directory-listing.html">A.1 Directory Listing</a></li><li><a href="build-directory.html">A.1.1 The BUILD Directory</a></li>
+<li><a href="client-directory.html">A.1.2 The client Directory</a></li>
+<li><a href="config-directory.html">A.1.3 The config Directory</a></li>
+<li><a href="cmd-line-utils-directory.html">A.1.4 The cmd-line-utils Directory</a></li>
+<li><a href="dbug-directory.html">A.1.5 The dbug Directory</a></li>
+<li><a href="docs-directory.html">A.1.6 The Docs Directory</a></li>
+<li><a href="extra-directory.html">A.1.7 The extra Directory</a></li>
+<li><a href="heap-directory.html">A.1.8 The heap Directory</a></li>
+<li><a href="include-directory.html">A.1.9 The include Directory</a></li>
+<li><a href="innobase-directory.html">A.1.10 The innobase Directory</a></li>
+<li><a href="libmysql-directory.html">A.1.11 The libmysql Directory</a></li>
+<li><a href="libmysql-r-directory.html">A.1.12 The libmysql_r Directory</a></li>
+<li><a href="libmysqld-directory.html">A.1.13 The libmysqld Directory</a></li>
+<li><a href="man-directory.html">A.1.14 The man Directory</a></li>
+<li><a href="myisam-directory.html">A.1.15 The myisam Directory</a></li>
+<li><a href="myisammrg-directory.html">A.1.16 The myisammrg Directory</a></li>
+<li><a href="mysql-test-directory.html">A.1.17 The mysql-test Directory</a></li>
+<li><a href="mysys-directory.html">A.1.18 The mysys Directory</a></li>
+<li><a href="ndb-directory.html">A.1.19 The ndb Directory</a></li>
+<li><a href="netware-directory.html">A.1.20 The netware Directory</a></li>
+<li><a href="new-rpms-directory.html">A.1.21 The NEW-RPMS Directory</a></li>
+<li><a href="os-directory.html">A.1.22 The os2 Directory</a></li>
+<li><a href="pstack-directory.html">A.1.23 The pstack Directory</a></li>
+<li><a href="regex-directory.html">A.1.24 The regex Directory</a></li>
+<li><a href="sccs-directory.html">A.1.25 The SCCS Directory</a></li>
+<li><a href="scripts-directory.html">A.1.26 The scripts Directory</a></li>
+<li><a href="server-tools-directory.html">A.1.27 The server-tools Directory</a></li>
+<li class="self">A.1.28 The sql Directory</li>
+<li><a href="sql-bench-directory.html">A.1.29 The sql-bench Directory</a></li>
+<li><a href="sql-common-directory.html">A.1.30 The sql-common Directory</a></li>
+<li><a href="ssl-directory.html">A.1.31 The SSL Directory</a></li>
+<li><a href="strings-directory.html">A.1.32 The strings Directory</a></li>
+<li><a href="support-files-directory.html">A.1.33 The support-files Directory</a></li>
+<li><a href="tests-directory.html">A.1.34 The tests Directory</a></li>
+<li><a href="tools-directory.html">A.1.35 The tools Directory</a></li>
+<li><a href="vc-plus-plus-files-directory.html">A.1.36 The VC++Files Directory</a></li>
+<li><a href="vio-directory.html">A.1.37 The vio Directory</a></li>
+<li><a href="zlib-directory.html">A.1.38 The zlib Directory</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="sql-directory"></a>A.1.28 The sql Directory</h3>
+
+</div>
+
+</div>
+
+</div>
+<p>
+        Programs for handling SQL commands. The "core" of MySQL.
+      </p><p>
+        These are the <code class="filename">.c</code> and
+        <code class="filename">.cc</code> files in the <code class="filename">sql</code>
+        directory:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            derror.cc --- read language-dependent message file
+          </p></li><li class="listitem"><p>
+            des_key_file.cc --- load DES keys from plaintext file
+          </p></li><li class="listitem"><p>
+            discover.cc --- Functions for discovery of
+            <code class="filename">.frm</code> file from handler
+          </p></li><li class="listitem"><p>
+            field.cc --- "implement classes defined in
+            <code class="filename">field.h</code>" (long); defines all storage
+            methods MySQL uses to store field information into records
+            that are then passed to handlers
+          </p></li><li class="listitem"><p>
+            field_conv.cc --- functions to copy data between fields
+          </p></li><li class="listitem"><p>
+            filesort.cc --- sort a result set, using memory or temporary
+            files
+          </p></li><li class="listitem"><p>
+            frm_crypt.cc --- contains only one short function:
+            <code class="filename">get_crypt_for_frm</code>
+          </p></li><li class="listitem"><p>
+            gen_lex_hash.cc --- Knuth's algorithm from Vol 3 Sorting and
+            Searching, Chapter 6.3; used to search for SQL keywords in a
+            query
+          </p></li><li class="listitem"><p>
+            gstream.cc --- GTextReadStream, used to read GIS objects
+          </p></li><li class="listitem"><p>
+            handler.cc --- handler-calling functions
+          </p></li><li class="listitem"><p>
+            hash_filo.cc --- static-sized hash tables, used to store
+            info like hostname -&gt; ip tables in a FIFO manner
+          </p></li><li class="listitem"><p>
+            ha_berkeley.cc --- Handler: BDB
+          </p></li><li class="listitem"><p>
+            ha_blackhole.cc --- Handler: Black Hole
+          </p></li><li class="listitem"><p>
+            ha_federated.cc --- Handler: Federated
+          </p></li><li class="listitem"><p>
+            ha_heap.cc --- Handler: Heap
+          </p></li><li class="listitem"><p>
+            ha_innodb.cc --- Handler: InnoDB
+          </p></li><li class="listitem"><p>
+            ha_myisam.cc --- Handler: MyISAM
+          </p></li><li class="listitem"><p>
+            ha_myisammrg.cc --- Handler: (MyISAM MERGE)
+          </p></li><li class="listitem"><p>
+            ha_ndbcluster.cc --- Handler: NDB
+          </p></li><li class="listitem"><p>
+            hostname.cc --- Given IP, return hostname
+          </p></li><li class="listitem"><p>
+            init.cc --- Init and dummy functions for interface with
+            unireg
+          </p></li><li class="listitem"><p>
+            item.cc --- Item functions
+          </p></li><li class="listitem"><p>
+            item_buff.cc --- Buffers to save and compare item values
+          </p></li><li class="listitem"><p>
+            item_cmpfunc.cc --- Definition of all compare functions
+          </p></li><li class="listitem"><p>
+            item_create.cc --- Create an item. Used by
+            <code class="filename">lex.h</code>.
+          </p></li><li class="listitem"><p>
+            item_func.cc --- Numerical functions
+          </p></li><li class="listitem"><p>
+            item_geofunc.cc --- Geometry functions
+          </p></li><li class="listitem"><p>
+            item_row.cc --- Row items for comparing rows and for
+            <code class="literal">IN</code> on rows
+          </p></li><li class="listitem"><p>
+            item_strfunc.cc --- String functions
+          </p></li><li class="listitem"><p>
+            item_subselect.cc --- Subqueries
+          </p></li><li class="listitem"><p>
+            item_sum.cc --- Set functions (<code class="literal">SUM()</code>,
+            <code class="literal">AVG()</code>, etc.)
+          </p></li><li class="listitem"><p>
+            item_strfunc.cc --- String functions
+          </p></li><li class="listitem"><p>
+            item_subselect.cc --- Item subquery
+          </p></li><li class="listitem"><p>
+            item_timefunc.cc --- Date/time functions, for example, week
+            of year
+          </p></li><li class="listitem"><p>
+            item_uniq.cc --- Empty file, here for compatibility reasons
+          </p></li><li class="listitem"><p>
+            key.cc --- Functions to create keys from records and compare
+            a key to a key in a record
+          </p></li><li class="listitem"><p>
+            lock.cc --- Locks
+          </p></li><li class="listitem"><p>
+            log.cc --- Logs
+          </p></li><li class="listitem"><p>
+            log_event.cc --- Log event (a binary log consists of a
+            stream of log events)
+          </p></li><li class="listitem"><p>
+            matherr.c --- Handling overflow, underflow, etc.
+          </p></li><li class="listitem"><p>
+            mf_iocache.cc --- Caching of (sequential) reads and writes
+          </p></li><li class="listitem"><p>
+            mysqld.cc --- Source for <code class="literal">mysqld.exe</code>;
+            includes the <code class="literal">main()</code> program that starts
+            <code class="literal">mysqld</code>, handling of signals and
+            connections
+          </p></li><li class="listitem"><p>
+            mf_decimal.cc --- New decimal and numeric code
+          </p></li><li class="listitem"><p>
+            my_lock.c --- Lock part of a file (like
+            <code class="filename">/mysys/my_lock.c</code>, but with timeout
+            handling for threads)
+          </p></li><li class="listitem"><p>
+            net_serv.cc --- Read/write of packets on a network socket
+          </p></li><li class="listitem"><p>
+            nt_servc.cc --- Initialize/register/remove an NT service
+          </p></li><li class="listitem"><p>
+            opt_range.cc --- Range of keys
+          </p></li><li class="listitem"><p>
+            opt_sum.cc --- Optimize functions in presence of (implied)
+            <code class="literal">GROUP BY</code>
+          </p></li><li class="listitem"><p>
+            parse_file.cc --- Text <code class="filename">.frm</code> files
+            management routines
+          </p></li><li class="listitem"><p>
+            password.c --- Password checking
+          </p></li><li class="listitem"><p>
+            procedure.cc --- Procedure interface, as used in
+            <code class="literal">SELECT * FROM Table_name PROCEDURE
+            ANALYSE()</code>
+          </p></li><li class="listitem"><p>
+            protocol.cc --- Low level functions for PACKING data that is
+            sent to client; actual sending done with
+            <code class="filename">net_serv.cc</code>
+          </p></li><li class="listitem"><p>
+            protocol_cursor.cc --- Low level functions for storing data
+            to be sent to the MySQL client
+          </p></li><li class="listitem"><p>
+            records.cc --- Functions for easy reading of records,
+            possible through a cache
+          </p></li><li class="listitem"><p>
+            repl_failsafe.cc --- Replication fail-save (not yet
+            implemented)
+          </p></li><li class="listitem"><p>
+            set_var.cc --- Set and retrieve MySQL user variables
+          </p></li><li class="listitem"><p>
+            slave.cc --- Procedures for a slave in a master/slave
+            (replication) relation
+          </p></li><li class="listitem"><p>
+            sp.cc --- DB storage of stored procedures and functions
+          </p></li><li class="listitem"><p>
+            sp_cache.cc --- For stored procedures
+          </p></li><li class="listitem"><p>
+            sp_head.cc --- For stored procedures
+          </p></li><li class="listitem"><p>
+            sp_pcontext.cc --- For stored procedures
+          </p></li><li class="listitem"><p>
+            sp_rcontext.cc --- For stored procedures
+          </p></li><li class="listitem"><p>
+            spatial.cc --- Geometry stuff (lines, points, etc.)
+          </p></li><li class="listitem"><p>
+            sql_acl.cc --- Functions related to ACL security; checks,
+            stores, retrieves, and deletes MySQL user level privileges
+          </p></li><li class="listitem"><p>
+            sql_analyse.cc --- Implements the <code class="literal">PROCEDURE
+            ANALYSE()</code>, which analyzes a query result and
+            returns the 'optimal' data type for each result column
+          </p></li><li class="listitem"><p>
+            sql_base.cc --- Basic functions needed by many modules, like
+            opening and closing tables with table cache management
+          </p></li><li class="listitem"><p>
+            sql_cache.cc --- SQL query cache, with long comments about
+            how caching works
+          </p></li><li class="listitem"><p>
+            sql_class.cc --- SQL class; implements the SQL base classes,
+            of which THD (THREAD object) is the most important
+          </p></li><li class="listitem"><p>
+            sql_client.cc --- A function called by my_net_init() to set
+            some check variables
+          </p></li><li class="listitem"><p>
+            sql_crypt.cc --- Encode / decode, very short
+          </p></li><li class="listitem"><p>
+            sql_db.cc --- Create / drop database
+          </p></li><li class="listitem"><p>
+            sql_delete.cc --- The <code class="literal">DELETE</code> statement
+          </p></li><li class="listitem"><p>
+            sql_derived.cc --- Derived tables, with long comments
+          </p></li><li class="listitem"><p>
+            sql_do.cc --- The <code class="literal">DO</code> statement
+          </p></li><li class="listitem"><p>
+            sql_error.cc --- Errors and warnings
+          </p></li><li class="listitem"><p>
+            sql_handler.cc --- Implements the <code class="literal">HANDLER</code>
+            interface, which gives direct access to rows in
+            <code class="literal">MyISAM</code> and <code class="literal">InnoDB</code>
+          </p></li><li class="listitem"><p>
+            sql_help.cc --- The <code class="literal">HELP</code> statement
+          </p></li><li class="listitem"><p>
+            sql_insert.cc --- The <code class="literal">INSERT</code> statement
+          </p></li><li class="listitem"><p>
+            sql_lex.cc --- Does lexical analysis of a query; that is,
+            breaks a query string into pieces and determines the basic
+            type (number, string, keyword, etc.) of each piece
+          </p></li><li class="listitem"><p>
+            sql_list.cc --- Only list_node_end_of_list, short (the rest
+            of the list class is implemented in
+            <code class="filename">sql_list.h</code>)
+          </p></li><li class="listitem"><p>
+            sql_load.cc --- The <code class="literal">LOAD DATA</code> statement
+          </p></li><li class="listitem"><p>
+            sql_manager.cc --- Maintenance tasks, for example, flushing
+            the buffers periodically; used with <code class="literal">BDB</code>
+            table logs
+          </p></li><li class="listitem"><p>
+            sql_map.cc --- Memory-mapped files (not yet in use)
+          </p></li><li class="listitem"><p>
+            sql_olap.cc --- <code class="literal">ROLLUP</code>
+          </p></li><li class="listitem"><p>
+            sql_parse.cc --- Parse an SQL statement; do initial checks
+            and then jump to the function that should execute the
+            statement
+          </p></li><li class="listitem"><p>
+            sql_prepare.cc --- Prepare an SQL statement, or use a
+            prepared statement
+          </p></li><li class="listitem"><p>
+            sql_rename.cc --- Rename table
+          </p></li><li class="listitem"><p>
+            sql_repl.cc --- Replication
+          </p></li><li class="listitem"><p>
+            sql_select.cc --- Select and join optimization
+          </p></li><li class="listitem"><p>
+            sql_show.cc --- The <code class="literal">SHOW</code> statement
+          </p></li><li class="listitem"><p>
+            sql_state.c --- Functions to map mysqld errno to sqlstate
+          </p></li><li class="listitem"><p>
+            sql_string.cc --- String functions: alloc, realloc, copy,
+            convert, etc.
+          </p></li><li class="listitem"><p>
+            sql_table.cc --- The <code class="literal">DROP TABLE</code> and
+            <code class="literal">ALTER TABLE</code> statements
+          </p></li><li class="listitem"><p>
+            sql_test.cc --- Some debugging information
+          </p></li><li class="listitem"><p>
+            sql_trigger.cc --- Triggers
+          </p></li><li class="listitem"><p>
+            sql_udf.cc --- User-defined functions
+          </p></li><li class="listitem"><p>
+            sql_union.cc --- The <code class="literal">UNION</code> operator
+          </p></li><li class="listitem"><p>
+            sql_update.cc --- The <code class="literal">UPDATE</code> statement
+          </p></li><li class="listitem"><p>
+            sql_view.cc --- Views
+          </p></li><li class="listitem"><p>
+            stacktrace.c --- Display stack trace (Linux/Intel only)
+          </p></li><li class="listitem"><p>
+            strfunc.cc --- String functions
+          </p></li><li class="listitem"><p>
+            table.cc --- Table metadata retrieval; read the table
+            definition from a <code class="filename">.frm</code> file and store
+            it in a <code class="literal">TABLE</code> object
+          </p></li><li class="listitem"><p>
+            thr_malloc.cc --- Thread-safe interface to
+            <code class="filename">/mysys/my_alloc.c</code>
+          </p></li><li class="listitem"><p>
+            time.cc --- Date and time functions
+          </p></li><li class="listitem"><p>
+            udf_example.cc --- Example file of user-defined functions
+          </p></li><li class="listitem"><p>
+            uniques.cc --- Function to handle quick removal of
+            duplicates
+          </p></li><li class="listitem"><p>
+            unireg.cc --- Create a unireg format file
+            (<code class="filename">.frm</code>) from a <code class="literal">FIELD</code>
+            and field-info struct
+</p></li></ul>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="server-tools-directory.html" title="A.1.27 The server-tools Directory">Previous</a> / <a rel="next" href="sql-bench-directory.html" title="A.1.29 The sql-bench Directory">Next</a> / <a rel="up" href="source-directory-listing.html" title="A.1 Directory Listing">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="sql-directory" />
+          <input type="hidden" name="return" value="/doc/internals/en/sql-directory.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="server-tools-directory.html" title="A.1.27 The server-tools Directory">Previous</a> / <a rel="next" href="sql-bench-directory.html" title="A.1.29 The sql-bench Directory">Next</a> / <a rel="up" href="source-directory-listing.html" title="A.1 Directory Listing">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 26.1.2 Adding Error Messages to MySQL 5.0.3 or Higher</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="error-message-multiple-versions.html" title="26.1.1 Adding an Error Message to Multiple MySQL Versions"/><link rel="next" href="error-messages-old-versions.html?ff=nopfpls" title="26.1.3 Adding Error Messages to Old (&amp;lt; MySQL 5.0) Versions"/><link rel="up" href="error-message-adding.html" title="26.1 Adding New Error Messages to MySQL"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Ferror-messages-5-0-3-higher.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="error-messages.html">26 Error Messages</a> :: <a href="error-message-adding.html">26.1 Adding New Error Messages to MySQL</a> :: 26.1.2 Adding Error Messages to MySQL 5.0.3 or Higher</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="error-message-multiple-versions.html" title="Previous Section">&laquo; 26.1.1 Adding an Error Message to Multiple MySQL Versions</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="error-messages-old-versions.html" title="Next Section">26.1.3 Adding Error Messages to Old (&lt; MySQL 5.0) Versions  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="error-message-adding.html">26.1 Adding New Error Messages to MySQL</a></li><li><a href="error-message-multiple-versions.html">26.1.1 Adding an Error Message to Multiple MySQL Versions</a></li>
+<li class="self">26.1.2 Adding Error Messages to MySQL 5.0.3 or Higher</li>
+<li><a href="error-messages-old-versions.html">26.1.3 Adding Error Messages to Old (&amp;lt; MySQL 5.0) Versions</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="error-messages-5-0-3-higher"></a>26.1.2 Adding Error Messages to MySQL 5.0.3 or Higher</h3>
+
+</div>
+
+</div>
+
+</div>
+<p>
+        The file you edit to add a new error message depends on your
+        version of MySQL:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            MySQL 5.0.3 up to 5.5: Edit <code class="literal">errmsg.txt</code>
+          </p></li><li class="listitem"><p>
+            MySQL 5.5 and up: Edit <code class="literal">errmsg-utf8.txt</code>
+</p></li></ul>
+</div>
+<p>
+        In either case, <span class="bold"><strong>comp_err</strong></span>
+        generates the header files automatically during the MySQL build
+        process.
+      </p><p>
+        The <code class="literal">errmsg.txt</code> (or
+        <code class="literal">errmsg-utf8.txt</code>) file begins with some lines
+        that define general characteristics of error messages, followed
+        by sections for particular messages. The following example shows
+        a partial listing of the file. (The <code class="literal">languages</code>
+        line is wrapped here; it must be given all on one line.)
+      </p><pre class="programlisting">
+languages czech=cze latin2, danish=dan latin1, dutch=nla latin1,
+english=eng latin1, estonian=est latin7, french=fre latin1, german=ger
+latin1, greek=greek greek, hungarian=hun latin2, italian=ita latin1,
+japanese=jpn ujis, japanese-sjis=jps sjis, korean=kor euckr,
+norwegian-ny=norwegian-ny latin1, norwegian=nor latin1, polish=pol
+latin2, portuguese=por latin1, romanian=rum latin2, russian=rus
+koi8r, serbian=serbian cp1250, slovak=slo latin2, spanish=spa latin1,
+swedish=swe latin1, ukrainian=ukr koi8u;
+
+default-language eng
+
+start-error-number 1000
+
+ER_HASHCHK
+        eng "hashchk"
+ER_NISAMCHK
+        eng "isamchk"
+ER_NO
+        cze "NE"
+        dan "NEJ"
+        nla "NEE"
+        eng "NO"
+        est "EI"
+        ...
+</pre><p>
+        A line beginning with a '<code class="literal">#</code>' character is
+        taken as a comment. Comments and blank lines are ignored.
+      </p><p>
+        Indentation is significant. Unless otherwise specified, leading
+        whitespace should not be used.
+      </p><p>
+        The grammar of the <code class="literal">errmsg.txt</code> file looks like
+        this:
+      </p><pre class="programlisting">
+languages langspec [, langspec] ... ;
+
+start-error-number number
+
+default-language langcode
+
+error-message-section
+error-message-section
+...
+</pre><p>
+        The <code class="literal">languages</code> line lists the languages for
+        which language-specific <code class="literal">errmsg.sys</code> files
+        should be generated. A language specification
+        <span class="emphasis"><em><code class="literal">langspec</code></em></span> in the
+        <code class="literal">languages</code> line has this syntax:
+      </p><pre class="programlisting"><span class="emphasis"><em>langspec</em></span>: <span class="emphasis"><em>langname</em></span>=<span class="emphasis"><em>langcode</em></span><span class="emphasis"><em>langcharset</em></span></pre><p>
+        <span class="emphasis"><em>langname</em></span> is the long language name,
+        <span class="emphasis"><em>langcode</em></span> is the short language code, and
+        <span class="emphasis"><em>langcharset</em></span> is the character set to use for
+        error messages in the language. <span class="emphasis"><em>langcharset</em></span>
+        is irrelevant as of MySQL 5.5 because all
+        <code class="literal">errmsg.sys</code> files are written using
+        <code class="literal">utf8</code>.
+      </p><p>
+        The <code class="literal">default-language</code> line specifies the short
+        language code for the default language. (If there is no
+        translation into a given language for a given error message, the
+        message from the default language will be used.)
+      </p><p>
+        The <code class="literal">start-error-number</code> line indicates the
+        number to be assigned to the first error message. Messages that
+        follow the first one are numbered consecutively from this value.
+</p>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+
+<div class="admon-title">
+Note
+</div>
+<p>
+          Beginning with MySQL 5.7.6, the file can contain multiple
+          <code class="literal">start-error-number</code> lines, with each one
+          resetting the numbering. This enables the file to contain
+          multiple ranges of error numbers. For example, this capability
+          is used to cause 5.7-specific error numbers to begin at 3000.
+</p>
+</div>
+<p>
+        Each <span class="emphasis"><em>error-message-section</em></span> begins with a
+        line that lists an error (or warning) symbol, optionally
+        followed by one or two SQLSTATE values. The error symbol must
+        begin with <code class="literal">ER_</code> for an error or
+        <code class="literal">WARN_</code> for a warning. Lines following the
+        error symbol line provide language-specific error messages that
+        correspond to the error symbol. Each message line consists of a
+        tab, a short language code, a space, and the text of the error
+        message within double quote ('<code class="literal">"</code>') characters.
+        Presumably, there must be a message in the default language.
+        There may be message translations for other languages. Order of
+        message lines within a section does not matter. If no
+        translation is given for a given language, the default language
+        message will be used. The following example defines several
+        language translations for the
+        <code class="literal">ER_BAD_FIELD_ERROR</code> symbol:
+      </p><pre class="programlisting">
+ER_BAD_FIELD_ERROR 42S22 S0022
+        dan "Ukendt kolonne '%-.64s' i tabel %s"
+        nla "Onbekende kolom '%-.64s' in %s"
+        eng "Unknown column '%-.64s' in '%-.64s'"
+        est "Tundmatu tulp '%-.64s' '%-.64s'-s"
+        fre "Champ '%-.64s' inconnu dans %s"
+        ger "Unbekanntes Tabellenfeld '%-.64s' in %-.64s"
+</pre><p>
+        In the preceding example, two SQLSTATE values are given
+        following the error symbol (<code class="literal">42S22</code>,
+        <code class="literal">S0022</code>). Internally (in
+        <code class="literal">sql/sql_state.c</code>), these are known as
+        <code class="literal">odbc_state</code> and <code class="literal">jdbc_state</code>.
+        Currently, only the first appears ever to be used.
+      </p><p>
+        In <code class="literal">errmsg-utf8.txt</code>, the entire file is
+        written in <code class="literal">utf8</code>. As long as your editor can
+        handle <code class="literal">utf8</code>, there should be no problem
+        editing the file.
+      </p><p>
+        <span class="emphasis"><em>In <code class="literal">errmsg.txt</code>, message strings for
+        a given language must be written in the character set indicated
+        for that language in the <code class="literal">languages</code>
+        line.</em></span> For example, the language information for
+        Japanese in that line is <code class="literal">japanese=jpn ujis</code>,
+        so messages with a language code of <code class="literal">jpn</code> must
+        be written in the <code class="literal">ujis</code> character set. You
+        might need to be careful about the editor you use for editing
+        the <code class="literal">errmsg.txt</code> file. For example, there is a
+        report that using <span class="bold"><strong>Emacs</strong></span> will
+        mangle the file, whereas <span class="bold"><strong>vi</strong></span>
+        will not.
+      </p><p>
+        Within a message string, C-style escape sequences are allowed:
+      </p><pre class="programlisting">
+\\  \
+\"  "
+\n  newline
+\N  N, where N is an octal number
+\X  X, for any other X
+</pre><p>
+        In MySQL 5.5 and up, error messages can contain positional
+        constructs for arguments. This is convenient when arguments are
+        most naturally specified in different orders in different
+        languages. Positional arguments enable and error-message writer
+        to avoid awkward language or unnecessarily long messages that
+        result from having the arguments in the same order in all
+        languages.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            To specify a positional argument, include a single digit 0
+            to 9 and a dollar sign in the formatting specifier for each
+            argument in the error message:
+            <code class="literal">"%1$.32s %2$.64s"</code> includes the first
+            argument, then the second, in that order.
+            <code class="literal">"%2$.64s %1$.32s"</code> includes the second
+            argument, then the first.
+          </p></li><li class="listitem"><p>
+            If any argument is positional, all must be positional. This
+            is illegal: <code class="literal">"%1$.32s %.64s"</code>
+          </p></li><li class="listitem"><p>
+            Duplicates are allowed. This is legal even though it
+            includes the first argument twice:
+            <code class="literal">"%1$.32s %2$.64s %1$.32s"</code>
+          </p></li><li class="listitem"><p>
+            Gaps in positional number are not allowed. This is illegal
+            because <code class="literal">$2</code> is missing:
+            <code class="literal">"%1$.32s %3$.64s"</code>
+</p></li></ul>
+</div>
+<p>
+        Use the following procedure to add new error messages:
+</p>
+<div class="orderedlist">
+<ol class="orderedlist" type="1"><li class="listitem"><p>
+            To add a new language translation for an existing error
+            message, find the section for the appropriate error symbol.
+            Then add a new message line to the section. For example:
+</p></li></ol>
+</div>
+<p>
+        Before:
+      </p><pre class="programlisting">
+ER_UNKNOWN_COLLATION  
+        eng "Unknown collation: '%-.64s'"
+        ger "Unbekannte Kollation: '%-.64s'"
+        por "Collation desconhecida: '%-.64s'"
+</pre><p>
+        After (with a new Spanish translation):
+      </p><pre class="programlisting">
+ER_UNKNOWN_COLLATION  
+        eng "Unknown collation: '%-.64s'"
+        ger "Unbekannte Kollation: '%-.64s'"
+        por "Collation desconhecida: '%-.64s'"
+        spa "Collation desconocida: '%-.64s'"
+</pre>
+<div class="orderedlist">
+<ol class="orderedlist" type="1"><li class="listitem"><p>
+            To add an entirely new error message, go to the end of the
+            <code class="filename">errmsg.txt</code> file. Add a new error symbol
+            line, followed by a message line for the default language,
+            and message lines for any translations that you can supply.
+          </p></li><li class="listitem"><p>
+            Make a full build (<span class="command"><strong>configure</strong></span> +
+            <span class="command"><strong>make</strong></span>). A <span class="command"><strong>make all</strong></span> is
+            insufficient to build the
+            <code class="filename">sql/share/*/errmsg.sys</code> files.
+</p></li></ol>
+</div>
+<p>
+        <span class="command"><strong>comp_err</strong></span> will generate the
+        <code class="filename">errmsg.sys</code> files, as well as the header
+        files <code class="filename">mysqld_error.h</code>,
+        <code class="filename">mysqld_ername.h</code>, and
+        <code class="filename">sql_state.h</code> in the
+        <code class="filename">include</code> directory.
+      </p><p>
+        Be aware that if you make a mistake editing a message text file,
+        <span class="bold"><strong>comp_err</strong></span> prints a cryptic error
+        message and gives you no other feedback. For example, it does
+        not print the input line number where it found a problem. It's
+        up to you to figure this out and correct the file. Perhaps that
+        is not a serious difficulty: <code class="literal">errmsg.txt</code> (or
+        <code class="literal">errmsg-utf8.txt</code>) tends to grow by gradual
+        accretion, so if an error occurs when
+        <span class="bold"><strong>comp_err</strong></span> processes it, the
+        problem is likely due to whatever change you just made.
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="error-message-multiple-versions.html" title="26.1.1 Adding an Error Message to Multiple MySQL Versions">Previous</a> / <a rel="next" href="error-messages-old-versions.html" title="26.1.3 Adding Error Messages to Old (&amp;lt; MySQL 5.0) Versions">Next</a> / <a rel="up" href="error-message-adding.html" title="26.1 Adding New Error Messages to MySQL">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="error-messages-5-0-3-higher" />
+          <input type="hidden" name="return" value="/doc/internals/en/error-messages-5-0-3-higher.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="error-message-multiple-versions.html" title="26.1.1 Adding an Error Message to Multiple MySQL Versions">Previous</a> / <a rel="next" href="error-messages-old-versions.html" title="26.1.3 Adding Error Messages to Old (&amp;lt; MySQL 5.0) Versions">Next</a> / <a rel="up" href="error-message-adding.html" title="26.1 Adding New Error Messages to MySQL">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

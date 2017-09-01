@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 20.4.2 The myisampack Program</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="huffman-compression.html" title="20.4.1 Huffman Compression"/><link rel="next" href="record-and-blob-length-encoding.html?ff=nopfpls" title="20.4.3 Record and Blob Length Encoding"/><link rel="up" href="myisam-compressed-data-file-layout.html" title="20.4 MyISAM Compressed Data File Layout"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fmyisampack.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.7/en/myisampack.html" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.6/en/myisampack.html" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.5/en/myisampack.html" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.1/en/myisampack.html" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.0/en/myisampack.html" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/4.1/en/myisampack.html" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="myisam.html">20 MyISAM Storage Engine</a> :: <a href="myisam-compressed-data-file-layout.html">20.4 MyISAM Compressed Data File Layout</a> :: 20.4.2 The myisampack Program</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="huffman-compression.html" title="Previous Section">&laquo; 20.4.1 Huffman Compression</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="record-and-blob-length-encoding.html" title="Next Section">20.4.3 Record and Blob Length Encoding  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="myisam-compressed-data-file-layout.html">20.4 MyISAM Compressed Data File Layout</a></li><li><a href="huffman-compression.html">20.4.1 Huffman Compression</a></li>
+<li class="self">20.4.2 The myisampack Program</li>
+<li><a href="record-and-blob-length-encoding.html">20.4.3 Record and Blob Length Encoding</a></li>
+<li><a href="code-tree-representation.html">20.4.4 Code Tree Representation</a></li>
+<li><a href="index-file-usage.html">20.4.5 Usage of the Index File</a></li>
+<li><a href="myisampack-tricks.html">20.4.6 myisampackTricks</a></li>
+<li><a href="decoding-specification.html">20.4.7 Detailed Specification of the Decoding</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="myisampack"></a>20.4.2 The myisampack Program</h3>
+
+</div>
+
+</div>
+
+</div>
+<p>
+        <a class="link" href="myisampack.html" title="20.4.2 The myisampack Program"><span class="command"><strong>myisampack</strong></span></a> tries both ways to compress the
+        column values. When starting to analyze the existing
+        uncompressed data, it collects distinct column values up to a
+        limit of 8KB. If there are more, it falls back to byte value
+        compression for this column.
+      </p><p>
+        This means also that <a class="link" href="myisampack.html" title="20.4.2 The myisampack Program"><span class="command"><strong>myisampack</strong></span></a> may use
+        different algorithms for different columns. Besides a couple of
+        other tricks, <a class="link" href="myisampack.html" title="20.4.2 The myisampack Program"><span class="command"><strong>myisampack</strong></span></a> determines for every
+        column if distinct column value compression or byte value
+        compression is better. After that it tries to combine byte value
+        compression trees of different columns into one or more code
+        trees. This means that finally we may have less code trees than
+        columns. Therefore the column information in the file header
+        contains the number of the code tree used for each column. Some
+        columns might not need a code tree at all. This happens for
+        columns which have the same value in all records.
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="huffman-compression.html" title="20.4.1 Huffman Compression">Previous</a> / <a rel="next" href="record-and-blob-length-encoding.html" title="20.4.3 Record and Blob Length Encoding">Next</a> / <a rel="up" href="myisam-compressed-data-file-layout.html" title="20.4 MyISAM Compressed Data File Layout">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><table id="c6053" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Jim Grill on May 3 2005 3:41pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=6053&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=6053&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html">Edit</a>]</td></tr></table><p class="commenttext">To see if a table is, in fact, compressed and that MySQL is using the compressed table, issue the following query:<br /><br />mysql&gt; SHOW TABLE STATUS FROM dbname LIKE 'tableName'\G<br /><br />The results will be similar to the following:<br /><br />*************************** 1. row ***************************<br />           Name: tableName<br />         Engine: MyISAM<br />        Version: 9<br />     Row_format: Compressed<br />           Rows: 8887<br /> Avg_row_length: 13<br />    Data_length: 120476<br />Max_data_length: 4294967295<br />   Index_length: 329728<br />      Data_free: 0<br /> Auto_increment: 21657<br />    Create_time: 2005-04-29 12:24:35<br />    Update_time: 2005-04-29 12:24:41<br />     Check_time: 2005-05-02 14:40:13<br />      Collation: latin1_swedish_ci<br />       Checksum: 2854389546<br /> Create_options:<br />        Comment:<br />1 row in set (0.72 sec)<br /><br />Notice the Row_format is shown as &quot;Compressed&quot;.<br /><br />If you do not see &quot;Compressed&quot; as the Row_format try issuing a &quot;FLUSH TABLE tableName;&quot; to force MySQL to reload the table and try again.<br /></p><table id="c6066" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Jim Grill on May 6 2005 10:06pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=6066&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=6066&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html">Edit</a>]</td></tr></table><p class="commenttext">It seems there are some particular issues regarding &quot;show table status&quot; with compressed tables on a working server.<br /><br />After further experimentation and some help from mysql support, it seems that the best method for compressing tables on a working database (even if you know the table will not be used during the process) is to first obtain a lock via a mysql client program and then flush the table.  While leaving your client program connected and holding the lock, use the myisampack and myisamchk utilities per the above documentation.<br /><br />When complete, release the lock and flush the table again.<br /><br />Always do issue a &quot;show table status...&quot; and check the &quot;Row_format&quot; field.  The Row_format should be &quot;Compressed&quot;.  If your table still shows something other than &quot;Compressed&quot; as the Row_format or if you are getting erroneous data from selects try issuing a &quot;flush tables&quot; statement.<br /><br />Hope that helps.  Have fun!<br /></p><table id="c9228" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by J Jorgenson on January 23 2008 9:38pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=9228&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9228&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html">Edit</a>]</td></tr></table><p class="commenttext">Beware that packing a table while the database is running can lead to data corruption, and is unsupported by MySQL AB.  However I've been able to successfully pack 100s of tables on a running database with only a minor warning in the end result.  The minor warning is result from the table not being closed.<br /><br />How to pack a table on a 'live' system:<br />step 1: LOCK TABLE x FOR WRITE;<br />step 2: FLUSH TABLE x;<br />step 3: myisamchk -cFU  -- fast check for pre-existing errors.  Don't pack if errors exist. Ignore the warning of table &quot;not closed&quot; because this check will go ahead and closed the DB files.<br />step 4: myisampack -f   -- force overwrite of any preexisting .TMD file<br />step 5: myisamchk -raqS  -- rebuild the index after pack<br />step 6: FLUSH TABLE x;   -- force reload of info_schema data<br />step 7: UNLOCK TABLES;   -- Release the table.<br /><br />Ultimatly the results of table packing is to trade the bottleneck of Disk i/o for CPU cycles, by unpacking more records for the same sized block of data.  We have reduced tables that take 1G down to 250M with myisampack.<br /><br />Enjoy!<br /></p><table id="c9229" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by J Jorgenson on January 23 2008 9:49pm</td><td align="right">[<a href="/doc/mysql/comment.php?id=9229&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9229&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html">Edit</a>]</td></tr></table><p class="commenttext">Details to NOT miss about packed tables:<br />1) Once you have Packed a MyISAM table is it **READ ONLY**.  <br />You can only Select From or Truncate the table. No updates or Inserts are allowed.<br />2) The Archive Engine produces a smaller table, it won't have an Index, but new records can still be appended.<br />3) The DATA is not sorted by myisampack.<br />4) You must rebuild the index after packing: myisamchk -raqS<br /><br />I've found the performance gains and disk space savings from packed tables is worth having to rebuilding the data periodically.  <br />I'm looking forward to combine partitioning of packed and unpacked tables for an archival system.<br /><br />-- JJ --<br /></p><table id="c9246" class="commentdetails" summary="" width="100%" border="0" cellpadding="0" cellspacing="0"><tr><td>Posted by Mark Robson on January 28 2008 10:33am</td><td align="right">[<a href="/doc/mysql/comment.php?id=9246&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html&amp;action=delete">Delete</a>] [<a href="/doc/mysql/comment.php?id=9246&amp;return=%2Fdoc%2Finternals%2Fen%2Fmyisampack.html">Edit</a>]</td></tr></table><p class="commenttext">Another important note:<br /><br />The mmap() behaviour described here is not optional and may cause a 32-bit server to run out of address space sooner than it otherwise would.<br /><br />Therefore I strongly recommend factoring address space usage into any feasibility study of myisampack on 32-bit systems.<br /></p><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="myisampack" />
+          <input type="hidden" name="return" value="/doc/internals/en/myisampack.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="huffman-compression.html" title="20.4.1 Huffman Compression">Previous</a> / <a rel="next" href="record-and-blob-length-encoding.html" title="20.4.3 Record and Blob Length Encoding">Next</a> / <a rel="up" href="myisam-compressed-data-file-layout.html" title="20.4 MyISAM Compressed Data File Layout">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

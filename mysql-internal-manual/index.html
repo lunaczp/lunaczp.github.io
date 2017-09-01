@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="next" href="preface.html?ff=nopfpls" title=" Preface and Legal Notice"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Findex.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.7/en/index.html" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.6/en/index.html" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.5/en/index.html" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.1/en/index.html" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/5.0/en/index.html" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="/doc/refman/4.1/en/index.html" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"> MySQL Internals Manual</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+				<a style="text-decoration: none" href="preface.html" title="Next Section"> Preface and Legal Notice  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="self"> MySQL Internals Manual
+<ul class="children">
+<li><a href="preface.html"> Preface and Legal Notice</a></li>
+<li><a href="guided-tour.html">1 A Guided Tour Of The MySQL Source Code</a></li>
+<li><a href="coding-guidelines.html">2 Coding Guidelines</a></li>
+<li><a href="reusable-classes-and-templates.html">3 Reusable Classes and Templates</a></li>
+<li><a href="cmake.html">4 Building MySQL Server with CMake</a></li>
+<li><a href="plugins.html">5 Plugins</a></li>
+<li><a href="transaction-management.html">6 Transaction Handling in the Server</a></li>
+<li><a href="optimizer.html">7 The Optimizer</a></li>
+<li><a href="optimizer-tracing.html">8 Tracing the Optimizer</a></li>
+<li><a href="memory-allocation.html">9 Memory Allocation</a></li>
+<li><a href="algorithms.html">10 Important Algorithms and Structures</a></li>
+<li><a href="fileformats.html">11 File Formats</a></li>
+<li><a href="selects.html">12 How MySQL Performs Different Selects</a></li>
+<li><a href="transformations.html">13 How MySQL Transforms Subqueries</a></li>
+<li><a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a></li>
+<li><a href="stored-programs.html">15 Stored Programs</a></li>
+<li><a href="prepared-stored.html">16 Prepared Statement and Stored Routine Re-Execution</a></li>
+<li><a href="result-postprocessing-procedures.html">17 Writing a Procedure</a></li>
+<li><a href="replication.html">18 Replication</a></li>
+<li><a href="binary-log.html">19 The Binary Log</a></li>
+<li><a href="myisam.html">20 MyISAM Storage Engine</a></li>
+<li><a href="innodb.html">21 InnoDB Storage Engine</a></li>
+<li><a href="custom-engine.html">22 Writing a Custom Storage Engine</a></li>
+<li><a href="test-synchronization.html">23 Test Synchronization</a></li>
+<li><a href="test-faults.html">24 Injecting Test Faults</a></li>
+<li><a href="good-tests.html">25 How to Create Good Test Cases</a></li>
+<li><a href="error-messages.html">26 Error Messages</a></li>
+<li><a href="files-in-mysql-sources.html">A MySQL Source Code Distribution</a></li>
+<li><a href="files-in-innodb-sources.html">B InnoDB Source Code Distribution</a></li>
+<li><a href="ix01.html"> Index</a></li>
+</ul>
+</li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div lang="en" class="book">
+
+<div class="titlepage">
+<div>
+<div>
+<h1 class="title"><a name="internals"></a>MySQL Internals Manual</h1>
+</div>
+<div>
+
+<div class="abstract">
+<p class="title"><b>Abstract</b></p><p>
+        This is the MySQL Internals Manual.
+      </p><p>
+        Document generated on:
+
+2015-01-28
+
+        (revision: 322)
+      </p><p>
+        For legal information, see the <a class="link" href="preface.html#legalnotice" title="Legal Notices">Legal
+        Notice</a>.
+</p>
+</div>
+
+</div>
+
+</div>
+<hr>
+</div>
+<div class="toc">
+<p><b>Table of Contents</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-1'); toggle('tocdetail-2'); toggle('tocdetail-3'); toggle('tocdetail-4'); toggle('tocdetail-5'); toggle('tocdetail-6'); toggle('tocdetail-7'); toggle('tocdetail-8'); toggle('tocdetail-9'); toggle('tocdetail-10'); toggle('tocdetail-11'); toggle('tocdetail-12'); toggle('tocdetail-13'); toggle('tocdetail-14'); toggle('tocdetail-15'); toggle('tocdetail-16'); toggle('tocdetail-17'); toggle('tocdetail-18'); toggle('tocdetail-19'); toggle('tocdetail-20'); toggle('tocdetail-21'); toggle('tocdetail-22'); toggle('tocdetail-23'); toggle('tocdetail-24'); toggle('tocdetail-25'); toggle('tocdetail-26'); toggle('tocdetail-27'); toggle('tocdetail-28'); toggle('tocdetail-29'); toggle('tocdetail-30'); toggle('tocdetail-31'); toggle('tocdetail-32'); toggle('tocdetail-33'); toggle('tocdetail-34'); toggle('tocdetail-35'); toggle('tocdetail-36'); toggle('tocdetail-37'); toggle('tocdetail-38'); toggle('tocdetail-39'); toggle('tocdetail-40'); toggle('tocdetail-41'); toggle('tocdetail-42'); toggle('tocdetail-43'); toggle('tocdetail-44'); toggle('tocdetail-45'); toggle('tocdetail-46'); toggle('tocdetail-47'); toggle('tocdetail-48'); toggle('tocdetail-49'); toggle('tocdetail-50'); toggle('tocdetail-51'); toggle('tocdetail-52'); toggle('tocdetail-53'); toggle('tocdetail-54'); toggle('tocdetail-55'); toggle('tocdetail-56'); toggle('tocdetail-57'); toggle('tocdetail-58'); toggle('tocdetail-59'); toggle('tocdetail-60'); toggle('tocdetail-61'); toggle('tocdetail-62'); toggle('tocdetail-63'); toggle('tocdetail-64'); toggle('tocdetail-65'); toggle('tocdetail-66'); toggle('tocdetail-67'); toggle('tocdetail-68'); toggle('tocdetail-69'); toggle('tocdetail-70'); toggle('tocdetail-71'); toggle('tocdetail-72'); toggle('tocdetail-73'); toggle('tocdetail-74'); toggle('tocdetail-75'); toggle('tocdetail-76'); toggle('tocdetail-77'); toggle('tocdetail-78'); toggle('tocdetail-79'); toggle('tocdetail-80'); toggle('tocdetail-81'); toggle('tocdetail-82'); toggle('tocdetail-83'); toggle('tocdetail-84'); toggle('tocdetail-85'); toggle('tocdetail-86'); toggle('tocdetail-87'); toggle('tocdetail-88'); toggle('tocdetail-89'); toggle('tocdetail-90'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-1'); toggle('tocdetail-2'); toggle('tocdetail-3'); toggle('tocdetail-4'); toggle('tocdetail-5'); toggle('tocdetail-6'); toggle('tocdetail-7'); toggle('tocdetail-8'); toggle('tocdetail-9'); toggle('tocdetail-10'); toggle('tocdetail-11'); toggle('tocdetail-12'); toggle('tocdetail-13'); toggle('tocdetail-14'); toggle('tocdetail-15'); toggle('tocdetail-16'); toggle('tocdetail-17'); toggle('tocdetail-18'); toggle('tocdetail-19'); toggle('tocdetail-20'); toggle('tocdetail-21'); toggle('tocdetail-22'); toggle('tocdetail-23'); toggle('tocdetail-24'); toggle('tocdetail-25'); toggle('tocdetail-26'); toggle('tocdetail-27'); toggle('tocdetail-28'); toggle('tocdetail-29'); toggle('tocdetail-30'); toggle('tocdetail-31'); toggle('tocdetail-32'); toggle('tocdetail-33'); toggle('tocdetail-34'); toggle('tocdetail-35'); toggle('tocdetail-36'); toggle('tocdetail-37'); toggle('tocdetail-38'); toggle('tocdetail-39'); toggle('tocdetail-40'); toggle('tocdetail-41'); toggle('tocdetail-42'); toggle('tocdetail-43'); toggle('tocdetail-44'); toggle('tocdetail-45'); toggle('tocdetail-46'); toggle('tocdetail-47'); toggle('tocdetail-48'); toggle('tocdetail-49'); toggle('tocdetail-50'); toggle('tocdetail-51'); toggle('tocdetail-52'); toggle('tocdetail-53'); toggle('tocdetail-54'); toggle('tocdetail-55'); toggle('tocdetail-56'); toggle('tocdetail-57'); toggle('tocdetail-58'); toggle('tocdetail-59'); toggle('tocdetail-60'); toggle('tocdetail-61'); toggle('tocdetail-62'); toggle('tocdetail-63'); toggle('tocdetail-64'); toggle('tocdetail-65'); toggle('tocdetail-66'); toggle('tocdetail-67'); toggle('tocdetail-68'); toggle('tocdetail-69'); toggle('tocdetail-70'); toggle('tocdetail-71'); toggle('tocdetail-72'); toggle('tocdetail-73'); toggle('tocdetail-74'); toggle('tocdetail-75'); toggle('tocdetail-76'); toggle('tocdetail-77'); toggle('tocdetail-78'); toggle('tocdetail-79'); toggle('tocdetail-80'); toggle('tocdetail-81'); toggle('tocdetail-82'); toggle('tocdetail-83'); toggle('tocdetail-84'); toggle('tocdetail-85'); toggle('tocdetail-86'); toggle('tocdetail-87'); toggle('tocdetail-88'); toggle('tocdetail-89'); toggle('tocdetail-90'); return false; } ">+/-</a>]</small></p><dl id="tocdetail"><dt><span class="preface"><a href="preface.html">Preface and Legal Notice</a></span></dt><dt><span class="chapter"><a href="guided-tour.html">1 A Guided Tour Of The MySQL Source Code</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-1'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-1'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-1"><dl><dt><span class="section"><a href="getting-source-tree.html">1.1 Getting the Source Tree</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-2'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-2'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-2"><dl><dt><span class="section"><a href="getting-source-tree-git.html">1.1.1 Getting the Source Tree (Git)</a></span></dt><dt><span class="section"><a href="getting-source-tree-bazaar.html">1.1.2 Getting the Source Tree (Bazaar)</a></span></dt></dl></dd><dt><span class="section"><a href="guided-tour-majordir.html">1.2 The Major Directories</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-3'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-3'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-3"><dl><dt><span class="section"><a href="guided-tour-majordir-build.html">1.2.1 Major Directories: BUILD</a></span></dt><dt><span class="section"><a href="guided-tour-majordir-client.html">1.2.2 Major Directories: client</a></span></dt><dt><span class="section"><a href="guided-tour-majordir-myisam.html">1.2.3 Major Directories: myisam</a></span></dt><dt><span class="section"><a href="guided-tour-majordir-mysys.html">1.2.4 Major Directories: mysys</a></span></dt><dt><span class="section"><a href="guided-tour-majordir-sql.html">1.2.5 Major Directories: sql</a></span></dt><dt><span class="section"><a href="guided-tour-majordir-vio.html">1.2.6 Major Directories: vio</a></span></dt></dl></dd><dt><span class="section"><a href="guided-tour-flow.html">1.3 The Flow</a></span></dt><dt><span class="section"><a href="guided-tour-osdir.html">1.4 The Open-Source Directories</a></span></dt><dt><span class="section"><a href="guided-tour-sedir.html">1.5 The Internal and External Storage Engine Directories</a></span></dt><dt><span class="section"><a href="guided-tour-os-specific.html">1.6 The OS-Specific Directories</a></span></dt><dt><span class="section"><a href="guided-tour-oddsends.html">1.7 Odds and Ends</a></span></dt><dt><span class="section"><a href="guided-tour-chunk.html">1.8 A Chunk of Code in /sql/sql_update.cc</a></span></dt><dt><span class="section"><a href="guided-tour-skeleton.html">1.9 The Skeleton of the Server Code</a></span></dt><dt><span class="section"><a href="guided-tour-recap.html">1.10 Recap</a></span></dt></dl></dd><dt><span class="chapter"><a href="coding-guidelines.html">2 Coding Guidelines</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-4'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-4'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-4"><dl><dt><span class="section"><a href="general-development-guidelines.html">2.1 General Development Guidelines</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-5'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-5'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-5"><dl><dt><span class="section"><a href="coding-guidelines-c.html">2.1.1 C/C++ Coding Guidelines of MySQL Server</a></span></dt><dt><span class="section"><a href="maintaining-coding-guidelines.html">2.1.2 How We Maintain the Server Coding Guidelines</a></span></dt><dt><span class="section"><a href="indentation-spacing.html">2.1.3 Indentation and Spacing</a></span></dt><dt><span class="section"><a href="naming-conventions.html">2.1.4 Naming Conventions</a></span></dt><dt><span class="section"><a href="commenting-code.html">2.1.5 Commenting Code</a></span></dt><dt><span class="section"><a href="header-files.html">2.1.6 Header Files</a></span></dt><dt><span class="section"><a href="additional-suggestions.html">2.1.7 Additional Suggestions</a></span></dt><dt><span class="section"><a href="suggested-mode-emacs.html">2.1.8 Suggested Mode in emacs</a></span></dt><dt><span class="section"><a href="basic-vim-setup.html">2.1.9 Basic vim Setup</a></span></dt><dt><span class="section"><a href="alternative-vim-setup.html">2.1.10 Another vim Setup</a></span></dt><dt><span class="section"><a href="example-setup-ctags.html">2.1.11 Example Setup for ctags</a></span></dt></dl></dd><dt><span class="section"><a href="c-plus-plus-coding-guidelines-ndb.html">2.2 C++ Coding Guidelines for the NDB Storage Engine</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-6'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-6'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-6"><dl><dt><span class="section"><a href="braces.html">2.2.1 Braces</a></span></dt><dt><span class="section"><a href="assignment.html">2.2.2 Assignment</a></span></dt><dt><span class="section"><a href="ndbrequire.html">2.2.3 Use of ndbrequire</a></span></dt></dl></dd><dt><span class="section"><a href="dbug-tags.html">2.3 DBUG Tags</a></span></dt></dl></dd><dt><span class="chapter"><a href="reusable-classes-and-templates.html">3 Reusable Classes and Templates</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-7'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-7'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-7"><dl><dt><span class="section"><a href="containers.html">3.1 Containers</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-8'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-8'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-8"><dl><dt><span class="section"><a href="array.html">3.1.1 Array</a></span></dt><dt><span class="section"><a href="i-p-list.html">3.1.2 I_P_List</a></span></dt><dt><span class="section"><a href="i-list.html">3.1.3 I_List</a></span></dt></dl></dd><dt><span class="section"><a href="memory-management.html">3.2 Memory Management</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-9'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-9'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-9"><dl><dt><span class="section"><a href="mem-root.html">3.2.1 MEM_ROOT</a></span></dt></dl></dd><dt><span class="section"><a href="extending-this-page.html">3.3 How to Extend This Page</a></span></dt></dl></dd><dt><span class="chapter"><a href="cmake.html">4 Building MySQL Server with CMake</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-10'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-10'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-10"><dl><dt><span class="section"><a href="cmake-prerequisites.html">4.1 CMake Prerequisites</a></span></dt><dt><span class="section"><a href="cmake-installation.html">4.2 How to Install CMake</a></span></dt><dt><span class="section"><a href="cmake-howto-quick.html">4.3 Quick How-to-Build Instructions</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-11'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-11'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-11"><dl><dt><span class="section"><a href="cmake-howto-quick-release-configuration.html">4.3.1 Release Configuration</a></span></dt><dt><span class="section"><a href="cmake-howto-quick-debug-configuration.html">4.3.2 Debug Configuration</a></span></dt><dt><span class="section"><a href="cmake-build-options-official-mysql.html">4.3.3 Building Using the Same Options as MySQL Official Releases</a></span></dt></dl></dd><dt><span class="section"><a href="cmake-howto-detailed.html">4.4 Detailed How-to-Build Instructions</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-12'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-12'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-12"><dl><dt><span class="section"><a href="creating-build-directory.html">4.4.1 Create the Build Directory</a></span></dt><dt><span class="section"><a href="configuration-step.html">4.4.2 Configure the Build</a></span></dt><dt><span class="section"><a href="listing-configuration-options.html">4.4.3 Listing Configuration Options</a></span></dt><dt><span class="section"><a href="changing-configuration-options.html">4.4.4 Changing Configuration Options</a></span></dt><dt><span class="section"><a href="debug-configurations.html">4.4.5 Building Debug Configurations</a></span></dt><dt><span class="section"><a href="building-with-cmake.html">4.4.6 Building With CMake</a></span></dt><dt><span class="section"><a href="configure-emulation.html">4.4.7 ./configure Emulation</a></span></dt><dt><span class="section"><a href="writing-platform-checks.html">4.4.8 For Developers: How to Write Platform Checks</a></span></dt><dt><span class="section"><a href="troubleshooting-cmake-code.html">4.4.9 Troubleshooting CMake Code</a></span></dt><dt><span class="section"><a href="tips-for-cmake-developers.html">4.4.10 Developer CMake Tips</a></span></dt><dt><span class="section"><a href="mysql-specific-cmake-macros.html">4.4.11 MySQL-Specific CMake Macros</a></span></dt><dt><span class="section"><a href="cmake-interface-to-third-party-tools.html">4.4.12 Interface to Third-Party Tools</a></span></dt></dl></dd><dt><span class="section"><a href="cmake-faq.html">4.5 FAQ / Miscellany</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-13'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-13'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-13"><dl><dt><span class="section"><a href="running-mysql-test-run-out-of-source.html">4.5.1 Running mysql-test-run.pl in an Out-of-Source Build</a></span></dt><dt><span class="section"><a href="running-mysql-test-run-visual-studio.html">4.5.2 Running mysql-test-run.pl with Visual Studio or Xcode Projects</a></span></dt><dt><span class="section"><a href="make-distclean.html">4.5.3 make distclean</a></span></dt><dt><span class="section"><a href="compiling-for-different-hardware-achitectures.html">4.5.4 Compiling for Different Hardware Architectures</a></span></dt></dl></dd><dt><span class="section"><a href="autotools-to-cmake.html">4.6 Autotools to CMake Transition Guide</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-14'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-14'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-14"><dl><dt><span class="section"><a href="command-invocation-syntax.html">4.6.1 Command Invocation Syntax</a></span></dt><dt><span class="section"><a href="installation-layout-options.html">4.6.2 Installation Layout Options</a></span></dt><dt><span class="section"><a href="storage-engine-options.html">4.6.3 Storage Engine Options</a></span></dt><dt><span class="section"><a href="library-options.html">4.6.4 Library Options</a></span></dt><dt><span class="section"><a href="miscellaneous-options.html">4.6.5 Miscellaneous Options</a></span></dt><dt><span class="section"><a href="debugging-configuration-process.html">4.6.6 Debugging the Configuration Process</a></span></dt><dt><span class="section"><a href="interface-to-third-party-tools.html">4.6.7 Interface to Third-Party Tools</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="plugins.html">5 Plugins</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-15'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-15'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-15"><dl><dt><span class="section"><a href="cmake-variables-controlling-plugin-building.html">5.1 CMake Variables to Control Plugin Building (MySQL 5.5 and Later)</a></span></dt><dt><span class="section"><a href="cmake-macro-defining-plugin.html">5.2 CMake Macro to Define the Plugin</a></span></dt><dt><span class="section"><a href="autotools-configure-support.html">5.3 Autotools configure Support (MySQL 5.1)</a></span></dt><dt><span class="section"><a href="autotools-plugin-macros.html">5.4 Autotools Plugin Macros</a></span></dt><dt><span class="section"><a href="mysqld-variables-within-plugin.html">5.5 Specifying mysqld Variables Within a Plugin</a></span></dt><dt><span class="section"><a href="additional-accessors-for-plugins.html">5.6 Additional Accessors for Plugins</a></span></dt><dt><span class="section"><a href="mysql-services-for-plugins.html">5.7 MySQL Services for Plugins</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-16'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-16'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-16"><dl><dt><span class="section"><a href="plugin-services-components.html">5.7.1 Plugin Services Components</a></span></dt><dt><span class="section"><a href="writing-services-for-use-from-plugins.html">5.7.2 Writing Services for Use from Within Plugins</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="transaction-management.html">6 Transaction Handling in the Server</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-17'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-17'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-17"><dl><dt><span class="section"><a href="transactions-historical-note.html">6.1 Historical Note</a></span></dt><dt><span class="section"><a href="transactions-current-situation.html">6.2 Current Situation</a></span></dt><dt><span class="section"><a href="transactions-data-layout.html">6.3 Data Layout</a></span></dt><dt><span class="section"><a href="transactions-life-cycle.html">6.4 Transaction Life Cycle</a></span></dt><dt><span class="section"><a href="transactions-roles-responsibilities.html">6.5 Roles and Responsibilities</a></span></dt><dt><span class="section"><a href="transactions-notes-on-ddl-and-normal-transaction.html">6.6 Additional Notes on DDL and the Normal Transaction</a></span></dt></dl></dd><dt><span class="chapter"><a href="optimizer.html">7 The Optimizer</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-18'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-18'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-18"><dl><dt><span class="section"><a href="optimizer-code-concepts.html">7.1 Code and Concepts</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-19'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-19'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-19"><dl><dt><span class="section"><a href="optimizer-definitions.html">7.1.1 Definitions</a></span></dt><dt><span class="section"><a href="optimizer-code.html">7.1.2 The Optimizer Code</a></span></dt></dl></dd><dt><span class="section"><a href="optimizer-primary-optimizations.html">7.2 Primary Optimizations</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-20'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-20'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-20"><dl><dt><span class="section"><a href="optimizer-handling-constant-relations.html">7.2.1 Optimizing Constant Relations</a></span></dt><dt><span class="section"><a href="optimizer-joins.html">7.2.2 Optimizing Joins</a></span></dt><dt><span class="section"><a href="optimizer-transpositions.html">7.2.3 Transpositions</a></span></dt><dt><span class="section"><a href="optimizer-order-by-clauses.html">7.2.4 ORDER BY Clauses</a></span></dt><dt><span class="section"><a href="optimizer-group-by-related-conditions.html">7.2.5 GROUP BY and Related Conditions</a></span></dt><dt><span class="section"><a href="optimizer-other-optimizations.html">7.2.6 Other Optimizations</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="optimizer-tracing.html">8 Tracing the Optimizer</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-21'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-21'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-21"><dl><dt><span class="section"><a href="optimizer-tracing-typical-usage.html">8.1 Typical Usage</a></span></dt><dt><span class="section"><a href="system-variables-controlling-trace.html">8.2 System Variables Controlling the Trace</a></span></dt><dt><span class="section"><a href="information-schema-optimizer-trace-table.html">8.3 The INFORMATION_SCHEMA.OPTIMIZER_TRACE Table</a></span></dt><dt><span class="section"><a href="traceable-queries.html">8.4 Traceable Queries</a></span></dt><dt><span class="section"><a href="automatic-trace-purging.html">8.5 Automatic Trace Purging</a></span></dt><dt><span class="section"><a href="tuning-trace-purging.html">8.6 Tuning Trace Purging</a></span></dt><dt><span class="section"><a href="tracing-memory-usage.html">8.7 Tracing Memory Usage</a></span></dt><dt><span class="section"><a href="privilege-checking.html">8.8 Privilege Checking</a></span></dt><dt><span class="section"><a href="interaction-with-debug-option.html">8.9 Interaction with the --debug Option</a></span></dt><dt><span class="section"><a href="optimizer-trace-system-variable.html">8.10 The optimizer_trace System Variable</a></span></dt><dt><span class="section"><a href="end-markers-in-json-system-variable.html">8.11 The end_markers_in_json System Variable</a></span></dt><dt><span class="section"><a href="optimizer-features-to-trace.html">8.12 Selecting Optimizer Features to Trace</a></span></dt><dt><span class="section"><a href="general-trace-structure.html">8.13 General Trace Structure</a></span></dt><dt><span class="section"><a href="tracing-example.html">8.14 Example</a></span></dt><dt><span class="section"><a href="nicely-displaying-trace.html">8.15 Nicely Displaying a Trace</a></span></dt><dt><span class="section"><a href="preventing-use-of-optimizer-trace.html">8.16 Preventing Use of Optimizer Trace</a></span></dt><dt><span class="section"><a href="optimizer-trace-testing.html">8.17 Testing</a></span></dt><dt><span class="section"><a href="optimizer-trace-implementation.html">8.18 Implementation</a></span></dt></dl></dd><dt><span class="chapter"><a href="memory-allocation.html">9 Memory Allocation</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-22'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-22'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-22"><dl><dt><span class="section"><a href="memory-allocation-mysql-server.html">9.1 Memory Allocation in the MySQL Server (sql Directory)</a></span></dt><dt><span class="section"><a href="memory-allocation-library-or-storage-engine.html">9.2 Memory Allocation in a Library or Storage Engine</a></span></dt></dl></dd><dt><span class="chapter"><a href="algorithms.html">10 Important Algorithms and Structures</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-23'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-23'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-23"><dl><dt><span class="section"><a href="item-class.html">10.1 The Item Class</a></span></dt><dt><span class="section"><a href="filesort.html">10.2 How MySQL Does Sorting (filesort)</a></span></dt><dt><span class="section"><a href="bulk-insert.html">10.3 Bulk Insert</a></span></dt><dt><span class="section"><a href="caching.html">10.4 How MySQL Does Caching</a></span></dt><dt><span class="section"><a href="join-buffer-size.html">10.5 How MySQL Uses the Join Buffer Cache</a></span></dt><dt><span class="section"><a href="flush-tables.html">10.6 How MySQL Handles FLUSH TABLES</a></span></dt><dt><span class="section"><a href="full-text-search.html">10.7 Full-Text Search</a></span></dt><dt><span class="section"><a href="floating-point-types.html">10.8 FLOAT and DOUBLE Data Type Representation</a></span></dt><dt><span class="section"><a href="date-and-time-data-type-representation.html">10.9 Date and Time Data Type Representation</a></span></dt><dt><span class="section"><a href="threads.html">10.10 Threads</a></span></dt><dt><span class="section"><a href="charsets.html">10.11 Character Sets and Collations</a></span></dt><dt><span class="section"><a href="error-flags.html">10.12 Error Flags and Functions</a></span></dt><dt><span class="section"><a href="mysys-functions.html">10.13 Functions in the mysys Library</a></span></dt><dt><span class="section"><a href="bitmaps.html">10.14 Bitmaps</a></span></dt></dl></dd><dt><span class="chapter"><a href="fileformats.html">11 File Formats</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-24'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-24'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-24"><dl><dt><span class="section"><a href="frm-file-format.html">11.1 MySQL .frm File Format</a></span></dt></dl></dd><dt><span class="chapter"><a href="selects.html">12 How MySQL Performs Different Selects</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-25'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-25'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-25"><dl><dt><span class="section"><a href="select-steps.html">12.1 Steps of Select Execution</a></span></dt><dt><span class="section"><a href="select-select-result.html">12.2 select_resultClass</a></span></dt><dt><span class="section"><a href="select-simple.html">12.3 SIMPLE or PRIMARY SELECT</a></span></dt><dt><span class="section"><a href="select-structure.html">12.4 Structure Of Complex Select</a></span></dt><dt><span class="section"><a href="select-union.html">12.5 Non-Subquery UNION Execution</a></span></dt><dt><span class="section"><a href="select-derived.html">12.6 Derived Table Execution</a></span></dt><dt><span class="section"><a href="select-subquery.html">12.7 Subqueries</a></span></dt><dt><span class="section"><a href="select-select-engine.html">12.8 Single Select Engine</a></span></dt><dt><span class="section"><a href="select-union-engine.html">12.9 Union Engine</a></span></dt><dt><span class="section"><a href="select-special-engines.html">12.10 Special Engines</a></span></dt><dt><span class="section"><a href="selectexplain.html">12.11 Explain Execution</a></span></dt></dl></dd><dt><span class="chapter"><a href="transformations.html">13 How MySQL Transforms Subqueries</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-26'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-26'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-26"><dl><dt><span class="section"><a href="transformation-in.html">13.1 Item_in_subselect::select_transformer</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-27'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-27'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-27"><dl><dt><span class="section"><a href="transformation-scalar-in.html">13.1.1 Scalar IN Subquery</a></span></dt><dt><span class="section"><a href="transformations-row-in.html">13.1.2 Row IN Subquery</a></span></dt></dl></dd><dt><span class="section"><a href="transformations-all-any.html">13.2 Item_allany_subselect</a></span></dt><dt><span class="section"><a href="transformations-singlerow.html">13.3 Item_singlerow_subselect</a></span></dt></dl></dd><dt><span class="chapter"><a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-28'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-28'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-28"><dl><dt><span class="section"><a href="overview.html">14.1 Overview</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-29'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-29'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-29"><dl><dt><span class="section"><a href="basic-types.html">14.1.1 Basic Types</a></span></dt><dt><span class="section"><a href="mysql-packet.html">14.1.2 MySQL Packet</a></span></dt><dt><span class="section"><a href="generic-response-packets.html">14.1.3 Generic Response Packets</a></span></dt><dt><span class="section"><a href="character-set.html">14.1.4 Character Set</a></span></dt><dt><span class="section"><a href="connection-lifecycle.html">14.1.5 Connection Lifecycle</a></span></dt><dt><span class="section"><a href="command-phase.html">14.1.6 Command Phase</a></span></dt></dl></dd><dt><span class="section"><a href="connection-phase.html">14.2 Connection Phase</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-30'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-30'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-30"><dl><dt><span class="section"><a href="initial-handshake.html">14.2.1 Initial Handshake</a></span></dt><dt><span class="section"><a href="auth-phase-fast-path.html">14.2.2 Auth Phase Fast Path</a></span></dt><dt><span class="section"><a href="authentication-method-mismatch.html">14.2.3 Authentication Method Mismatch</a></span></dt><dt><span class="section"><a href="authentication-after-com-change-user-command.html">14.2.4 Authentication After COM_CHANGE_USER Command</a></span></dt><dt><span class="section"><a href="connection-phase-packets.html">14.2.5 Connection Phase Packets</a></span></dt><dt><span class="section"><a href="capability-flags.html">14.2.6 Capability Flags</a></span></dt></dl></dd><dt><span class="section"><a href="authentication-method.html">14.3 Authentication Method</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-31'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-31'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-31"><dl><dt><span class="section"><a href="limitations.html">14.3.1 Limitations</a></span></dt><dt><span class="section"><a href="old-password-authentication.html">14.3.2 Old Password Authentication</a></span></dt><dt><span class="section"><a href="secure-password-authentication.html">14.3.3 Secure Password Authentication</a></span></dt><dt><span class="section"><a href="clear-text-authentication.html">14.3.4 Clear Text Authentication</a></span></dt><dt><span class="section"><a href="windows-native-authentication.html">14.3.5 Windows Native Authentication</a></span></dt><dt><span class="section"><a href="sha256.html">14.3.6 SHA256</a></span></dt></dl></dd><dt><span class="section"><a href="compression.html">14.4 Compression</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-32'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-32'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-32"><dl><dt><span class="section"><a href="compressed-packet.html">14.4.1 Compressed Packet</a></span></dt><dt><span class="section"><a href="compressed-packet-header.html">14.4.2 Compressed Packet Header</a></span></dt><dt><span class="section"><a href="compressed-payload.html">14.4.3 Compressed Payload</a></span></dt><dt><span class="section"><a href="uncompressed-payload.html">14.4.4 Uncompressed Payload</a></span></dt></dl></dd><dt><span class="section"><a href="ssl.html">14.5 SSL</a></span></dt><dt><span class="section"><a href="text-protocol.html">14.6 Text Protocol</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-33'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-33'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-33"><dl><dt><span class="section"><a href="com-sleep.html">14.6.1 COM_SLEEP</a></span></dt><dt><span class="section"><a href="com-quit.html">14.6.2 COM_QUIT</a></span></dt><dt><span class="section"><a href="com-init-db.html">14.6.3 COM_INIT_DB</a></span></dt><dt><span class="section"><a href="com-query.html">14.6.4 COM_QUERY</a></span></dt><dt><span class="section"><a href="com-field-list.html">14.6.5 COM_FIELD_LIST</a></span></dt><dt><span class="section"><a href="com-create-db.html">14.6.6 COM_CREATE_DB</a></span></dt><dt><span class="section"><a href="com-drop-db.html">14.6.7 COM_DROP_DB</a></span></dt><dt><span class="section"><a href="com-refresh.html">14.6.8 COM_REFRESH</a></span></dt><dt><span class="section"><a href="com-shutdown.html">14.6.9 COM_SHUTDOWN</a></span></dt><dt><span class="section"><a href="com-statistics.html">14.6.10 COM_STATISTICS</a></span></dt><dt><span class="section"><a href="com-process-info.html">14.6.11 COM_PROCESS_INFO</a></span></dt><dt><span class="section"><a href="com-connect.html">14.6.12 COM_CONNECT</a></span></dt><dt><span class="section"><a href="com-process-kill.html">14.6.13 COM_PROCESS_KILL</a></span></dt><dt><span class="section"><a href="com-debug.html">14.6.14 COM_DEBUG</a></span></dt><dt><span class="section"><a href="com-ping.html">14.6.15 COM_PING</a></span></dt><dt><span class="section"><a href="com-time.html">14.6.16 COM_TIME</a></span></dt><dt><span class="section"><a href="com-delayed-insert.html">14.6.17 COM_DELAYED_INSERT</a></span></dt><dt><span class="section"><a href="com-change-user.html">14.6.18 COM_CHANGE_USER</a></span></dt><dt><span class="section"><a href="com-reset-connection.html">14.6.19 COM_RESET_CONNECTION</a></span></dt><dt><span class="section"><a href="com-daemon.html">14.6.20 COM_DAEMON</a></span></dt></dl></dd><dt><span class="section"><a href="prepared-statements.html">14.7 Prepared Statements</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-34'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-34'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-34"><dl><dt><span class="section"><a href="binary-protocol-resultset.html">14.7.1 Binary Protocol Resultset</a></span></dt><dt><span class="section"><a href="binary-protocol-resultset-row.html">14.7.2 Binary Protocol Resultset Row</a></span></dt><dt><span class="section"><a href="binary-protocol-value.html">14.7.3 Binary Protocol Value</a></span></dt><dt><span class="section"><a href="com-stmt-prepare.html">14.7.4 COM_STMT_PREPARE</a></span></dt><dt><span class="section"><a href="com-stmt-send-long-data.html">14.7.5 COM_STMT_SEND_LONG_DATA</a></span></dt><dt><span class="section"><a href="com-stmt-execute.html">14.7.6 COM_STMT_EXECUTE</a></span></dt><dt><span class="section"><a href="com-stmt-close.html">14.7.7 COM_STMT_CLOSE</a></span></dt><dt><span class="section"><a href="com-stmt-reset.html">14.7.8 COM_STMT_RESET</a></span></dt></dl></dd><dt><span class="section"><a href="stored-procedures.html">14.8 Stored Procedures</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-35'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-35'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-35"><dl><dt><span class="section"><a href="multi-resultset.html">14.8.1 Multi-Resultset</a></span></dt><dt><span class="section"><a href="multi-statement.html">14.8.2 Multi-Statement</a></span></dt><dt><span class="section"><a href="com-set-option.html">14.8.3 COM_SET_OPTION</a></span></dt><dt><span class="section"><a href="com-stmt-fetch.html">14.8.4 COM_STMT_FETCH</a></span></dt></dl></dd><dt><span class="section"><a href="replication-protocol.html">14.9 Replication Protocol</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-36'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-36'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-36"><dl><dt><span class="section"><a href="binlog-file.html">14.9.1 Binlog File</a></span></dt><dt><span class="section"><a href="binlog-network-stream.html">14.9.2 Binlog Network Stream</a></span></dt><dt><span class="section"><a href="binlog-version.html">14.9.3 Binlog Version</a></span></dt><dt><span class="section"><a href="binlog-event.html">14.9.4 Binlog Event</a></span></dt><dt><span class="section"><a href="com-binlog-dump.html">14.9.5 COM_BINLOG_DUMP</a></span></dt><dt><span class="section"><a href="com-binlog-dump-gtid.html">14.9.6 COM_BINLOG_DUMP_GTID</a></span></dt><dt><span class="section"><a href="com-table-dump.html">14.9.7 COM_TABLE_DUMP</a></span></dt><dt><span class="section"><a href="com-connect-out.html">14.9.8 COM_CONNECT_OUT</a></span></dt><dt><span class="section"><a href="com-register-slave.html">14.9.9 COM_REGISTER_SLAVE</a></span></dt></dl></dd><dt><span class="section"><a href="row-based-replication.html">14.10 Row-Based Replication</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-37'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-37'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-37"><dl><dt><span class="section"><a href="table-map-event.html">14.10.1 TABLE_MAP_EVENT</a></span></dt><dt><span class="section"><a href="rows-event.html">14.10.2 ROWS_EVENT</a></span></dt><dt><span class="section"><a href="rows-query-event.html">14.10.3 ROWS_QUERY_EVENT</a></span></dt></dl></dd><dt><span class="section"><a href="semi-sync-replication.html">14.11 Semi-Synchronous Replication</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-38'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-38'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-38"><dl><dt><span class="section"><a href="semi-sync-binlog-event.html">14.11.1 Semi-Synchronous Binlog Event</a></span></dt><dt><span class="section"><a href="semi-sync-ack-packet.html">14.11.2 Semi-Synchronous ACK Packet</a></span></dt></dl></dd><dt><span class="section"><a href="protocol-examples.html">14.12 Protocol Examples</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-39'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-39'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-39"><dl><dt><span class="section"><a href="a-mysql-client-logs-in.html">14.12.1 A mysql Client Logs In</a></span></dt><dt><span class="section"><a href="protocoltext-resultset.html">14.12.2 ProtocolText::Resultset</a></span></dt><dt><span class="section"><a href="auth-method-switch.html">14.12.3 Auth Method Switch</a></span></dt><dt><span class="section"><a href="sha256-example.html">14.12.4 SHA256 Example</a></span></dt></dl></dd><dt><span class="section"><a href="source-code-locations.html">14.13 Source Code Locations</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-40'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-40'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-40"><dl><dt><span class="section"><a href="mysql-server.html">14.13.1 MySQL Server</a></span></dt><dt><span class="section"><a href="binary-protocol-type-implementation.html">14.13.2 Binary Protocol Type Implementation</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="stored-programs.html">15 Stored Programs</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-41'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-41'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-41"><dl><dt><span class="section"><a href="sp-overview.html">15.1 Overview</a></span></dt><dt><span class="section"><a href="sp-storage.html">15.2 Persistent Representation</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-42'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-42'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-42"><dl><dt><span class="section"><a href="sp-storage-sp_sf.html">15.2.1 Stored Procedure and Stored Function Storage</a></span></dt><dt><span class="section"><a href="sp-storage-trigger.html">15.2.2 Table Trigger Storage</a></span></dt><dt><span class="section"><a href="sp-storage-event.html">15.2.3 Event Storage</a></span></dt><dt><span class="section"><a href="sp-storage-derived.html">15.2.4 Derived Attribute Storage</a></span></dt></dl></dd><dt><span class="section"><a href="sp-internal.html">15.3 Internal Representation</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-43'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-43'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-43"><dl><dt><span class="section"><a href="sp-internal-instr.html">15.3.1 Instructions</a></span></dt><dt><span class="section"><a href="sp-internal-pcontext.html">15.3.2 Parsing Context</a></span></dt></dl></dd><dt><span class="section"><a href="sp-parser.html">15.4 Stored Program Parser</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-44'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-44'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-44"><dl><dt><span class="section"><a href="sp-parser-struct.html">15.4.1 Parser Structure</a></span></dt><dt><span class="section"><a href="sp-parser-codegen.html">15.4.2 Single-Pass Code Generation</a></span></dt></dl></dd><dt><span class="section"><a href="sp-optimizer.html">15.5 Flow Analysis Optimizations</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-45'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-45'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-45"><dl><dt><span class="section"><a href="sp-optimizer-dead.html">15.5.1 Dead Code Removal</a></span></dt><dt><span class="section"><a href="sp-optimizer-jump.html">15.5.2 Jump Shortcut Resolution</a></span></dt></dl></dd><dt><span class="section"><a href="sp-cache.html">15.6 Stored Program Caches</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-46'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-46'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-46"><dl><dt><span class="section"><a href="sp-cache-sp.html">15.6.1 Stored Procedure Cache</a></span></dt><dt><span class="section"><a href="sp-cache-sf.html">15.6.2 Stored Function Cache</a></span></dt><dt><span class="section"><a href="sp-cache-trg.html">15.6.3 Table Trigger Cache</a></span></dt><dt><span class="section"><a href="sp-cache-evt.html">15.6.4 Events and Caching</a></span></dt></dl></dd><dt><span class="section"><a href="sp-execution.html">15.7 Stored Program Execution</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-47'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-47'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-47"><dl><dt><span class="section"><a href="sp-exec-rcont.html">15.7.1 Runtime Context</a></span></dt><dt><span class="section"><a href="sp-exec-instr.html">15.7.2 Executing One Instruction</a></span></dt><dt><span class="section"><a href="sp-exec-flow.html">15.7.3 Flow Control</a></span></dt><dt><span class="section"><a href="sp-exec-handler.html">15.7.4 Exception Handling</a></span></dt><dt><span class="section"><a href="sp-exec-nest.html">15.7.5 Call Nesting</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="prepared-stored.html">16 Prepared Statement and Stored Routine Re-Execution</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-48'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-48'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-48"><dl><dt><span class="section"><a href="prepared-stored-reexecution.html">16.1 Statement Re-Execution Requirements</a></span></dt><dt><span class="section"><a href="prepared-stored-statement-preparation.html">16.2 Preparation of a Prepared Statement</a></span></dt><dt><span class="section"><a href="prepared-stored-statement-execution.html">16.3 Execution of a Prepared Statement</a></span></dt><dt><span class="section"><a href="prepared-stored-procedure-execution.html">16.4 Execution of a Stored Procedure Statement</a></span></dt></dl></dd><dt><span class="chapter"><a href="result-postprocessing-procedures.html">17 Writing a Procedure</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-49'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-49'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-49"><dl><dt><span class="section"><a href="class-procedure.html">17.1 Extend Class Procedure</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-50'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-50'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-50"><dl><dt><span class="section"><a href="class-procedure-constructor.html">17.1.1 Constructor</a></span></dt><dt><span class="section"><a href="class-procedure-change-columns.html">17.1.2 change_columns()</a></span></dt><dt><span class="section"><a href="class-procedure-send-row.html">17.1.3 send_row()</a></span></dt><dt><span class="section"><a href="class-procedure-add.html">17.1.4 add()</a></span></dt><dt><span class="section"><a href="class-procedure-end-group.html">17.1.5 end_group()</a></span></dt><dt><span class="section"><a href="class-procedure-end-of-records.html">17.1.6 end_of_records()</a></span></dt></dl></dd><dt><span class="section"><a href="initialization-callback.html">17.2 Initialization Callback</a></span></dt><dt><span class="section"><a href="calling-sequence.html">17.3 Calling Sequence</a></span></dt><dt><span class="section"><a href="required-server-code-patches.html">17.4 Required Server Code Patches</a></span></dt><dt><span class="section"><a href="result-postprocessing-procedures-examples.html">17.5 Examples</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-51'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-51'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-51"><dl><dt><span class="section"><a href="procedure-rownum.html">17.5.1 PROCEDURE ROWNUM(): Adding a RowNum Pseudo Column to a Result Set</a></span></dt><dt><span class="section"><a href="procedure-calltrace.html">17.5.2 PROCEDURE CALLTRACE(): Simple Trace of Procedure Member Function Calls</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="replication.html">18 Replication</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-52'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-52'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-52"><dl><dt><span class="section"><a href="replication-organization.html">18.1 Chapter Organization</a></span></dt><dt><span class="section"><a href="replication-source-code-files.html">18.2 Source Code Files</a></span></dt><dt><span class="section"><a href="replication-principles.html">18.3 Principles</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-53'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-53'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-53"><dl><dt><span class="section"><a href="binlog-formats.html">18.3.1 Binlog Formats</a></span></dt><dt><span class="section"><a href="differences-master-slave.html">18.3.2 Differences Between Master and Slave</a></span></dt><dt><span class="section"><a href="replication-crashes.html">18.3.3 Crashes</a></span></dt><dt><span class="section"><a href="binlog-files-and-indexes.html">18.3.4 Binlog Files and Indexes</a></span></dt></dl></dd><dt><span class="section"><a href="replication-rules.html">18.4 Rules</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-54'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-54'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-54"><dl><dt><span class="section"><a href="determining-logging-format.html">18.4.1 Determining the Logging Format</a></span></dt><dt><span class="section"><a href="unsafe-statements.html">18.4.2 Unsafe Statements</a></span></dt><dt><span class="section"><a href="logging-transactions.html">18.4.3 Logging Transactions</a></span></dt><dt><span class="section"><a href="logging-updates-auto-incement-columns.html">18.4.4 Logging Updates to auto_increment Columns</a></span></dt><dt><span class="section"><a href="logging-access-variables-functions.html">18.4.5 Logging Access to Variables and Functions</a></span></dt><dt><span class="section"><a href="other-unsafe-statements.html">18.4.6 Other Unsafe Statements</a></span></dt><dt><span class="section"><a href="binlog-row-image.html">18.4.7 binlog_row_image</a></span></dt><dt><span class="section"><a href="replication-locks.html">18.4.8 Replication Locks</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="binary-log.html">19 The Binary Log</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-55'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-55'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-55"><dl><dt><span class="section"><a href="binary-log-overview.html">19.1 Binary Log Overview</a></span></dt><dt><span class="section"><a href="binary-log-structure-and-contents.html">19.2 High-Level Binary Log Structure and Contents</a></span></dt><dt><span class="section"><a href="source-files-related-to-the-binary-log.html">19.3 Source Files Related to the Binary Log</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-56'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-56'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-56"><dl><dt><span class="section"><a href="source-file-archaeological-notes.html">19.3.1 Source File Archaeological Notes</a></span></dt></dl></dd><dt><span class="section"><a href="generating-browsable-binary-log-information.html">19.4 Generating Browsable Binary Log Information</a></span></dt><dt><span class="section"><a href="event-classes-and-types.html">19.5 Event Classes and Types</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-57'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-57'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-57"><dl><dt><span class="section"><a href="event-class-archaeological-notes.html">19.5.1 Event Class Archaeological Notes</a></span></dt></dl></dd><dt><span class="section"><a href="event-meanings.html">19.6 Event Meanings</a></span></dt><dt><span class="section"><a href="event-structure.html">19.7 Event Structure</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-58'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-58'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-58"><dl><dt><span class="section"><a href="event-content-writing-conventions.html">19.7.1 Event Content-Writing Conventions</a></span></dt><dt><span class="section"><a href="event-header-fields.html">19.7.2 Event Header Fields</a></span></dt><dt><span class="section"><a href="event-data-fields.html">19.7.3 Event Data Fields (Event-Specific Information)</a></span></dt></dl></dd><dt><span class="section"><a href="binary-log-versions.html">19.8 Binary Log Versions</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-59'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-59'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-59"><dl><dt><span class="section"><a href="determining-binary-log-version.html">19.8.1 Determining the Binary Log Version</a></span></dt><dt><span class="section"><a href="ensuring-compatibility-of-future-binary-log-versions.html">19.8.2 Ensuring Compatibility of Future Binary Log Versions</a></span></dt></dl></dd><dt><span class="section"><a href="event-data-for-specific-event-types.html">19.9 Event Data for Specific Event Types</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-60'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-60'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-60"><dl><dt><span class="section"><a href="load-data-infile-events.html">19.9.1 LOAD DATA INFILE Events</a></span></dt></dl></dd><dt><span class="section"><a href="row-based-binary-logging.html">19.10 Row-Based Binary Logging</a></span></dt><dt><span class="section"><a href="additional-resources.html">19.11 Additional Resources</a></span></dt></dl></dd><dt><span class="chapter"><a href="myisam.html">20 MyISAM Storage Engine</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-61'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-61'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-61"><dl><dt><span class="section"><a href="myisam-record-structure.html">20.1 MyISAM Record Structure</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-62'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-62'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-62"><dl><dt><span class="section"><a href="myisam-introduction.html">20.1.1 Introduction</a></span></dt><dt><span class="section"><a href="myisam-column-attributes.html">20.1.2 Physical Attributes of Columns</a></span></dt><dt><span class="section"><a href="myisam-more-information.html">20.1.3 Where to Look For More Information</a></span></dt></dl></dd><dt><span class="section"><a href="the-myi-file.html">20.2 The .MYI File</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-63'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-63'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-63"><dl><dt><span class="section"><a href="myisam-files.html">20.2.1 MyISAM Files</a></span></dt></dl></dd><dt><span class="section"><a href="myisam-dynamic-data-file-layout.html">20.3 MyISAM Dynamic Data File Layout</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-64'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-64'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-64"><dl><dt><span class="section"><a href="layout-record-storage-frame.html">20.3.1 Layout of the Record Storage Frame (Record Part, Record Block)</a></span></dt><dt><span class="section"><a href="record-contents.html">20.3.2 Record Contents</a></span></dt><dt><span class="section"><a href="packed-record-layout.html">20.3.3 Packed Record Layout</a></span></dt><dt><span class="section"><a href="in-memory-record-layout.html">20.3.4 In-memory Record Layout</a></span></dt></dl></dd><dt><span class="section"><a href="myisam-compressed-data-file-layout.html">20.4 MyISAM Compressed Data File Layout</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-65'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-65'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-65"><dl><dt><span class="section"><a href="huffman-compression.html">20.4.1 Huffman Compression</a></span></dt><dt><span class="section"><a href="myisampack.html">20.4.2 The myisampack Program</a></span></dt><dt><span class="section"><a href="record-and-blob-length-encoding.html">20.4.3 Record and Blob Length Encoding</a></span></dt><dt><span class="section"><a href="code-tree-representation.html">20.4.4 Code Tree Representation</a></span></dt><dt><span class="section"><a href="index-file-usage.html">20.4.5 Usage of the Index File</a></span></dt><dt><span class="section"><a href="myisampack-tricks.html">20.4.6 myisampackTricks</a></span></dt><dt><span class="section"><a href="decoding-specification.html">20.4.7 Detailed Specification of the Decoding</a></span></dt></dl></dd><dt><span class="section"><a href="myisam-key-cache.html">20.5 MyISAM Key Cache</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-66'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-66'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-66"><dl><dt><span class="section"><a href="myisam-concurrent-insert.html">20.5.1 MyISAM Concurrent Insert</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="innodb.html">21 InnoDB Storage Engine</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-67'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-67'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-67"><dl><dt><span class="section"><a href="innodb-record-structure.html">21.1 InnoDB Record Structure</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-68'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-68'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-68"><dl><dt><span class="section"><a href="innodb-overview.html">21.1.1 High-Altitude Picture</a></span></dt><dt><span class="section"><a href="innodb-more-information.html">21.1.2 Where to Look for More Information</a></span></dt></dl></dd><dt><span class="section"><a href="innodb-page-structure.html">21.2 InnoDB Page Structure</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-69'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-69'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-69"><dl><dt><span class="section"><a href="innodb-page-overview.html">21.2.1 High-Altitude View</a></span></dt><dt><span class="section"><a href="innodb-page-example.html">21.2.2 Example</a></span></dt><dt><span class="section"><a href="innodb-more-page-information.html">21.2.3 Where to Look For More Information</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="custom-engine.html">22 Writing a Custom Storage Engine</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-70'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-70'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-70"><dl><dt><span class="section"><a href="custom-engine-additional-resources.html">22.1 Additional Resources</a></span></dt><dt><span class="section"><a href="custom-engine-overview.html">22.2 Overview</a></span></dt><dt><span class="section"><a href="custom-engine-source-files.html">22.3 Creating Storage Engine Source Files</a></span></dt><dt><span class="section"><a href="custom-engine-variables-and-parameters.html">22.4 Adding Engine Specific Variables and Parameters</a></span></dt><dt><span class="section"><a href="creating-handlerton.html">22.5 Creating the handlerton</a></span></dt><dt><span class="section"><a href="handler-instantiation.html">22.6 Handling Handler Instantiation</a></span></dt><dt><span class="section"><a href="defining-filename-extensions.html">22.7 Defining Filename Extensions</a></span></dt><dt><span class="section"><a href="creating-tables.html">22.8 Creating Tables</a></span></dt><dt><span class="section"><a href="opening-a-table.html">22.9 Opening a Table</a></span></dt><dt><span class="section"><a href="implementing-basic-table-scanning.html">22.10 Implementing Basic Table Scanning</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-71'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-71'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-71"><dl><dt><span class="section"><a href="implementing-store-lock-method.html">22.10.1 Implementing the store_lock() Method</a></span></dt><dt><span class="section"><a href="implementing-external-lock-method.html">22.10.2 Implementing the external_lock() Method</a></span></dt><dt><span class="section"><a href="implementing-rnd-init-method.html">22.10.3 Implementing the rnd_init() Method</a></span></dt><dt><span class="section"><a href="implementing-info-method.html">22.10.4 Implementing the info(uinf flag) Method</a></span></dt><dt><span class="section"><a href="implementing-extra-method.html">22.10.5 Implementing the extra() Method</a></span></dt><dt><span class="section"><a href="implementing-rnd-next-method.html">22.10.6 Implementing the rnd_next() Method</a></span></dt></dl></dd><dt><span class="section"><a href="closing-a-table.html">22.11 Closing a Table</a></span></dt><dt><span class="section"><a href="support-for-insert.html">22.12 Adding Support for INSERT to a Storage Engine</a></span></dt><dt><span class="section"><a href="support-for-update.html">22.13 Adding Support for UPDATE to a Storage Engine</a></span></dt><dt><span class="section"><a href="support-for-delete.html">22.14 Adding Support for DELETE to a Storage Engine</a></span></dt><dt><span class="section"><a href="support-for-non-sequential-reads.html">22.15 Supporting Non-Sequential Reads</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-72'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-72'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-72"><dl><dt><span class="section"><a href="implementing-position-method.html">22.15.1 Implementing the position() Method</a></span></dt><dt><span class="section"><a href="implementing-rnd-pos-method.html">22.15.2 Implementing the rnd_pos() Method</a></span></dt></dl></dd><dt><span class="section"><a href="support-for-indexing.html">22.16 Supporting Indexing</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-73'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-73'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-73"><dl><dt><span class="section"><a href="indexing-overview.html">22.16.1 Indexing Overview</a></span></dt><dt><span class="section"><a href="getting-index-information.html">22.16.2 Getting Index Information During CREATE TABLE Operations</a></span></dt><dt><span class="section"><a href="creating-index-keys.html">22.16.3 Creating Index Keys</a></span></dt><dt><span class="section"><a href="parsing-key-information.html">22.16.4 Parsing Key Information</a></span></dt><dt><span class="section"><a href="providing-index-information-to-optimizer.html">22.16.5 Providing Index Information to the Optimizer</a></span></dt><dt><span class="section"><a href="preparing-for-index-use.html">22.16.6 Preparing for Index Use with index_init()</a></span></dt><dt><span class="section"><a href="cleaning-up-with-index-end.html">22.16.7 Cleaning up with index_end()</a></span></dt><dt><span class="section"><a href="implementing-index-read-method.html">22.16.8 Implementing the index_read() Method</a></span></dt><dt><span class="section"><a href="implementing-the-rnd-next-method.html">22.16.9 Implementing the index_read_idx() Method</a></span></dt><dt><span class="section"><a href="implementing-index-read-last-method.html">22.16.10 Implementing the index_read_last() Method</a></span></dt><dt><span class="section"><a href="implementing-index-next-method.html">22.16.11 Implementing the index_next() Method</a></span></dt><dt><span class="section"><a href="implementing-index-prev-method.html">22.16.12 Implementing the index_prev() Method</a></span></dt><dt><span class="section"><a href="implementing-index-first-method.html">22.16.13 Implementing the index_first() Method</a></span></dt><dt><span class="section"><a href="implementing-index-last-method.html">22.16.14 Implementing the index_last() Method</a></span></dt></dl></dd><dt><span class="section"><a href="supporting-transactions.html">22.17 Supporting Transactions</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-74'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-74'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-74"><dl><dt><span class="section"><a href="transaction-overview.html">22.17.1 Transaction Overview</a></span></dt><dt><span class="section"><a href="starting-transaction.html">22.17.2 Starting a Transaction</a></span></dt><dt><span class="section"><a href="implementing-rollback.html">22.17.3 Implementing ROLLBACK</a></span></dt><dt><span class="section"><a href="implementing-commit.html">22.17.4 Implementing COMMIT</a></span></dt><dt><span class="section"><a href="support-for-savepoints.html">22.17.5 Adding Support for Savepoints</a></span></dt></dl></dd><dt><span class="section"><a href="api-reference.html">22.18 API Reference</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-75'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-75'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-75"><dl><dt><span class="section"><a href="bas-ext.html">22.18.1 bas_ext</a></span></dt><dt><span class="section"><a href="close.html">22.18.2 close</a></span></dt><dt><span class="section"><a href="create.html">22.18.3 create</a></span></dt><dt><span class="section"><a href="delete-row.html">22.18.4 delete_row</a></span></dt><dt><span class="section"><a href="delete-table.html">22.18.5 delete_table</a></span></dt><dt><span class="section"><a href="external-lock.html">22.18.6 external_lock</a></span></dt><dt><span class="section"><a href="extra.html">22.18.7 extra</a></span></dt><dt><span class="section"><a href="index-end.html">22.18.8 index_end</a></span></dt><dt><span class="section"><a href="index-first.html">22.18.9 index_first</a></span></dt><dt><span class="section"><a href="index-init.html">22.18.10 index_init</a></span></dt><dt><span class="section"><a href="index-last.html">22.18.11 index_last</a></span></dt><dt><span class="section"><a href="index-next.html">22.18.12 index_next</a></span></dt><dt><span class="section"><a href="index-prev.html">22.18.13 index_prev</a></span></dt><dt><span class="section"><a href="index-read.html">22.18.14 index_read</a></span></dt><dt><span class="section"><a href="index-read-idx.html">22.18.15 index_read_idx</a></span></dt><dt><span class="section"><a href="index-read-last.html">22.18.16 index_read_last</a></span></dt><dt><span class="section"><a href="info.html">22.18.17 info</a></span></dt><dt><span class="section"><a href="open.html">22.18.18 open</a></span></dt><dt><span class="section"><a href="position.html">22.18.19 position</a></span></dt><dt><span class="section"><a href="records-in-range.html">22.18.20 records_in_range</a></span></dt><dt><span class="section"><a href="rnd-init.html">22.18.21 rnd_init</a></span></dt><dt><span class="section"><a href="rnd-next.html">22.18.22 rnd_next</a></span></dt><dt><span class="section"><a href="rnd-pos.html">22.18.23 rnd_pos</a></span></dt><dt><span class="section"><a href="start-stmt.html">22.18.24 start_stmt</a></span></dt><dt><span class="section"><a href="store-lock.html">22.18.25 store_lock</a></span></dt><dt><span class="section"><a href="update-row.html">22.18.26 update_row</a></span></dt><dt><span class="section"><a href="write-row.html">22.18.27 write_row</a></span></dt></dl></dd><dt><span class="section"><a href="custom-engine-faq.html">22.19 FAQ</a></span></dt></dl></dd><dt><span class="chapter"><a href="test-synchronization.html">23 Test Synchronization</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-76'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-76'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-76"><dl><dt><span class="section"><a href="sleep.html">23.1 Sleep</a></span></dt><dt><span class="section"><a href="wait-condition.html">23.2 Wait Condition</a></span></dt><dt><span class="section"><a href="dbug-sleep.html">23.3 Dbug Sleep</a></span></dt><dt><span class="section"><a href="error-injection.html">23.4 Error Injection</a></span></dt><dt><span class="section"><a href="user-level-locks.html">23.5 User-Level Locks</a></span></dt><dt><span class="section"><a href="debug-sync-facility.html">23.6 Debug Sync Facility</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-77'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-77'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-77"><dl><dt><span class="section"><a href="syntax-debug-sync-values.html">23.6.1 Formal Syntax for DEBUG_SYNC Values</a></span></dt><dt><span class="section"><a href="debug-sync-activation-deactivation.html">23.6.2 Debug Sync Activation/Deactivation</a></span></dt><dt><span class="section"><a href="debug-sync-implementation.html">23.6.3 Debug Sync Implementation</a></span></dt><dt><span class="section"><a href="synchronization-pattern.html">23.6.4 A Typical Synchronization Pattern</a></span></dt><dt><span class="section"><a href="cowork-with-dbug-facility.html">23.6.5 Co-work With the DBUG Facility</a></span></dt><dt><span class="section"><a href="debug-sync-further-reading.html">23.6.6 Debug Sync Further Reading</a></span></dt></dl></dd><dt><span class="section"><a href="debug-sync-point.html">23.7 Debug Sync Point (Obsolete)</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-78'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-78'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-78"><dl><dt><span class="section"><a href="backup-breakpoint.html">23.7.1 Backup Breakpoint</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="test-faults.html">24 Injecting Test Faults</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-79'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-79'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-79"><dl><dt><span class="section"><a href="test-faults-macros.html">24.1 Test Fault Macros</a></span></dt><dt><span class="section"><a href="test-faults-usage.html">24.2 Test Fault Macro Usage</a></span></dt></dl></dd><dt><span class="chapter"><a href="good-tests.html">25 How to Create Good Test Cases</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-80'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-80'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-80"><dl><dt><span class="section"><a href="formal-stuff.html">25.1 Formal Stuff</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-81'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-81'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-81"><dl><dt><span class="section"><a href="coding-style.html">25.1.1 Coding Style</a></span></dt><dt><span class="section"><a href="sql-statement-example.html">25.1.2 SQL Statement Example</a></span></dt><dt><span class="section"><a href="avoid-too-dense-code.html">25.1.3 Please Avoid too Dense Code</a></span></dt><dt><span class="section"><a href="header-of-scripts.html">25.1.4 Header of Scripts</a></span></dt><dt><span class="section"><a href="header-example.html">25.1.5 Header Example</a></span></dt><dt><span class="section"><a href="comments-within-boxes.html">25.1.6 Comments Within Boxes</a></span></dt></dl></dd><dt><span class="section"><a href="comments-everywhere.html">25.2 Comments Everywhere</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-82'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-82'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-82"><dl><dt><span class="section"><a href="complicated-test-architecture.html">25.2.1 Complicated test Architecture or Tricky Code</a></span></dt><dt><span class="section"><a href="subtest-case.html">25.2.2 A Subtest Case is Able to Reveal a Bug</a></span></dt><dt><span class="section"><a href="subtests.html">25.2.3 Subtests</a></span></dt><dt><span class="section"><a href="make-test-protocols-more-understandable.html">25.2.4 Make Test Protocols More Understandable</a></span></dt><dt><span class="section"><a href="better-protocols-example.html">25.2.5 Better Protocol Example</a></span></dt></dl></dd><dt><span class="section"><a href="rule-exceptions.html">25.3 Some Rules Outside of the Formal Stuff</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-83'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-83'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-83"><dl><dt><span class="section"><a href="error-masking.html">25.3.1 Error Masking</a></span></dt><dt><span class="section"><a href="use-of-disable-abort-on-error.html">25.3.2 Use of the Option --disable_abort_on_error</a></span></dt><dt><span class="section"><a href="perfect-cleanup.html">25.3.3 Perfect Cleanup at the End of a Test</a></span></dt><dt><span class="section"><a href="os-specific-commands.html">25.3.4 Use of OS-Specific Commands</a></span></dt></dl></dd><dt><span class="section"><a href="negative-tests.html">25.4 Negative Tests</a></span></dt><dt><span class="section"><a href="tests-with-several-variants.html">25.5 Tests with Several Variants</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-84'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-84'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-84"><dl><dt><span class="section"><a href="variation-of-storage-engine.html">25.5.1 Variation of the Storage Engine</a></span></dt><dt><span class="section"><a href="variation-of-protocol-option.html">25.5.2 Variation of the Protocol Option</a></span></dt></dl></dd><dt><span class="section"><a href="miscellaneous-test-tips.html">25.6 Miscellaneous Tips</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-85'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-85'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-85"><dl><dt><span class="section"><a href="stability-checks-for-random-timing-problems.html">25.6.1 Stability Checks for Random Timing Problems</a></span></dt><dt><span class="section"><a href="stability-checks-for-hostname-problems.html">25.6.2 Stability Checks for Hostname-Related Problems</a></span></dt><dt><span class="section"><a href="stability-checks-for-unexpected-problems.html">25.6.3 Stability Checks for Unexpected Problems</a></span></dt><dt><span class="section"><a href="row-order-within-result-sets.html">25.6.4 Row Order Within Result Sets</a></span></dt><dt><span class="section"><a href="test-case-behavior-depending-on-show.html">25.6.5 Test Case Behavior Should Depend on the Result of a SHOW</a></span></dt><dt><span class="section"><a href="test-execution-hanging.html">25.6.6 Does a Test Execution Hang?</a></span></dt><dt><span class="section"><a href="complicated-test-support-debugging.html">25.6.7 If Your Test is Complicated, Support Debugging</a></span></dt><dt><span class="section"><a href="grepping-for-syntax.html">25.6.8 You Need to Know Some Syntax, an Option, Etc., but Hate Reading Manuals</a></span></dt></dl></dd><dt><span class="section"><a href="notes-on-mtr2.html">25.7 Notes on MTR2</a></span></dt><dt><span class="section"><a href="examples-of-suspicious-tests.html">25.8 Examples of Suspicious Tests and Scripts</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-86'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-86'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-86"><dl><dt><span class="section"><a href="mismatch-of-focus-of-test-and-code-sequence.html">25.8.1 Probably Mismatch of Focus of Test and Code Sequence</a></span></dt><dt><span class="section"><a href="too-greedy-test.html">25.8.2 Too Greedy Test</a></span></dt><dt><span class="section"><a href="risky-handling-around-additional-sessions.html">25.8.3 Risky Handling Around Additional Sessions</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="error-messages.html">26 Error Messages</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-87'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-87'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-87"><dl><dt><span class="section"><a href="error-message-adding.html">26.1 Adding New Error Messages to MySQL</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-88'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-88'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-88"><dl><dt><span class="section"><a href="error-message-multiple-versions.html">26.1.1 Adding an Error Message to Multiple MySQL Versions</a></span></dt><dt><span class="section"><a href="error-messages-5-0-3-higher.html">26.1.2 Adding Error Messages to MySQL 5.0.3 or Higher</a></span></dt><dt><span class="section"><a href="error-messages-old-versions.html">26.1.3 Adding Error Messages to Old (&lt; MySQL 5.0) Versions</a></span></dt></dl></dd><dt><span class="section"><a href="error-messages-storage-engine.html">26.2 Adding Storage Engine Error Messages</a></span></dt></dl></dd><dt><span class="appendix"><a href="files-in-mysql-sources.html">A MySQL Source Code Distribution</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-89'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-89'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-89"><dl><dt><span class="section"><a href="source-directory-listing.html">A.1 Directory Listing</a></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-90'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-90'); return false;}">+/-</a>]</small></dt>
+<dd style="display:none;" id="tocdetail-90"><dl><dt><span class="section"><a href="build-directory.html">A.1.1 The BUILD Directory</a></span></dt><dt><span class="section"><a href="client-directory.html">A.1.2 The client Directory</a></span></dt><dt><span class="section"><a href="config-directory.html">A.1.3 The config Directory</a></span></dt><dt><span class="section"><a href="cmd-line-utils-directory.html">A.1.4 The cmd-line-utils Directory</a></span></dt><dt><span class="section"><a href="dbug-directory.html">A.1.5 The dbug Directory</a></span></dt><dt><span class="section"><a href="docs-directory.html">A.1.6 The Docs Directory</a></span></dt><dt><span class="section"><a href="extra-directory.html">A.1.7 The extra Directory</a></span></dt><dt><span class="section"><a href="heap-directory.html">A.1.8 The heap Directory</a></span></dt><dt><span class="section"><a href="include-directory.html">A.1.9 The include Directory</a></span></dt><dt><span class="section"><a href="innobase-directory.html">A.1.10 The innobase Directory</a></span></dt><dt><span class="section"><a href="libmysql-directory.html">A.1.11 The libmysql Directory</a></span></dt><dt><span class="section"><a href="libmysql-r-directory.html">A.1.12 The libmysql_r Directory</a></span></dt><dt><span class="section"><a href="libmysqld-directory.html">A.1.13 The libmysqld Directory</a></span></dt><dt><span class="section"><a href="man-directory.html">A.1.14 The man Directory</a></span></dt><dt><span class="section"><a href="myisam-directory.html">A.1.15 The myisam Directory</a></span></dt><dt><span class="section"><a href="myisammrg-directory.html">A.1.16 The myisammrg Directory</a></span></dt><dt><span class="section"><a href="mysql-test-directory.html">A.1.17 The mysql-test Directory</a></span></dt><dt><span class="section"><a href="mysys-directory.html">A.1.18 The mysys Directory</a></span></dt><dt><span class="section"><a href="ndb-directory.html">A.1.19 The ndb Directory</a></span></dt><dt><span class="section"><a href="netware-directory.html">A.1.20 The netware Directory</a></span></dt><dt><span class="section"><a href="new-rpms-directory.html">A.1.21 The NEW-RPMS Directory</a></span></dt><dt><span class="section"><a href="os-directory.html">A.1.22 The os2 Directory</a></span></dt><dt><span class="section"><a href="pstack-directory.html">A.1.23 The pstack Directory</a></span></dt><dt><span class="section"><a href="regex-directory.html">A.1.24 The regex Directory</a></span></dt><dt><span class="section"><a href="sccs-directory.html">A.1.25 The SCCS Directory</a></span></dt><dt><span class="section"><a href="scripts-directory.html">A.1.26 The scripts Directory</a></span></dt><dt><span class="section"><a href="server-tools-directory.html">A.1.27 The server-tools Directory</a></span></dt><dt><span class="section"><a href="sql-directory.html">A.1.28 The sql Directory</a></span></dt><dt><span class="section"><a href="sql-bench-directory.html">A.1.29 The sql-bench Directory</a></span></dt><dt><span class="section"><a href="sql-common-directory.html">A.1.30 The sql-common Directory</a></span></dt><dt><span class="section"><a href="ssl-directory.html">A.1.31 The SSL Directory</a></span></dt><dt><span class="section"><a href="strings-directory.html">A.1.32 The strings Directory</a></span></dt><dt><span class="section"><a href="support-files-directory.html">A.1.33 The support-files Directory</a></span></dt><dt><span class="section"><a href="tests-directory.html">A.1.34 The tests Directory</a></span></dt><dt><span class="section"><a href="tools-directory.html">A.1.35 The tools Directory</a></span></dt><dt><span class="section"><a href="vc-plus-plus-files-directory.html">A.1.36 The VC++Files Directory</a></span></dt><dt><span class="section"><a href="vio-directory.html">A.1.37 The vio Directory</a></span></dt><dt><span class="section"><a href="zlib-directory.html">A.1.38 The zlib Directory</a></span></dt></dl></dd></dl></dd><dt><span class="appendix"><a href="files-in-innodb-sources.html">B InnoDB Source Code Distribution</a></span></dt><dt><span class="index"><a href="ix01.html">Index</a></span></dt></dl>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="next" href="preface.html" title=" Preface and Legal Notice">Next</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 20.4.7 Detailed Specification of the Decoding</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="myisampack-tricks.html" title="20.4.6 myisampackTricks"/><link rel="next" href="myisam-key-cache.html?ff=nopfpls" title="20.5 MyISAM Key Cache"/><link rel="up" href="myisam-compressed-data-file-layout.html" title="20.4 MyISAM Compressed Data File Layout"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fdecoding-specification.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="myisam.html">20 MyISAM Storage Engine</a> :: <a href="myisam-compressed-data-file-layout.html">20.4 MyISAM Compressed Data File Layout</a> :: 20.4.7 Detailed Specification of the Decoding</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="myisampack-tricks.html" title="Previous Section">&laquo; 20.4.6 myisampackTricks</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="myisam-key-cache.html" title="Next Section">20.5 MyISAM Key Cache  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="myisam-compressed-data-file-layout.html">20.4 MyISAM Compressed Data File Layout</a></li><li><a href="huffman-compression.html">20.4.1 Huffman Compression</a></li>
+<li><a href="myisampack.html">20.4.2 The myisampack Program</a></li>
+<li><a href="record-and-blob-length-encoding.html">20.4.3 Record and Blob Length Encoding</a></li>
+<li><a href="code-tree-representation.html">20.4.4 Code Tree Representation</a></li>
+<li><a href="index-file-usage.html">20.4.5 Usage of the Index File</a></li>
+<li><a href="myisampack-tricks.html">20.4.6 myisampackTricks</a></li>
+<li class="self">20.4.7 Detailed Specification of the Decoding</li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="decoding-specification"></a>20.4.7 Detailed Specification of the Decoding</h3>
+
+</div>
+
+</div>
+
+</div>
+<p>
+        Below follows the detailed specification of the encoding:
+      </p><p>
+        Datafile fixed header (32 bytes):
+      </p><pre class="programlisting">
+4 byte  magic number
+4 byte  total header length (fixed + column info + code trees)
+4 byte  minimum packed record length
+4 byte  maximum packed record length
+4 byte  total number of elements in all code trees
+4 byte  total number of bytes collected for distinct column values
+2 byte  number of code trees
+1 byte  maximum number of bytes required to represent record+blob lengths
+1 byte  record pointer length, number of bytes for compressed data file length
+4 byte  zeros
+</pre><p>
+        Column Information. For every column in the table:
+      </p><pre class="programlisting">
+5 bits  field type
+    FIELD_NORMAL          0
+    FIELD_SKIP_ENDSPACE   1
+    FIELD_SKIP_PRESPACE   2
+    FIELD_SKIP_ZERO       3
+    FIELD_BLOB            4
+    FIELD_CONSTANT        5
+    FIELD_INTERVALL       6
+    FIELD_ZERO            7
+    FIELD_VARCHAR         8
+    FIELD_CHECK           9
+
+6 bits  pack type as a set of flags
+    PACK_TYPE_SELECTED      1
+    PACK_TYPE_SPACE_FIELDS  2
+    PACK_TYPE_ZERO_FILL     4
+
+5 bits  if pack type contains PACK_TYPE_ZERO_FILL
+    minimum number of trailing zero bytes in this column
+        else
+    number of bits to encode the number of
+    packed bytes in this column (length_bits)
+
+x bits  number of the code tree used to encode this column
+    x is the minimum number of bits required to represent the highest
+    tree number.
+</pre><p>
+        Alignment:
+      </p><pre class="programlisting">
+x bits alignment to the next byte border
+</pre><p>
+        Code Trees. For every tree:
+      </p><pre class="programlisting">
+1 bit   compression type
+    0 = byte value compression
+        8 bits  minimum byte value coded by this tree
+        9 bits  number of byte values encoded by this tree
+        5 bits  number of bits used to encode the byte values
+        5 bits  number of bits used to encode offsets to next tree elements
+    1 = distinct column value compression
+        15 bits number of distinct column values encoded by this tree
+        16 bits length of the buffer with all column values
+        5 bits  number of bits used to encode the index of the column value
+        5 bits  number of bits used to encode offsets to next tree elements
+For each code tree element:
+    1 bit   IS_OFFSET
+    x bits  the announced number of bits for either a value or an offset
+x bits  alignment to the next byte border
+If compression by distinct column values:
+    The number of 8-bit values that make up the column value buffer
+</pre><p>
+        Compressed Records. For every record:
+      </p><pre class="programlisting">
+1-5 bytes  length of the compressed record in bytes
+    1. byte  0..253 length
+             254    length encoded in the next two bytes little endian
+             255    length encoded in the next  x  bytes little endian
+                    x = 3  for pack file version 1
+                    x = 4  for pack file version &gt; 1
+1-5 bytes  total length of all expanded blobs of this record
+    1. byte  0..253 length
+             254    length encoded in the next two bytes little endian
+             255    length encoded in the next  x  bytes little endian
+                    x = 3  for pack file version 1
+                    x = 4  for pack file version &gt; 1
+For every column:
+    If pack type includes PACK_TYPE_SPACE_FIELDS,
+        1 bit   1 = spaces only, 0 = not only spaces
+    In case the field type is of:
+        FIELD_SKIP_ZERO
+            1 bit   1 = zeros only, 0 = not only zeros
+                    In the latter case
+                        x bits  the Huffman code for every byte
+        FIELD_NORMAL
+            x bits  the Huffman code for every byte
+        FIELD_SKIP_ENDSPACE
+            If pack type includes PACK_TYPE_SELECTED,
+                1 bit   1 = more than min endspace, 0 = not more
+                        In the former case
+                            x bits  nr of extra spaces, x = length_bits
+            else
+                x bits  nr of extra spaces, x = length_bits
+            x bits  the Huffman code for every byte
+        FIELD_SKIP_PRESPACE
+            If pack type includes PACK_TYPE_SELECTED,
+                1 bit   1 = more than min prespace, 0 = not more
+                        In the former case
+                            x bits  nr of extra spaces, x = length_bits
+            else
+                x bits  nr of extra spaces, x = length_bits
+            x bits  the Huffman code for every byte
+        FIELD_CONSTANT or FIELD_ZERO or FIELD_CHECK
+            nothing for these
+        FIELD_INTERVALL
+            x bits  the Huffman code for the buffer index of the column value
+        FIELD_BLOB
+            1 bit   1 = blob is empty, 0 = not empty
+                    In the latter case
+                        x bits  blob length, x = length_bits
+                        x bits  the Huffman code for every byte
+        FIELD_VARCHAR
+            1 bit   1 = varchar is empty, 0 = not empty
+                    In the latter case
+                        x bits  blob length, x = length_bits
+                        x bits  the Huffman code for every byte
+    x bits  alignment to the next byte border
+</pre>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="myisampack-tricks.html" title="20.4.6 myisampackTricks">Previous</a> / <a rel="next" href="myisam-key-cache.html" title="20.5 MyISAM Key Cache">Next</a> / <a rel="up" href="myisam-compressed-data-file-layout.html" title="20.4 MyISAM Compressed Data File Layout">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="decoding-specification" />
+          <input type="hidden" name="return" value="/doc/internals/en/decoding-specification.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="myisampack-tricks.html" title="20.4.6 myisampackTricks">Previous</a> / <a rel="next" href="myisam-key-cache.html" title="20.5 MyISAM Key Cache">Next</a> / <a rel="up" href="myisam-compressed-data-file-layout.html" title="20.4 MyISAM Compressed Data File Layout">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

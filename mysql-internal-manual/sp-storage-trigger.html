@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 15.2.2 Table Trigger Storage</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="sp-storage-sp_sf.html" title="15.2.1 Stored Procedure and Stored Function Storage"/><link rel="next" href="sp-storage-event.html?ff=nopfpls" title="15.2.3 Event Storage"/><link rel="up" href="sp-storage.html" title="15.2 Persistent Representation"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fsp-storage-trigger.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="stored-programs.html">15 Stored Programs</a> :: <a href="sp-storage.html">15.2 Persistent Representation</a> :: 15.2.2 Table Trigger Storage</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="sp-storage-sp_sf.html" title="Previous Section">&laquo; 15.2.1 Stored Procedure and Stored Function Storage</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="sp-storage-event.html" title="Next Section">15.2.3 Event Storage  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="sp-storage.html">15.2 Persistent Representation</a></li><li><a href="sp-storage-sp_sf.html">15.2.1 Stored Procedure and Stored Function Storage</a></li>
+<li class="self">15.2.2 Table Trigger Storage</li>
+<li><a href="sp-storage-event.html">15.2.3 Event Storage</a></li>
+<li><a href="sp-storage-derived.html">15.2.4 Derived Attribute Storage</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="sp-storage-trigger"></a>15.2.2 Table Trigger Storage</h3>
+
+</div>
+
+</div>
+
+</div>
+<p>
+        Information for a given trigger is stored in plain text files in
+        the database directory that contains the table associated with
+        the trigger:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            There is one <code class="filename">.TRN</code> file per trigger. It
+            indicates the table associated with the trigger. The design
+            decision that every trigger has a dedicated
+            <code class="filename">.TRN</code> file is used to facilitate
+            operating system filesystem services to enforce the SQL
+            standard requirement that all triggers in a given schema
+            must be unique.
+          </p></li><li class="listitem"><p>
+            There is one <code class="filename">.TRG</code> per table that has
+            triggers. It contains information about all the triggers for
+            the table.
+</p></li></ul>
+</div>
+<p>
+        Suppose that we create a table named <code class="literal">account</code>
+        and associate with it three triggers named
+        <code class="literal">ins_transaction</code>, <code class="literal">ins_sum</code>,
+        and <code class="literal">upd_check</code>:
+      </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>CREATE TABLE account (acct_num INT, amount DECIMAL(10,2));</code></strong>
+Query OK, 0 rows affected (0.05 sec)
+
+mysql&gt; <strong class="userinput"><code>CREATE TRIGGER ins_sum BEFORE INSERT ON account</code></strong>
+    -&gt; <strong class="userinput"><code>FOR EACH ROW SET @sum = @sum + NEW.amount;</code></strong>
+Query OK, 0 rows affected (0.04 sec)
+
+mysql&gt; <strong class="userinput"><code>CREATE TRIGGER ins_transaction BEFORE INSERT ON account</code></strong>
+    -&gt; <strong class="userinput"><code>FOR EACH ROW PRECEDES ins_sum</code></strong>
+    -&gt; <strong class="userinput"><code>SET</code></strong>
+    -&gt; <strong class="userinput"><code>@deposits = @deposits + IF(NEW.amount&gt;0,NEW.amount,0),</code></strong>
+    -&gt; <strong class="userinput"><code>@withdrawals = @withdrawals + IF(NEW.amount&lt;0,-NEW.amount,0);</code></strong>
+Query OK, 0 rows affected (0.02 sec)
+
+mysql&gt; <strong class="userinput"><code>delimiter //</code></strong>
+mysql&gt; <strong class="userinput"><code>CREATE TRIGGER upd_check BEFORE UPDATE ON account</code></strong>
+    -&gt; <strong class="userinput"><code>FOR EACH ROW</code></strong>
+    -&gt; <strong class="userinput"><code>BEGIN</code></strong>
+    -&gt;     <strong class="userinput"><code>IF NEW.amount &lt; 0 THEN</code></strong>
+    -&gt;         <strong class="userinput"><code>SET NEW.amount = 0;</code></strong>
+    -&gt;     <strong class="userinput"><code>ELSEIF NEW.amount &gt; 100 THEN</code></strong>
+    -&gt;         <strong class="userinput"><code>SET NEW.amount = 100;</code></strong>
+    -&gt;     <strong class="userinput"><code>END IF;</code></strong>
+    -&gt; <strong class="userinput"><code>END;//</code></strong>
+mysql&gt; <strong class="userinput"><code>delimiter ;</code></strong>
+Query OK, 0 rows affected (0.03 sec)
+</pre><p>
+        In this case, there are three <code class="filename">.TRN</code> files
+        named after the triggers
+        (<code class="filename">ins_transaction.TRN</code>,
+        <code class="filename">ins_sum.TRN</code>,
+        <code class="filename">upd_check.TRN</code>), and a
+        <code class="literal">.TRG</code> file named after the table
+        (<code class="filename">account.TRG</code>). table.
+      </p><p>
+        A <code class="filename">.TRN</code> file is specific to a trigger and
+        contains these fields:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">TYPE</code>: Indicates what the file represents.
+            For a <code class="filename">.TRN</code> file, this value is always
+            <code class="literal">TRIGGERNAME</code>, which means that the file
+            name corresponds to the trigger name. For example, a
+            <code class="filename">.TRN</code> file named
+            <code class="filename">ins_sum.TRN</code> corresponds to a trigger
+            named <code class="literal">ins_sum</code>.
+          </p></li><li class="listitem"><p>
+            <code class="literal">trigger_table</code>: The table associated with
+            the trigger.
+</p></li></ul>
+</div>
+<p>
+        Example <code class="filename">.TRN</code> file:
+      </p><pre class="programlisting">
+TYPE=TRIGGERNAME
+trigger_table=account
+</pre><p>
+        A <code class="filename">.TRG</code> file is specific to a table and
+        contains these fields:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">TYPE</code>: Indicates what the file represents.
+            For a <code class="filename">.TRN</code> file, this value is always
+            <code class="literal">TRIGGERS</code>, which means that the file
+            contains information about the triggers associated with the
+            table that corresponds to the file name. For example, a file
+            named <code class="literal">account.TRG</code> contains information
+            for the triggers associated with the
+            <code class="literal">account</code> table. trigger definitions and
+            related information.
+          </p></li><li class="listitem"><p>
+            <code class="literal">triggers</code>: The <code class="literal">CREATE
+            TRIGGER</code> statements for the triggers associated
+            with the table. Triggers that have the same trigger event
+            and action time are listed in activation order.
+          </p></li><li class="listitem"><p>
+            <code class="literal">sql_modes</code>: For each trigger, the
+            <a class="ulink" href="http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_sql_mode" target="_top"><code class="literal">sql_mode</code></a> value under which
+            the trigger executes, as a numeric value.
+          </p></li><li class="listitem"><p>
+            <code class="literal">definers</code>: For each trigger, the account
+            of the user who created it, in
+            <code class="literal">'<em class="replaceable"><code>user_name</code></em>'@'<em class="replaceable"><code>host_name</code></em>'</code>
+            format.
+          </p></li><li class="listitem"><p>
+            <code class="literal">client_cs_names</code>: For each trigger, the
+            session value of the
+            <a class="ulink" href="http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_character_set_client" target="_top"><code class="literal">character_set_client</code></a> system
+            variable when the trigger was created.
+          </p></li><li class="listitem"><p>
+            <code class="literal">connection_cl_names</code>: For each trigger,
+            the session value of the
+            <a class="ulink" href="http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_collation_connection" target="_top"><code class="literal">collation_connection</code></a> system
+            variable when the trigger was created.
+          </p></li><li class="listitem"><p>
+            <code class="literal">db_cl_names</code>: For each trigger, the
+            collation of the database with which the trigger is
+            associated.
+          </p></li><li class="listitem"><p>
+            <code class="literal">created</code>: For each trigger, its creation
+            time. This field is present only if triggers have been
+            created or dropped for the table as of MySQL 5.7.2 or later.
+            A value of 0 means that the trigger was created before 5.7.2
+            and thus that no creation time is known. (Creation time
+            values are not maintained until 5.7.2.)
+</p></li></ul>
+</div>
+<p>
+        Example <code class="filename">.TRG</code> file:
+      </p><pre class="programlisting">
+TYPE=TRIGGERS
+triggers='CREATE DEFINER=`me`@`localhost` TRIGGER ins_transaction
+BEFORE INSERT ON account\nFOR EACH ROW SET\n@deposits = @deposits
++ IF(NEW.amount&gt;0,NEW.amount,0),\n@withdrawals = @withdrawals +
+IF(NEW.amount&lt;0,-NEW.amount,0)' 'CREATE DEFINER=`me`@`localhost`
+TRIGGER ins_sum BEFORE INSERT ON account\nFOR EACH ROW SET @sum =
+@sum + NEW.amount' 'CREATE DEFINER=`me`@`localhost` TRIGGER upd_check
+BEFORE UPDATE ON account\nFOR EACH ROW\nBEGIN\n    IF NEW.amount &lt;
+0 THEN\n        SET NEW.amount = 0;\n    ELSEIF NEW.amount &gt; 100
+THEN\n        SET NEW.amount = 100;\n    END IF;\nEND'
+sql_modes=1073741824 1073741824 1073741824
+definers='me@localhost' 'me@localhost' 'me@localhost'
+client_cs_names='utf8' 'utf8' 'utf8'
+connection_cl_names='utf8_general_ci' 'utf8_general_ci' 'utf8_general_ci'
+db_cl_names='latin1_swedish_ci' 'latin1_swedish_ci' 'latin1_swedish_ci'
+created=137339041018 137339026087 137339063431
+</pre><p>
+        To convert a value on the <code class="literal">sql_modes</code> line to
+        more readable form, do this:
+      </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>SET sql_mode = 1073741824;</code></strong>
+mysql&gt; <strong class="userinput"><code>SELECT @@sql_mode;</code></strong>
++------------------------+
+| @@sql_mode             |
++------------------------+
+| NO_ENGINE_SUBSTITUTION |
++------------------------+
+</pre><p>
+        To break a value on the <code class="literal">created</code> line into
+        integer and fractional seconds parts and convert them to an
+        ISO-format date and time value, do this:
+      </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>SET @ts_int = FLOOR(137339041018/100);</code></strong>
+Query OK, 0 rows affected (0.01 sec)
+
+mysql&gt; <strong class="userinput"><code>SET @ts_frac = 137339041018 % 100;</code></strong>
+Query OK, 0 rows affected (0.00 sec)
+
+mysql&gt; <strong class="userinput"><code>SELECT CONCAT(FROM_UNIXTIME(@ts_int),'.',@ts_frac);</code></strong>
++---------------------------------------------+
+| CONCAT(FROM_UNIXTIME(@ts_int),'.',@ts_frac) |
++---------------------------------------------+
+| 2013-07-09 12:20:10.18                      |
++---------------------------------------------+
+1 row in set (0.00 sec)
+</pre><p>
+        The code used to encapsulate file access is:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">Table_triggers_list::create_trigger()</code>
+          </p></li><li class="listitem"><p>
+            <code class="literal">Table_triggers_list::drop_trigger()</code>
+          </p></li><li class="listitem"><p>
+            <code class="literal">Table_triggers_list::check_n_load()</code>
+          </p></li><li class="listitem"><p>
+            <code class="literal">Table_triggers_list::drop_all_triggers()</code>
+          </p></li><li class="listitem"><p>
+            <code class="literal">Table_triggers_list::change_table_name()</code>
+          </p></li><li class="listitem"><p>
+            See the C++ class <code class="literal">Table_triggers_list</code> in
+            general.
+</p></li></ul>
+</div>
+<p>
+        Using files for triggers is due to historical reasons, and
+        follows the same design as <code class="filename">*.frm</code> files for
+        table metadata. This approach has several drawbacks:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Each file has yet another text file format, which is
+            necessary to print and parse back correctly. Custom code has
+            to be implemented, which is consuming in terms of resources,
+            and introduces technical risk or code duplication.
+          </p></li><li class="listitem"><p>
+            Tables are replicated, values in columns are checked for
+            data validity, integrity constraints can be defined ...
+            where none of the above is available with a file based
+            implementation.
+          </p></li><li class="listitem"><p>
+            With tables, the default locking, transaction and isolation
+            mechanism used by the server in general can be leveraged,
+            but the same is not available with files.
+          </p></li><li class="listitem"><p>
+            Cluster support for any new metadata operation that operates
+            on files will require a custom solution. E.g. to propagate
+            CREATE TABLE statement across MySQL Cluster mysqld nodes we
+            use a so-called <span class="quote">“<span class="quote">.frm shipping</span>”</span> technique.
+            There is no similar solution implemented for triggers at
+            this point, and thus a trigger created in one mysqld node
+            does not automatically become visible on other nodes.
+            Potentially, if data is stored in tables, cluster support
+            may be added as simply as by issuing <code class="literal">ALTER TABLE
+            mysql.triggers ENGINE=NDB</code>;
+</p></li></ul>
+</div>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+<div class="admon-title">
+Note
+</div>
+<p>
+          Various drawbacks of filesystem based solution are provided in
+          this chapter only for a sake of example. Other advantages and
+          disadvantages of two approaches may be found in relevant
+          worklog entries and design documents.
+</p>
+</div>
+<div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+<div class="admon-title">
+Warning
+</div>
+<p>
+          The current implementation of the storage layer for table
+          triggers is considered <span class="emphasis"><em>private</em></span> to the
+          server, and might change without warnings in future releases.
+</p>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="sp-storage-sp_sf.html" title="15.2.1 Stored Procedure and Stored Function Storage">Previous</a> / <a rel="next" href="sp-storage-event.html" title="15.2.3 Event Storage">Next</a> / <a rel="up" href="sp-storage.html" title="15.2 Persistent Representation">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="sp-storage-trigger" />
+          <input type="hidden" name="return" value="/doc/internals/en/sp-storage-trigger.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="sp-storage-sp_sf.html" title="15.2.1 Stored Procedure and Stored Function Storage">Previous</a> / <a rel="next" href="sp-storage-event.html" title="15.2.3 Event Storage">Next</a> / <a rel="up" href="sp-storage.html" title="15.2 Persistent Representation">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

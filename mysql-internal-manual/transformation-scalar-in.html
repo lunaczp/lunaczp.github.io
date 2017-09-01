@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 13.1.1 Scalar IN Subquery</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="transformation-in.html" title="13.1 Item_in_subselect::select_transformer"/><link rel="next" href="transformations-row-in.html?ff=nopfpls" title="13.1.2 Row IN Subquery"/><link rel="up" href="transformation-in.html" title="13.1 Item_in_subselect::select_transformer"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Ftransformation-scalar-in.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="transformations.html">13 How MySQL Transforms Subqueries</a> :: <a href="transformation-in.html">13.1 Item_in_subselect::select_transformer</a> :: 13.1.1 Scalar IN Subquery</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="transformation-in.html" title="Previous Section">&laquo; 13.1 Item_in_subselect::select_transformer</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="transformations-row-in.html" title="Next Section">13.1.2 Row IN Subquery  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="transformation-in.html">13.1 Item_in_subselect::select_transformer</a></li><li class="self">13.1.1 Scalar IN Subquery</li>
+<li><a href="transformations-row-in.html">13.1.2 Row IN Subquery</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="transformation-scalar-in"></a>13.1.1 Scalar IN Subquery</h3>
+</div>
+</div>
+</div>
+<p>
+        To rewrite a scalar <code class="literal">IN</code> subquery, the
+        <code class="literal">Item_in_subselect::single_value_transformer</code>
+        method is used. The scalar <code class="literal">IN</code> subquery will
+        be replaced with an <code class="literal">Item_in_optimizer</code> item.
+      </p><p>
+        An <code class="literal">Item_in_optimizer</code> item is a special
+        boolean function. On a value request (one of
+        <code class="literal">val</code>, <code class="literal">val_int</code>, or
+        <code class="literal">val_str</code> methods) it evaluates the left
+        expression of the <code class="literal">IN</code> by storing its value in
+        a cache item (one of <code class="literal">Item_cache*</code> items), then
+        it tests the cache to see whether it is <code class="literal">NULL</code>.
+        If left expression (cache) is <code class="literal">NULL</code>, then
+        <code class="literal">Item_in_optimizer</code> returns
+        <code class="literal">NULL</code>, else it evaluates
+        <code class="literal">Item_in_subselect</code>.
+      </p><p>
+        Example queries.
+      </p><pre class="programlisting">
+a) SELECT * from t1 where t1.a in (SELECT t2.a FROM t2);
+b) SELECT * from t1 where t1.a in (SELECT t2.a FROM t2 GROUP BY t2.a);
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">Item_in_subselect</code> inherits the mechanism
+            for getting a value from
+            <code class="literal">Item_exists_subselect</code>.
+          </p></li><li class="listitem"><p>
+            <code class="literal">Select_transformer</code> stores a reference to
+            the left expression in its conditions:
+</p></li></ul>
+</div>
+<pre class="programlisting">
+(in WHERE and HAVING in case 'a' and in HAVING in case 'b')
+</pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Item from item list of this select (<code class="literal">t2.a</code>)
+            can be referenced with a special reference
+            (<code class="literal">Item_ref_null_helper</code> or
+            <code class="literal">Item_null_helper</code>). This reference informs
+            <code class="literal">Item_in_optimizer</code> whether item
+            (<code class="literal">t2.a</code>) is <code class="literal">NULL</code> by
+            setting the <code class="literal">was_null</code> flag.
+          </p></li><li class="listitem"><p>
+            The return value from <code class="literal">Item_in_subselect</code>
+            will be evaluated as follows:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                If TRUE, return true
+              </p></li><li class="listitem"><p>
+                If NULL, return null (that is, unknown)
+              </p></li><li class="listitem"><p>
+                If FALSE, and <code class="literal">was_null</code> is set, return
+                null
+              </p></li><li class="listitem"><p>
+                Return FALSE
+</p></li></ul>
+</div>
+</li></ul>
+</div>
+<p>
+        <code class="literal">&lt;left_expression&gt; IN (SELECT &lt;item&gt;
+        ...)</code> will be represented as follows:
+      </p><pre class="programlisting">
+                        +-----------------+
+                        |Item_in_optimizer|
+                        +-----------------+
+                                 |
+           +---------------------+------------+
+           |                                  |
++-----------------------+             +-----------------+
+|   &lt;left_expression&gt;   |             |Item_in_subselect|
+|                       |             +-----------------+
++-----------------------+                      |
+|&lt;left_expression cache&gt;|          +-----------+-----------+
+|                       |          |                       |
++-----------------------+          |                       |
+           ^                 +----------+        +--------------------+
+           +&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;| Item_ref | +&lt;&lt;&lt;|Item_ref_null_helper|
+                             +----------+    V   +--------------------+
+                                             V   +--------------------+
+                                             +&gt;&gt;&gt;| &lt;item&gt;       |
+                                                 +--------------------+
+</pre><p>
+        where <code class="literal">&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> is
+        reference in meaning of <code class="literal">Item_ref</code>.
+      </p><p>
+        <code class="literal">Item_ref</code> is used to point to
+        <code class="literal">&lt;left_expression cache&gt;</code>, because at the
+        time of transformation we know only the address of the variable
+        where the cache pointer will be stored.
+      </p><p>
+        If the select statement has an <code class="literal">ORDER BY</code>
+        clause, it will be wiped out, because there is no sense in
+        <code class="literal">ORDER BY</code> without <code class="literal">LIMIT</code>
+        here.
+      </p><p>
+        If <code class="literal">IN</code> subquery union, the condition of every
+        select in the <code class="literal">UNION</code> will be changed
+        individually.
+      </p><p>
+        If a condition needs to be added to the <code class="literal">WHERE</code>
+        clause, it will be presented as <code class="literal">(item OR item IS
+        NULL)</code> and
+        <code class="literal">Item_is_not_null_test(item)</code> will be added to
+        the <code class="literal">HAVING</code> clause.
+        <code class="literal">Item_is_not_null_test</code> registers a
+        <code class="literal">NULL</code> value the way
+        <code class="literal">Item_ref_null_helper</code> does it, and returns
+        FALSE if the argument is <code class="literal">NULL</code>. With the above
+        trick, we will register <code class="literal">NULL</code> value of
+        <code class="literal">Item</code> even for the case of index optimization
+        of a <code class="literal">WHERE</code> clause (case 'a' in the following
+        example).
+      </p><p>
+        The following are examples of <code class="literal">IN</code>
+        transformations:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Example 1:
+</p></li></ul>
+</div>
+<pre class="programlisting">
+&lt;left_expression&gt; IN (SELECT &lt;item&gt; FROM t WHERE &lt;where_exp&gt;)
+</pre><p>
+        If returning <code class="literal">NULL</code> correctly would make sense,
+        the above will become:
+      </p><pre class="programlisting">
+(SELECT 1 FROM t
+  WHERE
+    &lt;where_exp&gt; and
+    (Item_ref(&lt;cached_left_expression&gt;)=&lt;item&gt; or      &lt;Item&gt; is null)
+  HAVING Item_is_not_null_test(&lt;item&gt;))
+</pre><p>
+        When a subquery is marked as the top item of the
+        <code class="literal">WHERE</code> clause, it will become:
+      </p><pre class="programlisting">
+(SELECT 1 FROM t
+  WHERE
+     &lt;where_exp&gt; and
+     Item_ref(&lt;cached_left_expression&gt;)=&lt;item&gt;) </pre><p>
+        Example 2:
+      </p><pre class="programlisting">
+&lt;left_expression&gt; IN (SELECT &lt;item&gt; FROM t
+                           HAVING &lt;having_expr&gt;
+ ORDER BY 1) </pre><p>
+        will be represented as
+      </p><pre class="programlisting">
+(SELECT &lt;item&gt; as ref_null_helper FROM t
+   HAVING &lt;having_exp&gt; AND
+Item_ref(&lt;cached_left_expression&gt;) = Item_ref_null_helper(item)) </pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Example 3:
+</p></li></ul>
+</div>
+<pre class="programlisting">&lt;left_expression&gt; IN (SELECT &lt;item&gt; UNION ...) </pre><p>
+        will become
+      </p><pre class="programlisting">
+(SELECT 1
+   HAVING Item_ref(&lt;cached_left_expression&gt;)=           &lt;Item_null_helper(&lt;Item&gt;)&gt;
+ UNION ...) </pre><p>
+        (<code class="literal">HAVING</code> without <code class="literal">FROM</code> is a
+        syntax error, but a <code class="literal">HAVING</code> condition is
+        checked even for subquery without <code class="literal">FROM</code>)
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            Example 4:
+</p></li></ul>
+</div>
+<pre class="programlisting">
+&lt;left_expression&gt; IN (select &lt;item&gt;)
+</pre><p>
+        will be completely replaced with
+        <code class="literal">&lt;left_expression&gt; = &lt;item&gt;</code>
+      </p><p>
+        Now conditions <code class="literal">(WHERE (a) or HAVING (b))</code> will
+        be changed, depending on the select, in the following way:
+      </p><p>
+        If subquery contains a <code class="literal">HAVING</code> clause,
+        <code class="literal">SUM()</code> function or <code class="literal">GROUP BY</code>
+        (example 1), then the item list will be unchanged and an
+        <code class="literal">Item_ref_null_helper</code> reference will be
+        created on item list element. A condition will be added to the
+        <code class="literal">HAVING</code>.
+      </p><p>
+        If the subquery does not contain <code class="literal">HAVING</code>,
+        <code class="literal">SUM()</code> function, or <code class="literal">GROUP
+        BY</code> (example 2), then:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <code class="literal">item list</code> will be replaced with 1.
+          </p></li><li class="listitem"><p>
+            <code class="literal">left_expression cache&gt; = &lt;item&gt; or is null
+            &lt;item&gt;</code> will be added to the
+            <code class="literal">WHERE</code> clause and a special
+            <code class="literal">is_not_null(item)</code> will be added to the
+            <code class="literal">HAVING</code>, so null values will be
+            registered. If returning <code class="literal">NULL</code> wouldn't
+            make correct sense, then only <code class="literal">left_expression
+            cache&gt; = &lt;item&gt;</code> will be added to the
+            <code class="literal">WHERE</code> clause. If this subquery does not
+            contain a <code class="literal">FROM</code> clause or if the subquery
+            contains <code class="literal">UNION</code> (example 3), then
+            <code class="literal">left_expression cache&gt; =
+            Item_null_helper(&lt;item&gt;)</code> will be added to
+            the <code class="literal">HAVING</code> clause.
+</p></li></ul>
+</div>
+<p>
+        A single select without a <code class="literal">FROM</code> clause will be
+        reduced to just <code class="literal">&lt;left_expression&gt; =
+        &lt;item&gt;</code> without use of
+        <code class="literal">Item_in_optimizer</code>.
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="transformation-in.html" title="13.1 Item_in_subselect::select_transformer">Previous</a> / <a rel="next" href="transformations-row-in.html" title="13.1.2 Row IN Subquery">Next</a> / <a rel="up" href="transformation-in.html" title="13.1 Item_in_subselect::select_transformer">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="transformation-scalar-in" />
+          <input type="hidden" name="return" value="/doc/internals/en/transformation-scalar-in.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="transformation-in.html" title="13.1 Item_in_subselect::select_transformer">Previous</a> / <a rel="next" href="transformations-row-in.html" title="13.1.2 Row IN Subquery">Next</a> / <a rel="up" href="transformation-in.html" title="13.1 Item_in_subselect::select_transformer">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

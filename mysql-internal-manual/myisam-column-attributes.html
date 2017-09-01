@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 20.1.2 Physical Attributes of Columns</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="myisam-introduction.html" title="20.1.1 Introduction"/><link rel="next" href="myisam-more-information.html?ff=nopfpls" title="20.1.3 Where to Look For More Information"/><link rel="up" href="myisam-record-structure.html" title="20.1 MyISAM Record Structure"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fmyisam-column-attributes.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="myisam.html">20 MyISAM Storage Engine</a> :: <a href="myisam-record-structure.html">20.1 MyISAM Record Structure</a> :: 20.1.2 Physical Attributes of Columns</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="myisam-introduction.html" title="Previous Section">&laquo; 20.1.1 Introduction</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="myisam-more-information.html" title="Next Section">20.1.3 Where to Look For More Information  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="myisam-record-structure.html">20.1 MyISAM Record Structure</a></li><li><a href="myisam-introduction.html">20.1.1 Introduction</a></li>
+<li class="self">20.1.2 Physical Attributes of Columns</li>
+<li><a href="myisam-more-information.html">20.1.3 Where to Look For More Information</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="myisam-column-attributes"></a>20.1.2 Physical Attributes of Columns</h3>
+
+</div>
+
+</div>
+
+</div>
+<p>
+        Next I'll describe the physical attributes of each column in a
+        row. The format depends entirely on the data type and the size
+        of the column, so, for every data type, I'll give a description
+        and an example.
+      </p><p>
+        All the types are defined within the include/mysql_com.h file
+        within the <code class="literal">enum_field_types</code> enumerated
+        structure. Here's a sample of the key values and corresponding
+        numbers:
+</p><pre class="programlisting"> MYSQL_TYPE_BIT 16 MYSQL_TYPE_BLOB 252 MYSQL_TYPE_DATE 10 MYSQL_TYPE_DATETIME 12 MYSQL_TYPE_DECIMAL 0 MYSQL_TYPE_DOUBLE 5 MYSQL_TYPE_ENUM 247 MYSQL_TYPE_FLOAT 4 MYSQL_TYPE_GEOMETRY 255 MYSQL_TYPE_INT24 9 MYSQL_TYPE_LONG 3 MYSQL_TYPE_LONGLONG 8 MYSQL_TYPE_LONG_BLOB 251 MYSQL_TYPE_MEDIUM_BLOB 250 MYSQL_TYPE_NEWDATE 14 MYSQL_TYPE_NEWDECIMAL 246 MYSQL_TYPE_NULL 6 MYSQL_TYPE_SET 248 MYSQL_TYPE_SHORT 2 MYSQL_TYPE_STRING 254 MYSQL_TYPE_TIME 11 MYSQL_TYPE_TIMESTAMP 7 MYSQL_TYPE_TINY 1 MYSQL_TYPE_TINY_BLOB 249 MYSQL_TYPE_VARCHAR 15 MYSQL_TYPE_VAR_STRING 253 MYSQL_TYPE_YEAR 13 </pre>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="bold"><strong>The character data types</strong></span>
+</p></li></ul>
+</div>
+<p>
+        <code class="literal">CHAR</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                  Storage: fixed-length string with space padding on the
+                  right.
+                </p></li><li class="listitem"><p>
+                  Example: a <code class="literal">CHAR(5)</code> column
+                  containing the value <code class="literal">'A'</code> looks
+                  like: <code class="literal">hexadecimal 41 20 20 20 20</code> --
+                  (length = A??'&lt;/code&gt;)
+</p></li></ul>
+</div>
+<p>
+
+            <code class="literal">VARCHAR</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: variable-length string with a preceding length.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">VARCHAR(7)</code> column
+                containing <code class="literal">'A'</code> looks like:
+                <code class="literal">hexadecimal 01 41</code> -- (length =
+                A'&lt;/code&gt;)
+              </p></li><li class="listitem"><p>
+                In MySQL 4.1 the length is always 1 byte. In MySQL 5.0
+                the length may be either 1 byte (for up to 255) or 2
+                bytes (for 256 to 65535). Some further random notes
+                about the new format: In old tables (from MySQL 4.1 and
+                earlier), <code class="literal">VARCHAR</code> columns have type
+                <code class="literal">MYSQL_TYPE_VAR_STRING</code>, which works
+                exactly like a <code class="literal">CHAR</code> with the
+                exception that if you do an <code class="literal">ALTER
+                TABLE</code>, it's converted to a true
+                <code class="literal">VARCHAR</code>
+                (<code class="literal">MYSQL_TYPE_VARCHAR</code>). (This means
+                that old tables will work as before for users.) ...
+                Apart from the above case, there are no longer any
+                automatic changes from <code class="literal">CHAR</code> to
+                <code class="literal">VARCHAR</code> or from
+                <code class="literal">VARCHAR</code> to <code class="literal">CHAR</code>.
+                MySQL will remember the declared type and stick to it
+                ... <code class="literal">VARCHAR</code> is implemented in
+                <code class="filename">field.h</code> and
+                <code class="filename">field.cc</code> through the new class
+                <code class="literal">Field_varstring</code> ...
+                <code class="literal">MyISAM</code> implements
+                <code class="literal">VARCHAR</code> both for dynamic-length and
+                fixed-length rows (as signaled with the
+                <code class="literal">ROW_FORMAT</code> flag) ...
+                <code class="literal">VARCHAR</code> now stores trailing spaces.
+                (If they don't fit, that's an error in strict mode.)
+                Trailing spaces are not significant in comparisons ...
+                In <code class="literal">table-&gt;record</code>, the space is
+                reserved for length (1 or 2 bytes) plus data ... The
+                number of bytes used to store the length is in the field
+                <code class="literal">Field_varchar-&gt;length_bytes</code>. Note
+                that internally this can be 2 even if
+                <code class="literal">Field_varchar-&gt;field_length</code> &lt;
+                256 (for example, for a shortened key to a
+                <code class="literal">varchar(256)</code>) ... There is a new
+                macro,
+                <code class="literal">HA_VARCHAR_PACKLENGTH(field_length)</code>,
+                that can be used on <code class="literal">field-&gt;length</code>
+                in write_row / read_row to check how many length bytes
+                are used. (In this context we can't have a field_length
+                &lt; 256 with a 2-byte pack length) ... When creating a
+                key for the handler,
+                <code class="literal">HA_KEYTYPE_VARTEXT1</code> and
+                <code class="literal">HA_KEYTYPE_BINARY1</code> are used for a key
+                on a column that has a 1-byte length prefix and
+                <code class="literal">HA_KEYTYPE_VARTEXT2</code> and
+                <code class="literal">HA_KEYTYPE_BINARY2</code> for a column that
+                has a 2-byte length prefix. (In the future we will
+                probably delete <code class="literal">HA_KEYTYPE_BINARY#</code>,
+                as this can be instead be done by just using the
+                <code class="literal">binary</code> character set with
+                <code class="literal">HA_KEYTYPE_VARTEXT#</code>.) ... When
+                sending a key to the handler for
+                <code class="literal">index_read()</code> or records_in_range, we
+                always use a 2-byte length for the
+                <code class="literal">VARCHAR</code> to make things simpler. (For
+                version 5.1 we intend to change <code class="literal">CHAR</code>s
+                to also use a 2-byte length for these functions, as this
+                will speed up and simplify the key handling code on the
+                handler side.) ... The test case file
+                <code class="filename">mysql-test/include/varchar.inc</code>
+                should be included in the code that tests the handler.
+                See <code class="filename">t/myisam.test</code> for how to use
+                this. You should verify the result against the one in
+                <code class="filename">mysql-test/t/myisam.result</code> to
+                ensure that you get the correct results ... A client
+                sees both the old and new <code class="literal">VARCHAR</code>
+                type as <code class="literal">MYSQL_TYPE_VAR_STRING</code>. It
+                will never (at least for 5.0) see
+                <code class="literal">MYSQL_TYPE_VARCHAR</code>. This ensures that
+                old clients will work as before ... If you run MySQL 5.0
+                with the <code class="literal">--new</code> option, MySQL will
+                show old <code class="literal">VARCHAR</code> columns as
+                <code class="literal">'CHAR'</code> in <code class="literal">SHOW CREATE
+                TABLE</code>. (This is useful when testing whether a
+                table is using the new <code class="literal">VARCHAR</code> type
+                or not.)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            <span class="bold"><strong>The numeric data types</strong></span>
+          </p><p>
+            Important: MySQL almost always stores multi-byte binary
+            numbers with the low byte first. This is called
+            "little-endian" numeric storage; it's normal on Intel x86
+            machines; MySQL uses it even for non-Intel machines so that
+            databases will be portable.
+          </p><p>
+            <code class="literal">TINYINT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always one byte.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">TINYINT</code> column containing
+                <code class="literal">65</code> looks like: <code class="literal">hexadecimal
+                41</code> -- (length = 1, value = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">SMALLINT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always two bytes.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">SMALLINT</code> column containing
+                <code class="literal">65</code> looks like: <code class="literal">hexadecimal
+                41 00</code> -- (length = 2, value = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">MEDIUMINT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always three bytes.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">MEDIUMINT</code> column
+                containing <code class="literal">65</code> looks like:
+                <code class="literal">hexadecimal 41 00 00</code> -- (length = 3,
+                value = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">INT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always four bytes.
+              </p></li><li class="listitem"><p>
+                Example: an <code class="literal">INT</code> column containing
+                <code class="literal">65</code> looks like: <code class="literal">hexadecimal
+                41 00 00 00</code> -- (length = 4, value = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">BIGINT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always eight bytes.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">BIGINT</code> column containing
+                <code class="literal">65</code> looks like: <code class="literal">hexadecimal
+                41 00 00 00 00 00 00 00</code> -- (length = 8, value
+                = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">FLOAT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always four bytes.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">FLOAT</code> column containing
+                approximately <code class="literal">65</code> looks like:
+                <code class="literal">hexadecimal 00 00 82 42</code> -- (length =
+                4, value = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">DOUBLE PRECISION</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: fixed-length binary, always eight bytes.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">DOUBLE PRECISION</code> column
+                containing approximately <code class="literal">65</code> looks
+                like: <code class="literal">hexadecimal 00 00 00 00 00 40 50
+                40</code> -- (length = 8, value = 65)
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">REAL</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">FLOAT</code>, or same as
+                <code class="literal">DOUBLE PRECISION</code>, depending on the
+                setting of the <code class="literal">--ansi</code> option.
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">DECIMAL</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                MySQL 4.1 Storage: fixed-length string, with a leading
+                byte for the sign, if any.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">DECIMAL(2)</code> column
+                containing <code class="literal">65</code> looks like:
+                <code class="literal">hexadecimal 20 36 35</code> -- (length = 3,
+                value = <code class="literal">' 65'</code>)
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">DECIMAL(2) UNSIGNED</code> column
+                containing <code class="literal">65</code> looks like:
+                <code class="literal">hexadecimal 36 35</code> -- (length = 2,
+                value = <code class="literal">'65'</code>)
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">DECIMAL(4,2) UNSIGNED</code>
+                column containing <code class="literal">65</code> looks like:
+                <code class="literal">hexadecimal 36 35 2E 30 30</code> -- (length
+                = 5, value = <code class="literal">'65.00'</code>)
+              </p></li><li class="listitem"><p>
+                MySQL 5.0 Storage: high byte first, four-byte chunks. We
+                call the four-byte chunks "*decimal* digits". Since
+                2**32 = There is an implied decimal point. Details are
+                in /strings/decimal.c.
+              </p></li><li class="listitem"><p>
+                Example: a MySQL 5.0 <code class="literal">DECIMAL(21,9)</code>
+                column containing
+                <code class="literal">111222333444.555666777</code> looks like:
+                <code class="literal">hexadecimal 80 6f 0d 40 8a 04 21 1e cd
+                59</code> -- (flag + '111', '222333444',
+                '555666777').
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">NUMERIC</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">DECIMAL</code>.
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">BOOL</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">TINYINT</code>.
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            <span class="bold"><strong>The temporal data types</strong></span>
+          </p><p>
+            <code class="literal">DATE</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: 3 byte integer, low byte first. Packed as: 'day
+                + month*32 + year*16*32'
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">DATE</code> column containing
+                <code class="literal">'1962-01-02'</code> looks like:
+                <code class="literal">hexadecimal 22 54 0F</code>
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">DATETIME</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: eight bytes.
+              </p></li><li class="listitem"><p>
+                Part 1 is a 32-bit integer containing year*10000 +
+                month*100 + day.
+              </p></li><li class="listitem"><p>
+                Part 2 is a 32-bit integer containing hour*10000 +
+                minute*100 + second.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">DATETIME</code> column for
+                <code class="literal">'0001-01-01 01:01:01'</code> looks like:
+                <code class="literal">hexadecimal B5 2E 11 5A 02 00 00 00</code>
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">TIME</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: 3 bytes, low byte first. This is stored as
+                seconds: days*24*3600+hours*3600+minutes*60+seconds
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">TIME</code> column containing
+                <code class="literal">'1 02:03:04'</code> (1 day 2 hour 3 minutes
+                and 4 seconds) looks like: <code class="literal">hexadecimal 58 6E
+                01</code>
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">TIMESTAMP</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: 4 bytes, low byte first. Stored as unix
+                <code class="literal">time()</code>, which is seconds since the
+                Epoch (00:00:00 UTC, January 1, 1970).
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">TIMESTAMP</code> column
+                containing <code class="literal">'2003-01-01 01:01:01'</code>
+                looks like: <code class="literal">hexadecimal 4D AE 12 23</code>
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">YEAR</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as unsigned <code class="literal">TINYINT</code>
+                with a base value of 0 = 1901.
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            <span class="bold"><strong>Others</strong></span>
+          </p><p>
+            <code class="literal">SET</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: one byte for each eight members in the set.
+              </p></li><li class="listitem"><p>
+                Maximum length: eight bytes (for maximum 64 members).
+              </p></li><li class="listitem"><p>
+                This is a bit list. The least significant bit
+                corresponds to the first listed member of the set.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">SET('A','B','C')</code> column
+                containing <code class="literal">'A'</code> looks like:
+                <code class="literal">01</code> -- (length = 1, value = 'A')
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">ENUM</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: one byte if less than 256 alternatives, else
+                two bytes.
+              </p></li><li class="listitem"><p>
+                This is an index. The value 1 corresponds to the first
+                listed alternative. (Note: <code class="literal">ENUM</code>
+                always reserves the value 0 for an erroneous value. This
+                explains why <code class="literal">'A'</code> is 1 instead of 0.)
+              </p></li><li class="listitem"><p>
+                Example: an <code class="literal">ENUM('A','B','C')</code> column
+                containing <code class="literal">'A'</code> looks like:
+                <code class="literal">01</code> -- (length = A')
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+            <span class="bold"><strong>The Large-Object data types</strong></span>
+</p></li></ul>
+</div>
+<p>
+        Warning: Because <code class="literal">TINYBLOB</code>'s preceding length
+        is one byte long (the size of a <code class="literal">TINYINT</code>) and
+        <code class="literal">MEDIUMBLOB</code>'s preceding length is three bytes
+        long (the size of a <code class="literal">MEDIUMINT</code>), it's easy to
+        think there's some sort of correspondence between the
+        <code class="literal">BLOB</code> and <code class="literal">INT</code> types. There
+        isn't a <code class="literal">BLOB</code>'s preceding length is not four
+        bytes long (the size of an <code class="literal">INT</code>).
+        <code class="literal">TINYBLOB</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                  Storage: variable-length string with a preceding
+                  one-byte length.
+                </p></li><li class="listitem"><p>
+                  Example: a <code class="literal">TINYBLOB</code> column
+                  containing <code class="literal">'A'</code> looks like:
+                  <code class="literal">hexadecimal 01 41</code> -- (length = A')
+</p></li></ul>
+</div>
+<p>
+
+            <code class="literal">TINYTEXT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">TINYBLOB</code>.
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">BLOB</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: variable-length string with a preceding
+                two-byte length.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">BLOB</code> column containing
+                <code class="literal">'A'</code> looks like: <code class="literal">hexadecimal
+                01 00 41</code> -- (length = A')
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">TEXT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">BLOB</code>.
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">MEDIUMBLOB</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: variable-length string with a preceding length.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">MEDIUMBLOB</code> column
+                containing <code class="literal">'</code>A' looks like:
+                <code class="literal">hexadecimal 01 00 00 41</code> -- (length =
+                A')
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">MEDIUMTEXT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">MEDIUMBLOB</code>.
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">LONGBLOB</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: variable-length string with a preceding
+                four-byte length.
+              </p></li><li class="listitem"><p>
+                Example: a <code class="literal">LONGBLOB</code> column containing
+                <code class="literal">'A'</code> looks like: <code class="literal">hexadecimal
+                01 00 00 00 41</code> -- (length = A')
+</p></li></ul>
+</div>
+<p>
+            <code class="literal">LONGTEXT</code>
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+                Storage: same as <code class="literal">LONGBLOB</code>.
+</p></li></ul>
+</div>
+</li></ul>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="myisam-introduction.html" title="20.1.1 Introduction">Previous</a> / <a rel="next" href="myisam-more-information.html" title="20.1.3 Where to Look For More Information">Next</a> / <a rel="up" href="myisam-record-structure.html" title="20.1 MyISAM Record Structure">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="myisam-column-attributes" />
+          <input type="hidden" name="return" value="/doc/internals/en/myisam-column-attributes.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="myisam-introduction.html" title="20.1.1 Introduction">Previous</a> / <a rel="next" href="myisam-more-information.html" title="20.1.3 Where to Look For More Information">Next</a> / <a rel="up" href="myisam-record-structure.html" title="20.1 MyISAM Record Structure">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

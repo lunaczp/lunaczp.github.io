@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 1.9 The Skeleton of the Server Code</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="guided-tour-chunk.html" title="1.8 A Chunk of Code in /sql/sql_update.cc"/><link rel="next" href="guided-tour-recap.html?ff=nopfpls" title="1.10 Recap"/><link rel="up" href="guided-tour.html" title="1 A Guided Tour Of The MySQL Source Code"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fguided-tour-skeleton.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="guided-tour.html">1 A Guided Tour Of The MySQL Source Code</a> :: 1.9 The Skeleton of the Server Code</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="guided-tour-chunk.html" title="Previous Section">&laquo; 1.8 A Chunk of Code in /sql/sql_update.cc</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="guided-tour-recap.html" title="Next Section">1.10 Recap  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="guided-tour.html">1 A Guided Tour Of The MySQL Source Code</a></li><li><a href="getting-source-tree.html">1.1 Getting the Source Tree</a></li>
+<li><a href="guided-tour-majordir.html">1.2 The Major Directories</a></li>
+<li><a href="guided-tour-flow.html">1.3 The Flow</a></li>
+<li><a href="guided-tour-osdir.html">1.4 The Open-Source Directories</a></li>
+<li><a href="guided-tour-sedir.html">1.5 The Internal and External Storage Engine Directories</a></li>
+<li><a href="guided-tour-os-specific.html">1.6 The OS-Specific Directories</a></li>
+<li><a href="guided-tour-oddsends.html">1.7 Odds and Ends</a></li>
+<li><a href="guided-tour-chunk.html">1.8 A Chunk of Code in /sql/sql_update.cc</a></li>
+<li class="self">1.9 The Skeleton of the Server Code</li>
+<li><a href="guided-tour-recap.html">1.10 Recap</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="guided-tour-skeleton"></a>1.9 The Skeleton of the Server Code</h2>
+
+</div>
+
+</div>
+
+</div>
+<p>
+      And now we're going to walk through something harder, namely the
+      server.
+    </p><p>
+      WARNING WARNING WARNING: code changes constantly, so names and
+      parameters may have changed by the time you read this.
+    </p><p>
+      Important files we'll be walking through:
+    </p><pre class="programlisting">
+/sql/mysqld.cc
+/sql/sql_parse.cc
+/sql/sql_prepare.cc
+/sql/sql_insert.cc
+/sql/ha_myisam.cc
+/myisam/mi_write.c
+</pre><p>
+      This is not as simple as what we've just done. In fact we'll need
+      multiple pages to walk through this one, and that's despite our
+      use of truncation and condensation again. But the server is
+      important, and if you can grasp what we're doing with it, you'll
+      have grasped the essence of what the MySQL source code is all
+      about.
+    </p><p>
+      We'll mostly be looking at programs in the sql directory, which is
+      where mysqld and most of the programs for the SQL engine code are
+      stored.
+    </p><p>
+      Our objective is to follow the server from the time it starts up,
+      through a single INSERT statement that it receives from a client,
+      to the point where it finally performs the low level write in the
+      MyISAM file.
+    </p><p>
+      Walking Through The Server Code: /sql/mysqld.cc
+    </p><pre class="programlisting">
+  int main(int argc, char **argv)
+  {
+    _cust_check_startup();
+    (void) thr_setconcurrency(concurrency);
+    init_ssl();
+    server_init();                             // 'bind' + 'listen'
+    init_server_components();
+    start_signal_handler();
+    acl_init((THD *)0, opt_noacl);
+    init_slave();
+    create_shutdown_thread();
+    create_maintenance_thread();
+    handle_connections_sockets(0);             // !
+    DBUG_PRINT("quit",("Exiting main thread"));
+    exit(0);
+  }
+</pre><p>
+      Here is where it all starts, in the main function of mysqld.cc.
+    </p><p>
+      Notice that we show a directory name and program name just above
+      this snippet. We will do the same for all the snippets in this
+      series.
+    </p><p>
+      By glancing at this snippet for a few seconds, you will probably
+      see that the main function is doing some initial checks on
+      startup, is initializing some components, is calling a function
+      named handle_connections_sockets, and then is exiting. It's
+      possible that acl stands for "access control" and it's interesting
+      that DBUG_PRINT is something from Fred Fish's debug library, which
+      we've mentioned before. But we must not digress.
+    </p><p>
+      In fact there are 150 code lines in the main function, and we're
+      only showing 13 code lines. That will give you an idea of how much
+      we are shaving and pruning. We threw away the error checks, the
+      side paths, the optional code, and the variables. But we did not
+      change what was left. You will be able to find these lines if you
+      take an editor to the mysqld.cc program, and the same applies for
+      all the other routines in the snippets in this series.
+    </p><p>
+      The one thing you won't see in the actual source code is the
+      little marker "// !". This marker will always be on the line of
+      the function that will be the subject of the next snippet. In this
+      case, it means that the next snippet will show the
+      handle_connection_sockets function. To prove that, let's go to the
+      next snippet.
+    </p><p>
+      Walking Through The Server Code: /sql/mysqld.cc
+    </p><pre class="programlisting">
+  handle_connections_sockets (arg __attribute__((unused))
+  {
+     if (ip_sock != INVALID_SOCKET)
+     {
+       FD_SET(ip_sock,&amp;clientFDs);
+       DBUG_PRINT("general",("Waiting for connections."));
+       while (!abort_loop)
+       {
+         new_sock = accept(sock, my_reinterpret_cast(struct sockaddr*)
+           (&amp;cAddr),             &amp;length);
+         thd= new THD;
+         if (sock == unix_sock)
+         thd-&gt;host=(char*) localhost;
+         create_new_thread(thd);            // !
+         }
+</pre><p>
+      Inside handle_connections_sockets you'll see the hallmarks of a
+      classic client/server architecture. In a classic client/server,
+      the server has a main thread which is always listening for
+      incoming requests from new clients. Once it receives such a
+      request, it assigns resources which will be exclusive to that
+      client. In particular, the main thread will spawn a new thread
+      just to handle the connection. Then the main server will loop and
+      listen for new connections — but we will leave it and follow
+      the new thread.
+    </p><p>
+      As well as the sockets code that we chose to display here, there
+      are several variants of this thread loop, because clients can
+      choose to connect in other ways, for example with named pipes or
+      with shared memory. But the important item to note from this
+      section is that the server is spawning new threads.
+    </p><p>
+      Walking Through The Server Code: /sql/mysqld.cc
+    </p><pre class="programlisting">
+  create_new_thread(THD *thd)
+  {
+    pthread_mutex_lock(&amp;LOCK_thread_count);
+    pthread_create(&amp;thd-&gt;real_id,&amp;connection_attrib,
+        handle_one_connection,                        // !
+        (void*) thd));
+    pthread_mutex_unlock(&amp;LOCK_thread_count);
+  }
+</pre><p>
+      Here is a close look at the routine that spawns the new thread.
+      The noticeable detail is that, as you can see, it uses a mutex or
+      mutual exclusion object. MySQL has a great variety of mutexes that
+      it uses to keep actions of all the threads from conflicting with
+      each other.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_parse.cc
+    </p><pre class="programlisting">
+handle_one_connection(THD *thd)
+  {
+    init_sql_alloc(&amp;thd-&gt;mem_root, MEM_ROOT_BLOCK_SIZE, MEM_ROOT_PREALLOC);
+    while (!net-&gt;error &amp;&amp; net-&gt;vio != 0 &amp;&amp; !thd-&gt;killed)
+    {
+      if (do_command(thd))            // !
+        break;
+    }
+    close_connection(net);
+    end_thread(thd,1);
+    packet=(char*) net-&gt;read_pos; </pre><p>
+      With this snippet, we've wandered out of mysqld.cc. Now, we're in
+      the sql_parse file, still in the sql directory. This is where the
+      session's big loop is.
+    </p><p>
+      The loop repeatedly gets and does commands. When it ends, the
+      connection closes. At that point, the thread will end and the
+      resources for it will be deallocated.
+    </p><p>
+      But we're more interested in what happens inside the loop, when we
+      call the do_command function.
+    </p><pre class="programlisting">
+Graphic:
+
+   client           &lt;===== MESSAGE ====&gt; server                     &lt;======PACKETS ====&gt;
+
+   Example:
+   INSERT INTO Table1 VALUES (1);
+</pre><p>
+      To put it graphically, at this point there is a long-lasting
+      connection between the client and one server thread. Message
+      packets will go back and forth between them through this
+      connection. For today's tour, let's assume that the client passes
+      the INSERT statement shown on the Graphic, for the server to
+      process.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_parse.cc
+    </p><pre class="programlisting">
+bool do_command(THD *thd)
+{
+  net_new_transaction(net);
+  packet_length=my_net_read(net);
+  packet=(char*) net-&gt;read_pos;
+  command = (enum enum_server_command) (uchar) packet[0];
+  dispatch_command(command,thd, packet+1, (uint) packet_length);
+// !
+}
+</pre><p>
+      You've probably noticed by now that whenever we call a lower-level
+      routine, we pass an argument named thd, which is an abbreviation
+      for the word thread (we think). This is the essential context
+      which we must never lose.
+    </p><p>
+      The my_net_read function is in another file called net_serv.cc.
+      The function gets a packet from the client, uncompresses it, and
+      strips the header.
+    </p><p>
+      Once that's done, we've got a multi-byte variable named packet
+      which contains what the client has sent. The first byte is
+      important because it contains a code identifying the type of
+      message.
+    </p><p>
+      We'll pass that and the rest of the packet on to the
+      dispatch_command function.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_parse.cc
+    </p><pre class="programlisting">
+bool dispatch_command(enum enum_server_command command, THD *thd,
+       char* packet, uint packet_length)
+{
+  switch (command) {
+    case COM_INIT_DB:          ...
+    case COM_REGISTER_SLAVE:   ...
+    case COM_TABLE_DUMP:       ...
+    case COM_CHANGE_USER:      ...
+    case COM_EXECUTE:
+         mysql_stmt_execute(thd,packet);
+    case COM_LONG_DATA:        ...
+    case COM_PREPARE:
+         mysql_stmt_prepare(thd, packet, packet_length);   // !
+    /* and so on for 18 other cases */
+    default:
+     send_error(thd, ER_UNKNOWN_COM_ERROR);
+     break;
+    }
+</pre><p>
+      And here's just part of a very large switch statement in
+      sql_parse.cc. The snippet doesn't have room to show the rest, but
+      you'll see when you look at the dispatch_command function that
+      there are more case statements after the ones that you see here.
+    </p><p>
+      There will be — we're going into list mode now and just
+      reciting the rest of the items in the switch statement —
+      code for prepare, close statement, query, quit, create database,
+      drop database, dump binary log, refresh, statistics, get process
+      info, kill process, sleep, connect, and several minor commands.
+      This is the big junction.
+    </p><p>
+      We have cut out the code for all of the cases except for two,
+      COM_EXECUTE and COM_PREPARE.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_prepare.cc
+    </p><p>
+      We are not going to follow what happens with COM_PREPARE. Instead,
+      we are going to follow the code after COM_EXECUTE. But we'll have
+      to digress from our main line for a moment and explain what the
+      prepare does.
+    </p><pre class="programlisting">
+"Prepare:
+Parse the query
+Allocate a new statement, keep it in 'thd-&gt;prepared statements' pool
+Return to client the total number of parameters and result-set
+metadata information (if any)"
+</pre><p>
+      The prepare is the step that must happen before execute happens.
+      It consists of checking for syntax errors, looking up any tables
+      and columns referenced in the statement, and setting up tables for
+      the execute to use. Once a prepare is done, an execute can be done
+      multiple times without having to go through the syntax checking
+      and table lookups again.
+    </p><p>
+      Since we're not going to walk through the COM_PREPARE code, we
+      decided not to show its code at this point. Instead, we have cut
+      and pasted some code comments that describe prepare. All we're
+      illustrating here is that there are comments in the code, so you
+      will have aid when you look harder at the prepare code.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_parse.cc
+    </p><pre class="programlisting">
+  bool dispatch_command(enum enum_server_command command, THD *thd,
+       char* packet, uint packet_length)
+  {
+  switch (command) {
+    case COM_INIT_DB:          ...
+    case COM_REGISTER_SLAVE:   ...
+    case COM_TABLE_DUMP:       ...
+    case COM_CHANGE_USER:      ...
+    case COM_EXECUTE:
+         mysql_stmt_execute(thd,packet);                   // !
+    case COM_LONG_DATA:        ...
+    case COM_PREPARE:
+         mysql_stmt_prepare(thd, packet, packet_length);
+    /* and so on for 18 other cases */
+    default:
+     send_error(thd, ER_UNKNOWN_COM_ERROR);
+     break;
+    }
+</pre><p>
+      Let's return to the grand central junction again in sql_parse.cc
+      for a moment. The thing to note on this snippet is that the line
+      which we're really going to follow is what happens for
+      COM_EXECUTE.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_prepare.cc
+    </p><pre class="programlisting">
+  void mysql_stmt_execute(THD *thd, char *packet)
+  {
+    if (!(stmt=find_prepared_statement(thd, stmt_id, "execute")))
+    {
+      send_error(thd);
+      DBUG_VOID_RETURN;
+    }
+    init_stmt_execute(stmt);
+    mysql_execute_command(thd);           // !
+  }
+</pre><p>
+      In this case, the line that we're following is the line that
+      executes a statement.
+    </p><p>
+      Notice how we keep carrying the THD thread and the packet along
+      with us, and notice that we expect to find a prepared statement
+      waiting for us, since this is the execute phase. Notice as well
+      that we continue to sprinkle error-related functions that begin
+      with the letters DBUG, for use by the debug library. Finally,
+      notice that the identifier "stmt" is the same name that ODBC uses
+      for the equivalent object. We try to use standard names when they
+      fit.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_parse.cc
+    </p><pre class="programlisting">
+  void mysql_execute_command(THD *thd)
+       switch (lex-&gt;sql_command) {
+       case SQLCOM_SELECT: ...
+       case SQLCOM_SHOW_ERRORS: ...
+       case SQLCOM_CREATE_TABLE: ...
+       case SQLCOM_UPDATE: ...
+       case SQLCOM_INSERT: ...                   // !
+       case SQLCOM_DELETE: ...
+       case SQLCOM_DROP_TABLE: ...
+       }
+</pre><p>
+      In the mysql_execute_command function. we encounter another
+      junction. One of the items in the switch statement is named
+      SQLCOM_INSERT.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_parse.cc
+    </p><pre class="programlisting">
+case SQLCOM_INSERT:
+{
+  my_bool update=(lex-&gt;value_list.elements ? UPDATE_ACL : 0);
+  ulong privilege= (lex-&gt;duplicates == DUP_REPLACE ?
+                    INSERT_ACL | DELETE_ACL : INSERT_ACL | update);
+  if (check_access(thd,privilege,tables-&gt;db,&amp;tables-&gt;grant.privilege))
+    goto error;
+  if (grant_option &amp;&amp; check_grant(thd,privilege,tables))
+    goto error;
+  if (select_lex-&gt;item_list.elements != lex-&gt;value_list.elements)
+  {
+    send_error(thd,ER_WRONG_VALUE_COUNT);
+    DBUG_VOID_RETURN;
+  }
+  res = mysql_insert(thd,tables,lex-&gt;field_list,lex-&gt;many_values,
+                     select_lex-&gt;item_list, lex-&gt;value_list,
+                     (update ? DUP_UPDATE : lex-&gt;duplicates));
+// !
+  if (thd-&gt;net.report_error)
+    res= -1;
+  break;
+}
+</pre><p>
+      For this snippet, we've blown up the code around the SQLCOM_INSERT
+      case in the mysql_execute_command function. The first thing to do
+      is check whether the user has the appropriate privileges for doing
+      an INSERT into the table, and this is the place where the server
+      checks for that, by calling the check_access and check_grant
+      functions. It would be tempting to follow those functions, but
+      those are side paths. Instead, we'll follow the path where the
+      work is going on.
+    </p><p>
+      Walking Through The Server Code: Navigation Aid
+    </p><p>
+      Some program names in the /sql directory:
+    </p><pre class="programlisting">
+Program Name          SQL statement type
+------------          ------------------
+sql_delete.cc         DELETE
+sql_do.cc             DO
+sql_handler.cc        HANDLER
+sql_help.cc           HELP
+sql_insert.cc         INSERT            // !
+sql_load.cc           LOAD
+sql_rename.cc         RENAME
+sql_select.cc         SELECT
+sql_show.cc           SHOW
+sql_update.cc         UPDATE
+</pre><p>
+      Question: Where will mysql_insert() be?
+    </p><p>
+      The line that we're following will take us next to a routine named
+      mysql_insert. Sometimes it's difficult to guess what program a
+      routine will be in, because MySQL has no consistent naming
+      convention. However, here is one aid to navigation that works for
+      some statement types. In the sql directory, the names of some
+      programs correspond to statement types. This happens to be the
+      case for INSERT, for instance. So the mysql_insert program will be
+      in the program sql_insert.cc. But there's no reliable rule.
+    </p><p>
+      (Let's add here a few sentences about the tags 'ctags' program.
+      When an editor supports ctags (and the list is long, but vi and
+      emacs of course are there), the function definition is one key
+      press away - no guessing involved. In the above case, a vim user
+      could press ^] on mysql_insert name and vim would open
+      sql_insert.cc and position the curson on the first line of the
+      mysql_insert() function. The tags help can be indispensable in
+      everyday work.)
+    </p><p>
+      Walking Through The Server Code: /sql/sql_insert.cc
+    </p><pre class="programlisting">
+ int mysql_insert(THD *thd,TABLE_LIST *table_list, List&lt;Item&gt; &amp;fields,
+        List&lt;List_item&gt; &amp;values_list,enum_duplicates duplic)
+  {
+    table = open_ltable(thd,table_list,lock_type);
+    if (check_insert_fields(thd,table,fields,*values,1) ||
+      setup_tables(table_list) ||
+      setup_fields(thd,table_list,*values,0,0,0))
+      goto abort;
+    fill_record(table-&gt;field,*values);
+    error=write_record(table,&amp;info);                 // !
+    query_cache_invalidate3(thd, table_list, 1);
+    if (transactional_table)
+      error=ha_autocommit_or_rollback(thd,error);
+    query_cache_invalidate3(thd, table_list, 1);
+    mysql_unlock_tables(thd, thd-&gt;lock);
+    }
+</pre><p>
+      For the mysql_insert routine, we're just going to read what's in
+      the snippet. What we're trying to do here is highlight the fact
+      that the function names and variable names are nearly English.
+    </p><p>
+      Okay, we start by opening a table. Then, if a check of the fields
+      in the INSERT fails, or if an attempt to set up the tables fails,
+      or if an attempt to set up the fields fails, we'll abort.
+    </p><p>
+      Next, we'll fill the record buffer with values. Then we'll write
+      the record. Then we'll invalidate the query cache. Remember, by
+      the way, that MySQL stores frequently-used select statements and
+      result sets in memory as an optimization, but once the insert
+      succeeds the stored sets are invalid. Finally, we'll unlock the
+      tables.
+    </p><p>
+      Walking Through The Server Code: /sql/sql_insert.cc
+    </p><pre class="programlisting">
+  int write_record(TABLE *table,COPY_INFO *info)
+  {
+    table-&gt;file-&gt;write_row(table-&gt;record[0];           // !
+  }
+</pre><p>
+      You can see from our marker that we're going to follow the line
+      that contains the words 'write row'. But this is not an ordinary
+      function call, so people who are just reading the code without the
+      aid of a debugger can easily miss what the next point is in the
+      line of execution here. The fact is, 'write_row' can take us to
+      one of several different places.
+    </p><p>
+      Walking Through The Server Code: /sql/handler.h
+    </p><pre class="programlisting">
+  /* The handler for a table type.
+     Will be included in the TABLE structure */
+
+  handler(TABLE *table_arg) :
+table(table_arg),active_index(MAX_REF_PARTS),
+    ref(0),ref_length(sizeof(my_off_t)),
+block_size(0),records(0),deleted(0),
+    data_file_length(0), max_data_file_length(0),
+index_file_length(0),
+    delete_length(0), auto_increment_value(0), raid_type(0),
+    key_used_on_scan(MAX_KEY),
+    create_time(0), check_time(0), update_time(0), mean_rec_length(0),
+    ft_handler(0)
+    {}
+  ...
+  virtual int write_row(byte * buf)=0;
+</pre><p>
+      To see what the write_row statement is doing, we'll have to look
+      at one of the include files. In handler.h on the sql directory, we
+      find that write_row is associated with a handler for a table. This
+      definition is telling us that the address in write_row will vary
+      it gets filled in at run time. In fact, there are several possible
+      addresses.
+    </p><p>
+      There is one address for each handler. In our case, since we're
+      using the default values, the value at this point will be the
+      address of write_row in the MyISAM handler program.
+    </p><p>
+      Walking Through The Server Code: /sql/ha_myisam.cc
+    </p><pre class="programlisting">
+int ha_myisam::write_row(byte * buf)
+{
+  statistic_increment(ha_write_count,&amp;LOCK_status);
+   /* If we have a timestamp column, update it to the current time */
+   if (table-&gt;time_stamp)
+    update_timestamp(buf+table-&gt;time_stamp-1);
+   /*
+  If we have an auto_increment column and we are writing a changed row
+    or a new row, then update the auto_increment value in the record.
+  */
+  if (table-&gt;next_number_field &amp;&amp; buf == table-&gt;record[0])
+    update_auto_increment();
+  return mi_write(file,buf);     // !
+}
+</pre><p>
+      And that brings us to write_row in the ha_myisam.cc program.
+      Remember we told you that these programs beginning with the
+      letters ha are interfaces to handlers, and this one is the
+      interface to the myisam handler. We have at last reached the point
+      where we're ready to call something in the handler package.
+    </p><p>
+      Walking Through The Server Code: /myisam/mi_write.c
+    </p><pre class="programlisting">
+int mi_write(MI_INFO *info, byte *record)
+{
+  _mi_readinfo(info,F_WRLCK,1);
+  _mi_mark_file_changed(info);
+  /* Calculate and check all unique constraints */
+  for (i=0 ; i &lt; share-&gt;state.header.uniques ; i++)
+  {
+    mi_check_unique(info,share-&gt;uniqueinfo+i,record,
+      mi_unique_hash(share-&gt;uniqueinfo+i,record),
+      HA_OFFSET_ERROR);
+  }
+
+  ... to be continued in next snippet
+</pre><p>
+      Notice that at this point there is no more referencing of tables,
+      the comments are about files and index keys. We have reached the
+      bottom level at last. Notice as well that we are now in a C
+      program, not a C++ program.
+    </p><p>
+      In this first half of the mi_write function, we see a call which
+      is clearly commented. This is where checking happens for
+      uniqueness (not the UNIQUE constraint, but an internal matter).
+    </p><p>
+      Walking Through The Server Code: /myisam/mi_write.c
+    </p><pre class="programlisting">
+ ... continued from previous snippet
+
+  /* Write all keys to indextree */
+  for (i=0 ; i &lt; share-&gt;base.keys ; i++)
+  {
+    share-&gt;keyinfo[i].ck_insert(info,i,buff,
+      _mi_make_key(info,i,buff,record,filepos)
+  }
+  (*share-&gt;write_record)(info,record);
+  if (share-&gt;base.auto_key)
+    update_auto_increment(info,record);
+}
+</pre><p>
+      In this second half of the mi_write function, we see another clear
+      comment, to the effect that this is where the new keys are made
+      for any indexed columns. Then we see the culmination of all that
+      the last 20 snippets have been preparing, the moment we've all
+      been waiting for, the writing of the record.
+    </p><p>
+      And, since the object of the INSERT statement is ultimately to
+      cause a write to a record in a file, that's that. The server has
+      done the job.
+    </p><p>
+      Walking Through The Server Code: Stack Trace
+    </p><pre class="programlisting">
+main in /sql/mysqld.cc
+handle_connections_sockets in /sql/mysqld.cc
+create_new_thread in /sql/mysqld.cc
+handle_one_connection in /sql/sql_parse.cc
+do_command in /sql/sql_parse.cc
+dispatch_command in /sql/sql_parse.cc
+mysql_stmt_execute in /sql/sql_prepare.cc
+mysql_execute_command in /sql/sql_parse.cc
+mysql_insert in /sql/mysql_insert.cc
+write_record in /sql/mysql_insert.cc
+ha_myisam::write_row in /sql/ha_myisam.cc
+mi_write in /myisam/mi_write.c
+</pre><p>
+      And now here's a look at what's above us on the stack, or at least
+      an idea of how we got here. We started with the main program in
+      mysqld.cc. We proceeded through the creation of a thread for the
+      client, the several junction processes that determined where we're
+      heading, the parsing and initial execution of an SQL statement,
+      the decision to invoke the MyISAM handler, and the writing of the
+      row. We ended in a low level place, where we're calling the
+      routines that write to the file. That's about as low as we should
+      go today.
+    </p><p>
+      The server program would, of course, continue by returning several
+      times in a row, sending a packet to the client saying "Okay", and
+      ending up back in the loop inside the handle_one_connection
+      function.
+    </p><p>
+      We, instead, will pause for a moment in awe at the amount of code
+      we've just flitted past. And that will end our walk through the
+      server code.
+    </p><pre class="programlisting">
+Graphic: A Chunk of MyISAM File
+
+CREATE TABLE Table1 (
+   column1 CHAR(1),
+   column2 CHAR(1),
+   column3 CHAR(1));
+
+INSERT INTO Table1 VALUES ('a', 'b', 'c');
+
+INSERT INTO Table1 VALUES ('d', NULL, 'e');
+
+F1 61 62 63 00 F5 64 00 66 00 ... .abc..d e.
+</pre><p>
+      Continuing with our worm's-eye view, let's glance at the structure
+      of a record in a MyISAM file.
+    </p><p>
+      The SQL statements on this graphic show a table definition and
+      some insert statements that we used to populate the table.
+    </p><p>
+      The final line on the graphic is a hexadecimal dump display of the
+      two records that we ended up with, as taken from the MyISAM file
+      for Table1.
+    </p><p>
+      The thing to notice here is that the records are stored compactly.
+      There is one byte at the start of each record F1 for the first
+      record and F5 for the second record which contains a bit list.
+    </p><p>
+      When a bit is on, that means its corresponding field is NULL.
+      That's why the second row, which has a NULL in the second column,
+      or field, has a different header byte from the first row.
+    </p><p>
+      Complications are possible, but a simple record really does look
+      this simple.
+    </p><pre class="programlisting">
+Graphic: A Chunk of InnoDB File
+
+19 17 15 13 0C 06 Field Start Offsets /* First Row */
+00 00 78 0D 02 BF Extra Bytes
+00 00 00 00 04 21 System Column #1
+00 00 00 00 09 2A System Column #2
+80 00 00 00 2D 00 84 System Column #3
+50 50 Field1 'PP'
+50 50 Field2 'PP'
+50 50 Field3 'PP'
+</pre><p>
+      If, on the other hand, you look at an InnoDB file, you'll find
+      that it's got more complexities in the storage. The details are
+      elsewhere in this document. But here's an introductory look.
+    </p><p>
+      The header here begins with offsets unlike MyISAM, which has no
+      offsets. So you'd have to go through column 1 before getting to
+      column 2.
+    </p><p>
+      Then there is a fixed header the extra bytes.
+    </p><p>
+      Then comes the record proper. The first fields of a typical record
+      contain information that the user won't see, such as a row ID, a
+      transaction ID, and a rollback pointer. This part would look
+      different if the user had defined a primary key during the CREATE
+      TABLE statement.
+    </p><p>
+      And finally there are the column contents the string of Ps at the
+      end of the snippet here. You can see that InnoDB does more
+      administrating.
+    </p><p>
+      There's been a recent change for InnoDB; what you see above is
+      from a database made before version 5.0.
+    </p><pre class="programlisting">
+Graphic: A Packet
+
+Header
+Number Of Rows
+ID
+Status
+Length
+Message Content
+</pre><p>
+      Our final worm's-eye look at a physical structure will be a look
+      at packets.
+    </p><p>
+      By packet, we mean: what's the format of a message that the client
+      sends over the tcp/ip line to the server and what does the server
+      send back?
+    </p><p>
+      Here we're not displaying a dump. If you want to see hexadecimal
+      dumps of the contents of packets, this document is full of them.
+      We're just going to note that a typical message will have a
+      header, an identifier, and a length, followed by the message
+      contents.
+    </p><p>
+      Admittedly this isn't following a standard like ISO's RDA or IBM's
+      DRDA, but it's documented so if you want to go out and write your
+      own type 4 JDBC driver, you've got what you need here. (Subject to
+      license restrictions, of course.) But a word of advice on that
+      last point: it's already been done. Mark Matthews wrote it
+      originally, it's all in "MySQL Connector/J".
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="guided-tour-chunk.html" title="1.8 A Chunk of Code in /sql/sql_update.cc">Previous</a> / <a rel="next" href="guided-tour-recap.html" title="1.10 Recap">Next</a> / <a rel="up" href="guided-tour.html" title="1 A Guided Tour Of The MySQL Source Code">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="guided-tour-skeleton" />
+          <input type="hidden" name="return" value="/doc/internals/en/guided-tour-skeleton.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="guided-tour-chunk.html" title="1.8 A Chunk of Code in /sql/sql_update.cc">Previous</a> / <a rel="next" href="guided-tour-recap.html" title="1.10 Recap">Next</a> / <a rel="up" href="guided-tour.html" title="1 A Guided Tour Of The MySQL Source Code">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

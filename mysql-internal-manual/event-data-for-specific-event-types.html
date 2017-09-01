@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 19.9 Event Data for Specific Event Types</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="ensuring-compatibility-of-future-binary-log-versions.html" title="19.8.2 Ensuring Compatibility of Future Binary Log Versions"/><link rel="next" href="load-data-infile-events.html?ff=nopfpls" title="19.9.1 LOAD DATA INFILE Events"/><link rel="up" href="binary-log.html" title="19 The Binary Log"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fevent-data-for-specific-event-types.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="binary-log.html">19 The Binary Log</a> :: 19.9 Event Data for Specific Event Types</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="ensuring-compatibility-of-future-binary-log-versions.html" title="Previous Section">&laquo; 19.8.2 Ensuring Compatibility of Future Binary Log Versions</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="load-data-infile-events.html" title="Next Section">19.9.1 LOAD DATA INFILE Events  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="binary-log.html">19 The Binary Log</a></li><li><a href="binary-log-overview.html">19.1 Binary Log Overview</a></li>
+<li><a href="binary-log-structure-and-contents.html">19.2 High-Level Binary Log Structure and Contents</a></li>
+<li><a href="source-files-related-to-the-binary-log.html">19.3 Source Files Related to the Binary Log</a></li>
+<li><a href="generating-browsable-binary-log-information.html">19.4 Generating Browsable Binary Log Information</a></li>
+<li><a href="event-classes-and-types.html">19.5 Event Classes and Types</a></li>
+<li><a href="event-meanings.html">19.6 Event Meanings</a></li>
+<li><a href="event-structure.html">19.7 Event Structure</a></li>
+<li><a href="binary-log-versions.html">19.8 Binary Log Versions</a></li>
+<li class="self">19.9 Event Data for Specific Event Types
+<ul class="children">
+<li><a href="load-data-infile-events.html">19.9.1 LOAD DATA INFILE Events</a></li>
+</ul>
+</li>
+<li><a href="row-based-binary-logging.html">19.10 Row-Based Binary Logging</a></li>
+<li><a href="additional-resources.html">19.11 Additional Resources</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="event-data-for-specific-event-types"></a>19.9 Event Data for Specific Event Types</h2>
+
+</div>
+
+</div>
+
+</div>
+<div class="toc">
+<p><small>[<a href="#" class="tocdetail" onclick="toggle('tocdetail-0'); return false;" onkeypress="if (event.keyCode == 13) { toggle('tocdetail-0'); return false;}">+/-</a>]</small></p>
+<dl id="tocdetail-0"><dt><span class="section"><a href="load-data-infile-events.html">19.9.1 LOAD DATA INFILE Events</a></span></dt></dl>
+</div>
+<p>
+      The following sections provide details about what appears in the
+      fixed and variable parts of the event data for each event type.
+    </p><p>
+      <code class="literal">LOAD DATA INFILE</code> statements have been
+      associated over time with several different events. The event
+      contents are detailed in this section, and
+      <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD DATA INFILE
+      Events</a> provides a historical perspective on which events
+      were used when.
+    </p><p>
+      <strong class="userinput"><code>Start_log_event_v3/START_EVENT_V3</code></strong>
+    </p><p>
+      This event occurs at the beginning of v1 or v3 binary log files.
+      See <a class="link" href="binary-log-versions.html" title="19.8 Binary Log Versions">Binary Log Versions</a>
+      for how it is used.
+    </p><p>
+      In MySQL 4.0 and 4.1, such events are written only to the first
+      binary log file that <code class="literal">mysqld</code> creates after
+      startup. Log files created subsequently (when someone issues a
+      <code class="literal">FLUSH LOGS</code> statement or the current binary log
+      file becomes too large) do not contain this event. In MySQL 5.0
+      and up, all binary log files start with a
+      <code class="literal">FORMAT_DESCRIPTION_EVENT</code>.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          2 bytes. The binary log format version. This is 1 in MySQL
+          3.23 and 3 in MySQL 4.0 and 4.1. (In MySQL 5.0 and up,
+          <code class="literal">FORMAT_DESCRIPTION_EVENT</code> is used instead of
+          <code class="literal">START_EVENT_V3</code>.)
+        </p></li><li class="listitem"><p>
+          50 bytes. The MySQL server's version (example:
+          4.0.14-debug-log), padded with 0x00 bytes on the right.
+        </p></li><li class="listitem"><p>
+          4 bytes. Timestamp in seconds when this event was created
+          (this is the moment when the binary log was created). This
+          value is redundant; the same value occurs in the
+          <code class="literal">timestamp</code> header field.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Query_log_event/QUERY_EVENT</code></strong>
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the thread that issued this statement.
+          Needed for temporary tables. This is also useful for a DBA for
+          knowing who did what on the master.
+        </p></li><li class="listitem"><p>
+          4 bytes. The time in seconds that the statement took to
+          execute. Only useful for inspection by the DBA.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the database which was the
+          default database when the statement was executed. This name
+          appears later, in the variable data part. It is necessary for
+          statements such as <code class="literal">INSERT INTO t VALUES(1)</code>
+          that don't specify the database and rely on the default
+          database previously selected by <code class="literal">USE</code>.
+        </p></li><li class="listitem"><p>
+          2 bytes. The error code resulting from execution of the
+          statement on the master. Error codes are defined in
+          <code class="literal">include/mysqld_error.h</code>. 0 means no error.
+          How come statements with a nonzero error code can exist in the
+          binary log? This is mainly due to the use of nontransactional
+          tables within transactions. For example, if an <code class="literal">INSERT
+          ... SELECT</code> fails after inserting 1000 rows into a
+          <code class="literal">MyISAM</code> table (for example, with a
+          duplicate-key violation), we have to write this statement to
+          the binary log, because it truly modified the
+          <code class="literal">MyISAM</code> table. For transactional tables,
+          there should be no event with a nonzero error code (though it
+          can happen, for example if the connection was interrupted
+          (Control-C)). The slave checks the error code: After executing
+          the statement itself, it compares the error code it got with
+          the error code in the event, and if they are different it
+          stops replicating (unless
+          <code class="literal">--slave-skip-errors</code> was used to ignore the
+          error).
+        </p></li><li class="listitem"><p>
+          2 bytes (not present in v1, v3). The length of the status
+          variable block.
+</p></li></ul>
+</div>
+<p>
+      Variable part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Zero or more status variables (not present in v1, v3). Each
+          status variable consists of one byte code identifying the
+          variable stored, followed by the value of the variable. The
+          format of the value is variable-specific, as described later.
+        </p></li><li class="listitem"><p>
+          The default database name (null-terminated).
+        </p></li><li class="listitem"><p>
+          The SQL statement. The slave knows the size of the other
+          fields in the variable part (the sizes are given in the fixed
+          data part), so by subtraction it can know the size of the
+          statement.
+</p></li></ul>
+</div>
+<p>
+      Each entry in the status variable block has a code and a value,
+      where the value format is as indicated in the following list. The
+      list provides basic information about each variable. For
+      additional details, see <code class="literal">log_event.h</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">Q_FLAGS2_CODE</code> = 0. Value is a 4-byte
+          bit-field. This variable is written only as of MySQL 5.0.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_SQL_MODE_CODE</code> = 1. Value is an 8-byte SQL
+          mode value.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_CATALOG_CODE</code> = 2. Value is the catalog
+          name: a length byte followed by that many bytes, plus a
+          terminating null byte. This variable is present only in MySQL
+          5.0.0 to 5.0.3. It was replaced with
+          <code class="literal">Q_CATALOG_NZ_CODE</code> in MySQL 5.0.4 because
+          the terminating null is unnecessary.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_AUTO_INCREMENT</code> = 3. Value is two 2-byte
+          unsigned integers representing the
+          <code class="literal">auto_increment_increment</code> and
+          <code class="literal">auto_increment_offset</code> system variables.
+          This variable is present only if auto_increment is greater
+          than 1.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_CHARSET_CODE</code> = 4. Value is three 2-byte
+          unsigned integers representing the
+          <code class="literal">character_set_client</code>,
+          <code class="literal">collation_connection</code>, and
+          <code class="literal">collation_server</code> system variables.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_TIME_ZONE_CODE</code> = 5. Value is the time
+          zone name: a length byte followed by that many bytes. This
+          variable is present only if the time zone string is non-empty.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_CATALOG_NZ_CODE</code> = 6. Value is the catalog
+          name: a length byte followed by that many bytes. Value is
+          always <code class="literal">std</code>. This variable is present only
+          if the catalog name is non-empty.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_LC_TIME_NAMES_CODE</code> = 7. Value is a 2-byte
+          unsigned integer representing the
+          <code class="literal">lc_time_names</code> number. This variable is
+          present only if the value is not 0 (that is, not en_US).
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_CHARSET_DATABASE_CODE</code> = 8. Value is a
+          2-byte unsigned integer representing the
+          <code class="literal">collation_database</code> system variable.
+        </p></li><li class="listitem"><p>
+          <code class="literal">Q_TABLE_MAP_FOR_UPDATE_CODE</code> = 9. Value is 8
+          bytes representing the table map to be updated by a
+          multiple-table update statement. Each bit of this variable
+          represents a table, and is set to 1 if the corresponding table
+          is to be updated by the statement.
+</p></li></ul>
+</div>
+<p>
+      <code class="literal">Table_map_for_update</code> is used to evaluate the
+      filter rules specified by <code class="literal">--replicate-do-table</code>
+      / <code class="literal">--replicate-ignore-table</code>.
+    </p><p>
+      <strong class="userinput"><code>Stop_log_event/STOP_EVENT</code></strong>
+    </p><p>
+      A <code class="literal">Stop_log_event</code> is written under these
+      circumstances:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          A master writes the event to the binary log when it shuts down
+        </p></li><li class="listitem"><p>
+          A slave writes the event to the relay log when it shuts down
+          or when a <code class="literal">RESET SLAVE</code> statement is executed
+</p></li></ul>
+</div>
+<p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Rotate_log_event/ROTATE_EVENT</code></strong>
+    </p><p>
+      When a binary log file exceeds a size limit, a
+      <code class="literal">ROTATE_EVENT</code> is written at the end of the file
+      that points to the next file in the squence. This event is
+      information for the slave to know the name of the next binary log
+      it is going to receive.
+    </p><p>
+      <code class="literal">ROTATE_EVENT</code> is generated locally and written
+      to the binary log on the master. It is written to the relay log on
+      the slave when <code class="literal">FLUSH LOGS</code> occurs, and when
+      receiving a <code class="literal">ROTATE_EVENT</code> from the master. In
+      the latter case, there will be two rotate events in total
+      originating on different servers.
+    </p><p>
+      There are conditions under which the terminating log-rotation
+      event does not occur. For example, the server might crash.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          8 bytes. The position of the first event in the next log file.
+          Always contains the number 4 (meaning the next event starts at
+          position 4 in the next binary log). This field is not present
+          in v1; presumably the value is assumed to be 4.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          The name of the next binary log. The filename is not
+          null-terminated. Its length is the event size minus the size
+          of the fixed parts.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Intvar_log_event/INTVAR_EVENT</code></strong>
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          1 byte. A value indicating the variable type:
+          <code class="literal">LAST_INSERT_ID_EVENT</code> = 1 or
+          <code class="literal">INSERT_ID_EVENT</code> = 2.
+        </p></li><li class="listitem"><p>
+          8 bytes. An unsigned integer indicating the value to be used
+          for the <code class="literal">LAST_INSERT_ID()</code> invocation or
+          <code class="literal">AUTO_INCREMENT</code> column.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Load_log_event/LOAD_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      <code class="literal">LOAD_EVENT</code> shares the Load_log_event class with
+      <code class="literal">NEW_LOAD_EVENT</code>. The primary difference is that
+      <code class="literal">LOAD_EVENT</code> allows only single-character field
+      and line option values, whereas <code class="literal">NEW_LOAD_EVENT</code>
+      allows multiple-character values. Also,
+      <code class="literal">LOAD_EVENT</code> has no file ID or data block because
+      with this event, the slave asks the master to transfer the data
+      file at event execution time.
+    </p><p>
+      The format for this event is more complicated than for others,
+      because it contains information about many <code class="literal">LOAD DATA
+      INFILE</code> statement clauses.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the thread on the master that issued this
+          <code class="literal">LOAD DATA INFILE</code> statement. Needed for
+          temporary tables. This is also useful for a DBA for knowing
+          who did what on the master.
+        </p></li><li class="listitem"><p>
+          4 bytes. The time in seconds which the <code class="literal">LOAD DATA
+          INFILE</code> took for execution. Only useful for
+          inspection by the DBA.
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of lines to skip at the beginning of the
+          file (corresponds to the <code class="literal">IGNORE N LINES</code>
+          clause of <code class="literal">LOAD DATA INFILE</code>).
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the table to load.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the database containing the
+          table.
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of columns to load
+          (<code class="literal">(col_name,...)</code> clause). Will be nonzero
+          only if the columns to load were explicitly mentioned in the
+          statement.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          1 byte. The field-terminating character (<code class="literal">FIELDS
+          TERMINATED BY</code> option).
+        </p></li><li class="listitem"><p>
+          1 byte. The field-enclosing character (<code class="literal">FIELDS
+          ENCLOSED BY</code> option).
+        </p></li><li class="listitem"><p>
+          1 byte. The line-terminating character (<code class="literal">LINES
+          TERMINATED BY</code> option).
+        </p></li><li class="listitem"><p>
+          1 byte. The line-starting character (<code class="literal">LINES STARTING
+          BY</code> option).
+        </p></li><li class="listitem"><p>
+          1 byte. The escaping character (<code class="literal">FIELDS ESCAPED
+          BY</code> option).
+        </p></li><li class="listitem"><p>
+          1 byte. Flags that indicate whether certain keywords are
+          present in the statement:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+              <code class="literal">DUMPFILE_FLAG</code> =0x1 (unused; this flag
+              appears to be a botch because it would apply to
+              <code class="literal">SELECT ... INTO OUTFILE</code>, not
+              <code class="literal">LOAD DATA INFILE</code>)
+            </p></li><li class="listitem"><p>
+              <code class="literal">OPT_ENCLOSED_FLAG</code> = 0x2 (<code class="literal">FIELD
+              OPTIONALLY ENCLOSED BY</code> option)
+            </p></li><li class="listitem"><p>
+              <code class="literal">REPLACE_FLAG</code> = 0x4 (<code class="literal">LOAD DATA
+              INFILE REPLACE</code>)
+            </p></li><li class="listitem"><p>
+              <code class="literal">IGNORE_FLAG</code> = 0x8 (<code class="literal">LOAD DATA
+              INFILE IGNORE</code>)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+          1 byte. Flags that indicate whether each of the field and line
+          options are empty. The low-order five bits are 1 to indicate
+          an empty option (has a length of 0) or 0 to indicate a
+          non-empty option (has a length of 1).
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+              <code class="literal">FIELD_TERM_EMPTY</code> = 0x1
+            </p></li><li class="listitem"><p>
+              <code class="literal">ENCLOSED_EMPTY</code> = 0x2
+            </p></li><li class="listitem"><p>
+              <code class="literal">LINE_TERM_EMPTY</code> = 0x4
+            </p></li><li class="listitem"><p>
+              <code class="literal">LINE_START_EMPTY</code> = 0x8
+            </p></li><li class="listitem"><p>
+              <code class="literal">ESCAPED_EMPTY</code> = 0x10
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+          1 byte. The length of the name of the first column to load.
+        </p></li><li class="listitem"><p>
+          ...
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the last column to load.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the first column to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          ...
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the last column to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the table to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the database that contains the
+          table (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the file that was loaded (the
+          original name on the master, not the name of the temporary
+          file created on the slave). The length of the data filename is
+          the event size minus the size of all other parts.
+</p></li></ul>
+</div>
+<p>
+      <span class="bold"><strong>Note:</strong></span> Because this event allows
+      only single-character field and line option values, presumably
+      <code class="literal">LOAD DATA INFILE</code> statements will not replicate
+      correctly if any such option contains multiple characters.
+    </p><p>
+      <strong class="userinput"><code>Slave_log_event/SLAVE_EVENT</code></strong>
+    </p><p>
+      This event is never written, so it cannot exist in a binary log
+      file. It was meant for failsafe replication, which has never been
+      implemented.
+    </p><p>
+      <strong class="userinput"><code>Create_file_log_event/CREATE_FILE_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      This event tells the slave to create a temporary file and fill it
+      with a first data block. Later, zero or more
+      <code class="literal">APPEND_BLOCK_EVENT</code> events append blocks to this
+      temporary file. <code class="literal">EXEC_LOAD_EVENT</code> tells the slave
+      to load the temporary file into the table, or
+      <code class="literal">DELETE_FILE_EVENT</code> tells the slave not to do the
+      load and to delete the temporary file.
+      <code class="literal">DELETE_FILE_EVENT</code> occurs when the <code class="literal">LOAD
+      DATA</code> failed on the master: On the master we start to
+      write loaded blocks to the binary log before the end of the
+      statement. If for some reason there is an error, we must tell the
+      slave to abort the load.
+    </p><p>
+      The format for this event is more complicated than for others,
+      because it contains information about many <code class="literal">LOAD DATA
+      INFILE</code> statement clauses.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the thread on the master that issued this
+          <code class="literal">LOAD DATA INFILE</code> statement. Needed for
+          temporary tables. This is also useful for a DBA for knowing
+          who did what on the master.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The time in seconds which the <code class="literal">LOAD DATA
+          INFILE</code> took for execution. Only useful for
+          inspection by the DBA.
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of lines to skip at the beginning of the
+          file (corresponds to the <code class="literal">IGNORE N LINES</code>
+          clause of <code class="literal">LOAD DATA INFILE</code>).
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the table to load.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the database containing the
+          table.
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of columns to load
+          (<code class="literal">(col_name,...)</code> clause). Will be nonzero
+          only if the columns to load were explicitly mentioned in the
+          statement.
+        </p></li><li class="listitem"><p>
+          4 bytes. An ID for the data file. This is necessary in case
+          several <code class="literal">LOAD DATA INFILE</code> statements occur
+          in parallel on the master. In that case, the binary log may
+          contain intermixed events for the statements. The ID resolves
+          which file the blocks in each
+          <code class="literal">APPEND_BLOCK_EVENT</code> must be appended, and
+          the file that must be loaded by the
+          <code class="literal">EXEC_LOAD_EVENT</code> or deleted by the
+          <code class="literal">DELETE_FILE_EVENT</code>.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the field-terminating string
+          (<code class="literal">FIELDS TERMINATED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The field-terminating string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the field-enclosing string
+          (<code class="literal">FIELDS ENCLOSED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The field-enclosing string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the line-terminating string
+          (<code class="literal">LINES TERMINATED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The line-terminating string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the line-starting string (<code class="literal">LINES
+          STARTING BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The line-starting string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the escaping string (<code class="literal">FIELDS
+          ESCAPED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The escaping string.
+        </p></li><li class="listitem"><p>
+          1 byte. Flags that indicate whether certain keywords are
+          present in the statement:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+              <code class="literal">DUMPFILE_FLAG</code> =0x1 (unused; this flag
+              appears to be a botch because it would apply to
+              <code class="literal">SELECT ... INTO OUTFILE</code>, not
+              <code class="literal">LOAD DATA INFILE</code>)
+            </p></li><li class="listitem"><p>
+              <code class="literal">OPT_ENCLOSED_FLAG</code> = 0x2 (<code class="literal">FIELD
+              OPTIONALLY ENCLOSED BY</code> option)
+            </p></li><li class="listitem"><p>
+              <code class="literal">REPLACE_FLAG</code> = 0x4 (<code class="literal">LOAD DATA
+              INFILE REPLACE</code>)
+            </p></li><li class="listitem"><p>
+              <code class="literal">IGNORE_FLAG</code> = 0x8 (<code class="literal">LOAD DATA
+              INFILE IGNORE</code>)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+          1 byte. The length of the name of the first column to load.
+        </p></li><li class="listitem"><p>
+          ...
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the last column to load.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the first column to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          ...
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the last column to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the table to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the database that contains the
+          table (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the file that was loaded (the
+          original name on the master, not the name of the temporary
+          file created on the slave) (null-terminated). The length of
+          the data filename is not explicit in the event. However, it is
+          null-terminated, so the length can be determined by reading to
+          the null byte.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The block of raw data to load. If the file
+          size exceeds a threshold, additional
+          <code class="literal">APPEND_BLOCK_EVENT</code> instances will follow,
+          each containing a data block. The size of the raw data is the
+          event size minus the size of all other parts.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Append_block_log_event/APPEND_BLOCK_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      Contains data to be written to the data file for a <code class="literal">LOAD
+      DATA INFILE</code> statement.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the file to append this block to.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          The raw data to load. The raw data size is the event size
+          minus the size of all the fixed event parts.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Execute_log_event/EXEC_LOAD_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      Indicates the end of a successful <code class="literal">LOAD DATA
+      INFILE</code> statement and that the data file should be
+      loaded.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the file to load.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Delete_file_log_event/DELETE_FILE_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      Indicates the end of an unsuccessful <code class="literal">LOAD DATA
+      INFILE</code> statement and that the data file should not be
+      loaded.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the file to be deleted.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Load_log_event/NEW_LOAD_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      The format for this event is more complicated than for others,
+      because it contains information about many <code class="literal">LOAD DATA
+      INFILE</code> statement clauses.
+    </p><p>
+      <code class="literal">LOAD_EVENT</code> shares the Load_log_event class with
+      <code class="literal">NEW_LOAD_EVENT</code>. The primary difference is that
+      <code class="literal">LOAD_EVENT</code> allows only single-character field
+      and line option values, whereas <code class="literal">NEW_LOAD_EVENT</code>
+      allows multiple-character values. Each of these is encoded as a
+      length followed by a string rather than as a single character.
+      Because of that, <code class="literal">NEW_LOAD_DATA</code> does not have
+      the flags byte that indicates whether each option is empty.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the thread on the master that issued this
+          <code class="literal">LOAD DATA INFILE</code> statement. Needed for
+          temporary tables. This is also useful for a DBA for knowing
+          who did what on the master.
+        </p></li><li class="listitem"><p>
+          4 bytes. The time in seconds which the <code class="literal">LOAD DATA
+          INFILE</code> took for execution. Only useful for
+          inspection by the DBA.
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of lines to skip at the beginning of the
+          file (corresponds to the <code class="literal">IGNORE N LINES</code>
+          clause of <code class="literal">LOAD DATA INFILE</code>).
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the table to load.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the database containing the
+          table.
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of columns to load
+          (<code class="literal">(col_name,...)</code> clause). Will be nonzero
+          only if the columns to load were explicitly mentioned in the
+          statement.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          1 byte. The length of the field-terminating string
+          (<code class="literal">FIELDS TERMINATED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The field-terminating string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the field-enclosing string
+          (<code class="literal">FIELDS ENCLOSED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The field-enclosing string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the line-terminating string
+          (<code class="literal">LINES TERMINATED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The line-terminating string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the line-starting string (<code class="literal">LINES
+          STARTING BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The line-starting string.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the escaping string (<code class="literal">FIELDS
+          ESCAPED BY</code> option).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The escaping string.
+        </p></li><li class="listitem"><p>
+          1 byte. Flags that indicate whether certain keywords are
+          present in the statement:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+              <code class="literal">DUMPFILE_FLAG</code> =0x1 (unused; this flag
+              appears to be a botch because it would apply to
+              <code class="literal">SELECT ... INTO OUTFILE</code>, not
+              <code class="literal">LOAD DATA INFILE</code>)
+            </p></li><li class="listitem"><p>
+              <code class="literal">OPT_ENCLOSED_FLAG</code> = 0x2 (<code class="literal">FIELD
+              OPTIONALLY ENCLOSED BY</code> option)
+            </p></li><li class="listitem"><p>
+              <code class="literal">REPLACE_FLAG</code> = 0x4 (<code class="literal">LOAD DATA
+              INFILE REPLACE</code>)
+            </p></li><li class="listitem"><p>
+              <code class="literal">IGNORE_FLAG</code> = 0x8 (<code class="literal">LOAD DATA
+              INFILE IGNORE</code>)
+</p></li></ul>
+</div>
+</li><li class="listitem"><p>
+          1 byte. The length of the name of the first column to load.
+        </p></li><li class="listitem"><p>
+          ...
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the last column to load.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the first column to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          ...
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the last column to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the table to load
+          (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the database that contains the
+          table (null-terminated).
+        </p></li><li class="listitem"><p>
+          Variable-sized. The name of the file that was loaded (the
+          original name on the master, not the name of the temporary
+          file created on the slave). The length of the data filename is
+          not explicit in the event. It is determined as the remaining
+          characters to the end of the event.
+</p></li></ul>
+</div>
+<p>
+      There is no file ID or data block in the variable data part. The
+      slave is supposed to request the file from the master in a
+      separate connection.
+    </p><p>
+      <strong class="userinput"><code>Rand_log_event/RAND_EVENT</code></strong>
+    </p><p>
+      <code class="literal">RAND()</code> in MySQL generates a random number. A
+      <code class="literal">RAND_EVENT</code> contains two seed values that set
+      the rand_seed1 and rand_seed2 system variables that are used to
+      compute the random number.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          8 bytes. The value for the first seed.
+        </p></li><li class="listitem"><p>
+          8 bytes. The value for the second seed.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>User_var_log_event/USER_VAR_EVENT</code></strong>
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. the size of the user variable name.
+        </p></li><li class="listitem"><p>
+          The user variable name.
+        </p></li><li class="listitem"><p>
+          1 byte. Non-zero if the variable value is the SQL
+          <code class="literal">NULL</code> value, 0 otherwise. If this byte is 0,
+          the following parts exist in the event.
+        </p></li><li class="listitem"><p>
+          1 byte. The user variable type. The value corresponds to
+          elements of <code class="literal">enum Item_result</code> defined in
+          <code class="literal">include/mysql_com.h</code> (STRING_RESULT=0,
+          REAL_RESULT=1, INT_RESULT=2, ROW_RESULT=3, DECIMAL_RESULT=4).
+        </p></li><li class="listitem"><p>
+          4 bytes. The number of the character set for the user variable
+          (needed for a string variable). The character set number is
+          really a collation number that indicates a character
+          set/collation pair.
+        </p></li><li class="listitem"><p>
+          4 bytes. The size of the user variable value (corresponds to
+          member <code class="literal">val_len</code> of class
+          <code class="literal">Item_string</code>).
+        </p></li><li class="listitem"><p>
+          Variable-sized. For a string variable, this is the string. For
+          a float or integer variable, this is its value in 8 bytes. For
+          a decimal this value is a packed value - 1 byte for the
+          precision, 1 byte for the scale, and $size - 2 bytes for the
+          actual value. See the <code class="literal">decimal2bin</code> function
+          in <code class="literal">strings/decimal.c</code> for the format of this
+          packed value.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Format_description_log_event/FORMAT_DESCRIPTION_EVENT</code></strong>
+    </p><p>
+      This event occurs at the beginning of v4 binary log files. See
+      <a class="link" href="binary-log-versions.html" title="19.8 Binary Log Versions">Binary Log Versions</a> for
+      how it is used.
+    </p><p>
+      In MySQL 5.0 and up, all binary log files start with a
+      <code class="literal">FORMAT_DESCRIPTION_EVENT</code>, but there will be a
+      way to distinguish between a
+      <code class="literal">FORMAT_DESCRIPTION_EVENT</code> created at
+      <code class="literal">mysqld</code> startup and other
+      <code class="literal">FORMAT_DESCRIPTION_EVENT</code> instances; such a
+      distinction is needed because the first category of
+      <code class="literal">FORMAT_DESCRIPTION_EVENT</code> (which means the
+      master has started) should trigger some cleaning tasks on the
+      slave. (Suppose the master died brutally and restarted: the slave
+      must delete old replicated temporary tables.)
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          2 bytes. The binary log format version. This is 4 in MySQL 5.0
+          and up.
+        </p></li><li class="listitem"><p>
+          50 bytes. The MySQL server's version (example:
+          5.0.14-debug-log), padded with 0x00 bytes on the right.
+        </p></li><li class="listitem"><p>
+          4 bytes. Timestamp in seconds when this event was created
+          (this is the moment when the binary log was created). This
+          value is redundant; the same value occurs in the
+          <code class="literal">timestamp</code> header field.
+        </p></li><li class="listitem"><p>
+          1 byte. The header length. This length - 19 gives the size of
+          the <code class="literal">extra headers</code> field at the end of the
+          header for other events.
+        </p></li><li class="listitem"><p>
+          Variable-sized. An array that indicates the post-header
+          lengths for all event types. There is one byte per event type
+          that the server knows about.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Xid_log_event/XID_EVENT</code></strong>
+    </p><p>
+      An XID event is generated for a commit of a transaction that
+      modifies one or more tables of an XA-capable storage engine.
+      Strictly speaking, <code class="literal">Xid_log_event</code> is used if
+      <code class="literal">thd-&gt;transaction.xid_state.xid.get_my_xid()</code>
+      returns nonzero.
+    </p><p>
+      Here is an example of how to generate an XID event (it occurs
+      whether or not <code class="literal">innodb_support_xa</code> is enabled):
+    </p><pre class="programlisting">
+CREATE TABLE t1 (a INT) ENGINE = INNODB;
+START TRANSACTION;
+INSERT INTO t1 VALUES (1);
+COMMIT;
+</pre><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          8 bytes. The XID transaction number.
+</p></li></ul>
+</div>
+<p>
+      <span class="bold"><strong>Note:</strong></span> Contrary to all other
+      numeric fields, the XID transaction number is not always written
+      in little-endian format. The bytes are copied unmodified from
+      memory to disk, so the format is machine-dependent. Hence, when
+      replicating from a little-endian to a big-endian machine (or vice
+      versa), the numeric value of transaction numbers will differ. In
+      particular, the output of <code class="literal">mysqlbinlog</code> differs.
+      This should does not cause inconsistencies in replication because
+      the only important property of transaction numbers is that
+      different transactions have different numbers (relative order does
+      not matter).
+    </p><p>
+      <strong class="userinput"><code>Begin_load_query_log_event/BEGIN_LOAD_QUERY_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. An ID for the data file. This is necessary in case
+          several <code class="literal">LOAD DATA INFILE</code> statements occur
+          in parallel on the master. In that case, the binary log may
+          contain intermixed events for the statements. The ID resolves
+          which file the blocks in each
+          <code class="literal">APPEND_BLOCK_EVENT</code> must be appended to, and
+          the file that must be loaded by the
+          <code class="literal">EXEC_LOAD_QUERY_EVENT</code> or deleted by the
+          <code class="literal">DELETE_FILE_EVENT</code>.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Variable-sized. The first block of data to load. The size is
+          the event size minus the size of all other fields in the
+          event. If the file size exceeds a threshold, additional
+          <code class="literal">APPEND_BLOCK_EVENT</code> instances will follow,
+          each containing a data block.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Execute_load_query_log_event/EXECUTE_LOAD_QUERY_EVENT</code></strong>
+    </p><p>
+      This event is used for <code class="literal">LOAD DATA INFILE</code>
+      statements. See also <a class="link" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">LOAD
+      DATA INFILE Events</a>.
+    </p><p>
+      Indicates the end of a successful <code class="literal">LOAD DATA
+      INFILE</code> statement and that the data file should be
+      loaded. It is similar to <code class="literal">QUERY_EVENT</code>, but
+      before executing the statement, it substitutes the original
+      filename in the statement with the name of the slave-side
+      temporary file. The first 13 bytes of the fixed data part are the
+      same as for <code class="literal">QUERY_EVENT</code>, as is the initial
+      status variable block in the variable data part. See the
+      description of that event type for additional information.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          4 bytes. The ID of the thread that issued this statement.
+        </p></li><li class="listitem"><p>
+          4 bytes. The time in seconds that the statement took to
+          execute.
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the name of the database which was the
+          default database when the statement was executed.
+        </p></li><li class="listitem"><p>
+          2 bytes. The error code resulting from execution of the
+          statement on the master.
+        </p></li><li class="listitem"><p>
+          2 bytes. The length of the status variable block.
+        </p></li><li class="listitem"><p>
+          4 bytes. The ID of the file to load.
+        </p></li><li class="listitem"><p>
+          4 bytes. The start position within the statement for filename
+          substitution.
+        </p></li><li class="listitem"><p>
+          4 bytes. The end position within the statement for filename
+          substitution.
+        </p></li><li class="listitem"><p>
+          1 byte. How to handle duplicates:
+          <code class="literal">LOAD_DUP_ERROR</code> = 0,
+          <code class="literal">LOAD_DUP_IGNORE</code> = 1,
+          <code class="literal">LOAD_DUP_REPLACE</code> = 2
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Zero or more status variables. Each status variable consists
+          of one byte identifying the variable stored, followed by the
+          value of the variable.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The database name (null-terminated).
+        </p></li><li class="listitem"><p>
+          The <code class="literal">LOAD DATA INFILE</code> statement. The length
+          is the event size minus the size of all other fields.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Table_map_log_event/TABLE_MAP_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging beginning with MySQL 5.1.5.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          6 bytes. The table ID.
+        </p></li><li class="listitem"><p>
+          2 bytes. Reserved for future use.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          1 byte. The length of the database name.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The database name (null-terminated).
+        </p></li><li class="listitem"><p>
+          1 byte. The length of the table name.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The table name (null-terminated).
+        </p></li><li class="listitem"><p>
+          Packed integer. The number of columns in the table.
+        </p></li><li class="listitem"><p>
+          Variable-sized. An array of column types, one byte per column.
+        </p></li><li class="listitem"><p>
+          Packed integer. The length of the metadata block.
+        </p></li><li class="listitem"><p>
+          Variable-sized. The metadata block; see log_event.h for
+          contents and format.
+        </p></li><li class="listitem"><p>
+          Variable-sized. Bit-field indicating whether each column can
+          be <code class="literal">NULL</code>, one bit per column. For this
+          field, the amount of storage required for
+          <span class="emphasis"><em>N</em></span> columns is
+          <code class="literal">INT((N+7)/8)</code> bytes.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Write_rows_log_event_old/PRE_GA_WRITE_ROWS_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging from MySQL 5.1.5 to 5.1.17,
+      using the old implementation of
+      <code class="literal">Write_rows_log_event/WRITE_ROWS_EVENT</code>. The
+      structure is similar to that for the newer event.
+    </p><p>
+      <strong class="userinput"><code>Update_rows_log_event_old/PRE_GA_UPDATE_ROWS_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging from MySQL 5.1.5 to 5.1.17,
+      using the old implementation of
+      <code class="literal">Update_rows_log_event/UPDATE_ROWS_EVENT</code>. The
+      structure is similar to that for the newer event.
+    </p><p>
+      <strong class="userinput"><code>Delete_rows_log_event_old/PRE_GA_DELETE_ROWS_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging from MySQL 5.1.5 to 5.1.17,
+      using the old implementation of
+      <code class="literal">Delete_rows_log_event/DELETE_ROWS_EVENT</code>. The
+      structure is similar to that for the newer event.
+    </p><p>
+      <strong class="userinput"><code>Write_rows_log_event/WRITE_ROWS_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging beginning with MySQL 5.1.18.
+    </p><p>
+      [TODO: following needs verification; it's guesswork]
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          6 bytes. The table ID.
+        </p></li><li class="listitem"><p>
+          2 bytes. Reserved for future use.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Packed integer. The number of columns in the table.
+        </p></li><li class="listitem"><p>
+          Variable-sized. Bit-field indicating whether each column is
+          used, one bit per column. For this field, the amount of
+          storage required for <span class="emphasis"><em>N</em></span> columns is
+          <code class="literal">INT((N+7)/8)</code> bytes.
+        </p></li><li class="listitem"><p>
+          Variable-sized (for <code class="literal">UPDATE_ROWS_LOG_EVENT</code>
+          only). Bit-field indicating whether each column is used in the
+          <code class="literal">UPDATE_ROWS_LOG_EVENT</code> after-image; one bit
+          per column. For this field, the amount of storage required for
+          <span class="emphasis"><em>N</em></span> columns is
+          <code class="literal">INT((N+7)/8)</code> bytes.
+        </p></li><li class="listitem"><p>
+          Variable-sized. A sequence of zero or more rows. The end is
+          determined by the size of the event. Each row has the
+          following format:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem"><p>
+              Variable-sized. Bit-field indicating whether each field in
+              the row is <code class="literal">NULL</code>. Only columns that are
+              "used" according to the second field in the variable data
+              part are listed here. If the second field in the variable
+              data part has <span class="emphasis"><em>N</em></span> one-bits, the amount
+              of storage required for this field is
+              <code class="literal">INT((N+7)/8)</code> bytes.
+            </p></li><li class="listitem"><p>
+              Variable-sized. The row-image, containing values of all
+              table fields. This only lists table fields that are used
+              (according to the second field of the variable data part)
+              and non-<code class="literal">NULL</code> (according to the previous
+              field). In other words, the number of values listed here
+              is equal to the number of zero bits in the previous field
+              (not counting padding bits in the last byte).
+            </p><p>
+              The format of each value is described in the
+              <code class="literal">log_event_print_value()</code> function in
+              <code class="literal">log_event.cc</code>.
+            </p></li><li class="listitem"><p>
+              (for <code class="literal">UPDATE_ROWS_EVENT</code> only) the
+              previous two fields are repeated, representing a second
+              table row.
+</p></li></ul>
+</div>
+</li></ul>
+</div>
+<p>
+      For each row, the following is done:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          For <code class="literal">WRITE_ROWS_LOG_EVENT</code>, the row described
+          by the row-image is inserted.
+        </p></li><li class="listitem"><p>
+          For <code class="literal">DELETE_ROWS_LOG_EVENT</code>, a row matching
+          the given row-image is deleted.
+        </p></li><li class="listitem"><p>
+          For <code class="literal">UPDATE_ROWS_LOG_EVENT</code>, a row matching
+          the first row-image is removed, and the row described by the
+          second row-image is inserted.
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Update_rows_log_event/UPDATE_ROWS_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging beginning with MySQL 5.1.18.
+    </p><p>
+      See the description for <code class="literal">WRITE_ROWS_EVENT</code>.
+    </p><p>
+      <strong class="userinput"><code>Delete_rows_log_event/DELETE_ROWS_EVENT</code></strong>
+    </p><p>
+      Used for row-based binary logging beginning with MySQL 5.1.18.
+    </p><p>
+      See the description for <code class="literal">WRITE_ROWS_EVENT</code>.
+    </p><p>
+      <strong class="userinput"><code>Incident_log_event/INCIDENT_EVENT</code></strong>
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          1 byte. The incident number.
+        </p></li><li class="listitem"><p>
+          1 byte. The message length.
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          The incident message, if present.
+</p></li></ul>
+</div>
+<p>
+      Incident number codes are listed in
+      <code class="literal">rpl_constant.h</code>. The only code currently used is
+      <code class="literal">INCIDENT_LOST_EVENTS</code>, which indicates that
+      there may be lost events (a "gap") in the replication stream that
+      requires databases to be resynchronized.
+    </p><p>
+      <strong class="userinput"><code>Heartbeat_log_event/HEARTBEAT_LOG_EVENT</code></strong>
+    </p><p>
+      A <code class="literal">Heartbeat_log_event</code> is sent by a master to a
+      slave to let the slave know that the master is still alive. Events
+      of this type do not appear in the binary or relay logs. They are
+      generated on a master server by the thread that dumps events and
+      sent straight to the slave without ever being written to the
+      binary log. The slave examines the event contents and then
+      discards it without writing it to the relay log.
+    </p><p>
+      Fixed data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      Variable data part:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Empty
+</p></li></ul>
+</div>
+<p>
+      <strong class="userinput"><code>Muted_query_log_event</code></strong>
+    </p><p>
+      This is a subclass of <code class="literal">Query_log_event</code> that is
+      not written to the log. It is used as a means of flushing a
+      transaction without logging an event.
+    </p><p>
+      This event class was added in MySQL 5.0.23 and removed in 6.0.4.
+      It was a solution to
+      <a class="ulink" href="http://bugs.mysql.com/16206" target="_top">Bug#16206</a> that
+      became unnecessary with the fix for
+      <a class="ulink" href="http://bugs.mysql.com/29020" target="_top">Bug#29020</a>.
+</p>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="ensuring-compatibility-of-future-binary-log-versions.html" title="19.8.2 Ensuring Compatibility of Future Binary Log Versions">Previous</a> / <a rel="next" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">Next</a> / <a rel="up" href="binary-log.html" title="19 The Binary Log">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="event-data-for-specific-event-types" />
+          <input type="hidden" name="return" value="/doc/internals/en/event-data-for-specific-event-types.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="ensuring-compatibility-of-future-binary-log-versions.html" title="19.8.2 Ensuring Compatibility of Future Binary Log Versions">Previous</a> / <a rel="next" href="load-data-infile-events.html" title="19.9.1 LOAD DATA INFILE Events">Next</a> / <a rel="up" href="binary-log.html" title="19 The Binary Log">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

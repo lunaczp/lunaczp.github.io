@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 14.2.5 Connection Phase Packets</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="cs-sect-expired-password.html" title="14.2.4.2 Expired Password"/><link rel="next" href="capability-flags.html?ff=nopfpls" title="14.2.6 Capability Flags"/><link rel="up" href="connection-phase.html" title="14.2 Connection Phase"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fconnection-phase-packets.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="client-server-protocol.html">14 MySQL Client/Server Protocol</a> :: <a href="connection-phase.html">14.2 Connection Phase</a> :: 14.2.5 Connection Phase Packets</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="cs-sect-expired-password.html" title="Previous Section">&laquo; 14.2.4.2 Expired Password</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="capability-flags.html" title="Next Section">14.2.6 Capability Flags  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="connection-phase.html">14.2 Connection Phase</a></li><li><a href="initial-handshake.html">14.2.1 Initial Handshake</a></li>
+<li><a href="auth-phase-fast-path.html">14.2.2 Auth Phase Fast Path</a></li>
+<li><a href="authentication-method-mismatch.html">14.2.3 Authentication Method Mismatch</a></li>
+<li><a href="authentication-after-com-change-user-command.html">14.2.4 Authentication After COM_CHANGE_USER Command</a></li>
+<li class="self">14.2.5 Connection Phase Packets</li>
+<li><a href="capability-flags.html">14.2.6 Capability Flags</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h3 class="title"><a name="connection-phase-packets"></a>14.2.5 Connection Phase Packets</h3>
+
+</div>
+
+</div>
+
+</div>
+<h4><a name="packet-Protocol::Handshake"></a>Protocol::Handshake</h4>
+<p>
+        Initial Handshake Packet
+      </p><p>
+        When the client connects to the server the server sends a
+        handshake packet to the client. Depending on the server version
+        and configuration options different variants of the initial
+        packet are sent.
+      </p><p>
+        To allow the server to add support for newer protocols, the
+        first byte defines the protocol version.
+      </p><p>
+        Since 3.21.0 the
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeV10" title="Protocol::HandshakeV10"><code class="literal">Protocol::HandshakeV10</code></a>
+        is sent, while it was still supporting
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeV9" title="Protocol::HandshakeV9:"><code class="literal">Protocol::HandshakeV9</code></a>
+        with a compile time option.
+</p>
+<h4><a name="idm139751354263648"></a>Payload</h4>
+<pre class="programlisting">
+1              protocol_version
+...
+</pre>
+<h4><a name="packet-Protocol::HandshakeV10"></a>Protocol::HandshakeV10</h4>
+<p>
+        Initial Handshake Packet - protocol version 10
+</p>
+<h4><a name="idm139751354260816"></a>Payload</h4>
+<pre class="programlisting">
+1              [0a] protocol version
+string[NUL]    server version
+4              connection id
+string[8]      auth-plugin-data-part-1
+1              [00] filler
+2              capability flags (lower 2 bytes)
+  if more data in the packet:
+1              character set
+2              status flags
+2              capability flags (upper 2 bytes)
+  if capabilities &amp; CLIENT_PLUGIN_AUTH {
+1              length of auth-plugin-data
+  } else {
+1              [00]
+  }
+string[10]     reserved (all [00])
+  if capabilities &amp; CLIENT_SECURE_CONNECTION {
+string[$len]   auth-plugin-data-part-2 ($len=MAX(13, length of auth-plugin-data - 8))
+  if capabilities &amp; CLIENT_PLUGIN_AUTH {
+string[NUL]    auth-plugin name
+  }
+</pre>
+<h4><a name="idm139751354258720"></a>Fields</h4>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="strong"><strong>protocol_version</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            <code class="literal">0x0a</code> protocol_version
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>server_version</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- human-readable server version
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>connection_id</strong></span>
+            (<a class="link" href="describing-packets.html#type-4"><span class="emphasis"><em>4</em></span></a>) --
+            connection id
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_plugin_data_part_1</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.fix_len"><span class="emphasis"><em>string.fix_len</em></span></a>)
+            -- [len=8] first 8 bytes of the auth-plugin data
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>filler_1</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            <code class="literal">0x00</code>
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>capability_flag_1</strong></span>
+            (<a class="link" href="describing-packets.html#type-2"><span class="emphasis"><em>2</em></span></a>) --
+            lower 2 bytes of the
+            <a class="link" href="capability-flags.html#packet-Protocol::CapabilityFlags" title="Protocol::CapabilityFlags:"><code class="literal">Protocol::CapabilityFlags</code></a>
+            (optional)
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>character_set</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            default server character-set, only the lower 8-bits
+            <a class="link" href="character-set.html#packet-Protocol::CharacterSet" title="Protocol::CharacterSet"><code class="literal">Protocol::CharacterSet</code></a>
+            (optional)
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>status_flags</strong></span>
+            (<a class="link" href="describing-packets.html#type-2"><span class="emphasis"><em>2</em></span></a>) --
+            <a class="link" href="status-flags.html#packet-Protocol::StatusFlags" title="Protocol::StatusFlags"><code class="literal">Protocol::StatusFlags</code></a>
+            (optional)
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>capability_flags_2</strong></span>
+            (<a class="link" href="describing-packets.html#type-2"><span class="emphasis"><em>2</em></span></a>) --
+            upper 2 bytes of the
+            <a class="link" href="capability-flags.html#packet-Protocol::CapabilityFlags" title="Protocol::CapabilityFlags:"><code class="literal">Protocol::CapabilityFlags</code></a>
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_plugin_data_len</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            length of the combined auth_plugin_data, if
+            auth_plugin_data_len is &gt; 0
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_plugin_name</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- name of the auth_method that the auth_plugin_data belongs
+            to
+
+</p>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+
+<div class="admon-title">
+Note
+</div>
+<p>
+                Due to
+                <a class="ulink" href="http://bugs.mysql.com/bug.php?id=59453" target="_top">Bug#59453</a>
+                the auth-plugin-name is missing the terminating NUL-char
+                in versions prior to 5.5.10 and 5.6.2.
+</p>
+</div>
+<p>
+</p></li></ul>
+</div>
+<h4><a name="idm139751354223968"></a>Returns</h4>
+<p>
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeResponse" title="Protocol::HandshakeResponse:"><code class="literal">Protocol::HandshakeResponse</code></a>
+        from the client
+</p>
+<h4><a name="idm139751354221728"></a>Implemented By</h4>
+<p>
+        <a class="link" href="mysql-server.html#send_server_handshake_packet"><code class="literal">send_server_handshake_packet()</code></a>
+</p>
+<h4><a name="idm139751354219536"></a>Example</h4>
+<pre class="programlisting">
+36 00 00 00 0a 35 2e 35    2e 32 2d 6d 32 00 0b 00    6....5.5.2-m2...
+00 00 64 76 48 40 49 2d    43 4a 00 ff f7 08 02 00    ..dvH@I-CJ......
+00 00 00 00 00 00 00 00    00 00 00 00 00 2a 34 64    .............*4d
+7c 63 5a 77 6b 34 5e 5d    3a 00                      |cZwk4^]:.
+</pre><p>
+        If
+        <a class="link" href="capability-flags.html#flag-CLIENT_PLUGIN_AUTH"><code class="literal">CLIENT_PLUGIN_AUTH</code></a>
+        is set the server sends the name of the
+        <a class="link" href="authentication-method.html" title="14.3 Authentication Method"><span class="emphasis"><em>Authentication
+        Method</em></span></a> that the
+        <code class="literal">auth_plugin_data</code> belongs to:
+      </p><pre class="programlisting">
+50 00 00 00 0a 35 2e 36    2e 34 2d 6d 37 2d 6c 6f    P....5.6.4-m7-lo
+67 00 56 0a 00 00 52 42    33 76 7a 26 47 72 00 ff    g.V...RB3vz&amp;Gr..
+ff 08 02 00 0f c0 15 00    00 00 00 00 00 00 00 00    ................
+00 2b 79 44 26 2f 5a 5a    33 30 35 5a 47 00 6d 79    .+yD&amp;/ZZ305ZG.my
+73 71 6c 5f 6e 61 74 69    76 65 5f 70 61 73 73 77    sql_native_passw
+6f 72 64 00                                           ord
+</pre>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+
+<div class="admon-title">
+Note
+</div>
+<p>
+          The <code class="literal">auth-plugin-data</code> is the concatenation
+          of strings <code class="literal">auth-plugin-data-part-1</code> and
+          <code class="literal">auth-plugin-data-part-2</code>.
+</p>
+</div>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+<div class="admon-title">
+Note
+</div>
+<p>
+          Only the fields up to the <code class="literal">filler</code> after the
+          <code class="literal">auth_plugin_data_part_1</code> are required, all
+          other fields are optional.
+</p>
+</div>
+<h4><a name="packet-Protocol::HandshakeV9"></a>Protocol::HandshakeV9:</h4>
+<p>
+        Initial Handshake Packet - Protocol Version 9
+</p>
+<h4><a name="idm139751354200352"></a>Payload</h4>
+<pre class="programlisting">
+1              [09] protocol_version
+string[NUL]    server_version
+4              connection_id
+string[NUL]    scramble
+</pre>
+<h4><a name="idm139751354198864"></a>Fields</h4>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="strong"><strong>protocol_version</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            <code class="literal">0x09</code> protocol_version
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>server_version</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- human-readable server version
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>connection_id</strong></span>
+            (<a class="link" href="describing-packets.html#type-4"><span class="emphasis"><em>4</em></span></a>) --
+            connection id
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_plugin_data</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- auth plugin data for
+            <a class="link" href="old-password-authentication.html#packet-Authentication::Old"><code class="literal">Authentication::Old</code></a>
+</p></li></ul>
+</div>
+<h4><a name="idm139751354186560"></a>Returns</h4>
+<p>
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeResponse320" title="Protocol::HandshakeResponse320:"><code class="literal">Protocol::HandshakeResponse320</code></a>
+</p>
+<h4><a name="packet-Protocol::HandshakeResponse"></a>Protocol::HandshakeResponse:</h4>
+<p>
+        Depending on the servers support for the
+        <a class="link" href="capability-flags.html#flag-CLIENT_PROTOCOL_41"><code class="literal">CLIENT_PROTOCOL_41</code></a>
+        capability and the clients understanding of that flag the client
+        has to send either a
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeResponse41" title="Protocol::HandshakeResponse41:"><code class="literal">Protocol::HandshakeResponse41</code></a>
+        or
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeResponse320" title="Protocol::HandshakeResponse320:"><code class="literal">Protocol::HandshakeResponse320</code></a>.
+</p>
+<h4><a name="packet-Protocol::HandshakeResponse41"></a>Protocol::HandshakeResponse41:</h4>
+<p>
+        Handshake Response Packet sent by 4.1+ clients supporting
+        <a class="link" href="capability-flags.html#flag-CLIENT_PROTOCOL_41"><code class="literal">CLIENT_PROTOCOL_41</code></a>
+        capability, if the server announced it in its Initial Handshake
+        Packet. Otherwise (talking to an old server) the
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::HandshakeResponse320" title="Protocol::HandshakeResponse320:"><code class="literal">Protocol::HandshakeResponse320</code></a>
+        packet has to be used.
+</p>
+<h4><a name="idm139751354173072"></a>Payload</h4>
+<pre class="programlisting">
+4              capability flags, CLIENT_PROTOCOL_41 always set
+4              max-packet size
+1              character set
+string[23]     reserved (all [0])
+string[NUL]    username
+  if capabilities &amp; CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA {
+lenenc-int     length of auth-response
+string[n]      auth-response
+  } else if capabilities &amp; CLIENT_SECURE_CONNECTION {
+1              length of auth-response
+string[n]      auth-response
+  } else {
+string[NUL]    auth-response
+  }
+  if capabilities &amp; CLIENT_CONNECT_WITH_DB {
+string[NUL]    database
+  }
+  if capabilities &amp; CLIENT_PLUGIN_AUTH {
+string[NUL]    auth plugin name
+  }
+  if capabilities &amp; CLIENT_CONNECT_ATTRS {
+lenenc-int     length of all key-values
+lenenc-str     key
+lenenc-str     value
+   if-more data in 'length of all key-values', more keys and value pairs
+  }
+</pre>
+<h4><a name="idm139751354170592"></a>Fields</h4>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="strong"><strong>capability_flags</strong></span>
+            (<a class="link" href="describing-packets.html#type-4"><span class="emphasis"><em>4</em></span></a>) --
+            capability flags of the client as defined in
+            <a class="link" href="capability-flags.html#packet-Protocol::CapabilityFlags" title="Protocol::CapabilityFlags:"><code class="literal">Protocol::CapabilityFlags</code></a>
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>max_packet_size</strong></span>
+            (<a class="link" href="describing-packets.html#type-4"><span class="emphasis"><em>4</em></span></a>) --
+            max size of a command packet that the client wants to send
+            to the server
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>character_set</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            connection's default character set as defined in
+            <a class="link" href="character-set.html#packet-Protocol::CharacterSet" title="Protocol::CharacterSet"><code class="literal">Protocol::CharacterSet</code></a>.
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>username</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.fix_len"><span class="emphasis"><em>string.fix_len</em></span></a>)
+            -- name of the SQL account which client wants to log in --
+            this string should be interpreted using the character set
+            indicated by <code class="literal">character set</code> field.
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth-response</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- opaque authentication response data generated by
+            <a class="link" href="authentication-method.html" title="14.3 Authentication Method"><span class="emphasis"><em>Authentication
+            Method</em></span></a> indicated by the <code class="literal">plugin
+            name</code> field.
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>database</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- initail database for the connection -- this string should
+            be interpreted using the character set indicated by
+            <code class="literal">character set</code> field.
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth plugin name</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- the
+            <a class="link" href="authentication-method.html" title="14.3 Authentication Method"><span class="emphasis"><em>Authentication
+            Method</em></span></a> used by the client to generate
+            <code class="literal">auth-response</code> value in this packet. This
+            is an UTF-8 string.
+</p></li></ul>
+</div>
+<h4><a name="idm139751354145728"></a>Example</h4>
+<p>
+        On MySQL 5.5.8 with
+        <a class="link" href="capability-flags.html#flag-CLIENT_PROTOCOL_41"><code class="literal">CLIENT_PROTOCOL_41</code></a>
+        <a class="link" href="capability-flags.html#flag-CLIENT_PLUGIN_AUTH"><code class="literal">CLIENT_PLUGIN_AUTH</code></a>,
+        <a class="link" href="capability-flags.html#flag-CLIENT_SECURE_CONNECTION"><code class="literal">CLIENT_SECURE_CONNECTION</code></a>,
+        and
+        <a class="link" href="capability-flags.html#flag-CLIENT_CONNECT_WITH_DB"><code class="literal">CLIENT_CONNECT_WITH_DB</code></a>
+        set, it may look like:
+      </p><pre class="programlisting">
+54 00 00 01 8d a6 0f 00    00 00 00 01 08 00 00 00    T...............
+00 00 00 00 00 00 00 00    00 00 00 00 00 00 00 00    ................
+00 00 00 00 70 61 6d 00    14 ab 09 ee f6 bc b1 32    ....pam........2
+3e 61 14 38 65 c0 99 1d    95 7d 75 d4 47 74 65 73    &gt;a.8e....}u.Gtes
+74 00 6d 79 73 71 6c 5f    6e 61 74 69 76 65 5f 70    t.mysql_native_p
+61 73 73 77 6f 72 64 00                               assword.
+</pre><p>
+        Starting with MySQL 5.6.6 the client may send attributes if
+        <a class="link" href="capability-flags.html#flag-CLIENT_CONNECT_ATTRS"><code class="literal">CLIENT_CONNECT_ATTRS</code></a>
+        is set:
+      </p><pre class="programlisting">
+b2 00 00 01 85 a2 1e 00    00 00 00 40 08 00 00 00    ...........@....
+00 00 00 00 00 00 00 00    00 00 00 00 00 00 00 00    ................
+00 00 00 00 72 6f 6f 74    00 14 22 50 79 a2 12 d4    ....root.."Py...
+e8 82 e5 b3 f4 1a 97 75    6b c8 be db 9f 80 6d 79    .......uk.....my
+73 71 6c 5f 6e 61 74 69    76 65 5f 70 61 73 73 77    sql_native_passw
+6f 72 64 00 61 03 5f 6f    73 09 64 65 62 69 61 6e    ord.a._os.debian
+36 2e 30 0c 5f 63 6c 69    65 6e 74 5f 6e 61 6d 65    6.0._client_name
+08 6c 69 62 6d 79 73 71    6c 04 5f 70 69 64 05 32    .libmysql._pid.2
+32 33 34 34 0f 5f 63 6c    69 65 6e 74 5f 76 65 72    2344._client_ver
+73 69 6f 6e 08 35 2e 36    2e 36 2d 6d 39 09 5f 70    sion.5.6.6-m9._p
+6c 61 74 66 6f 72 6d 06    78 38 36 5f 36 34 03 66    latform.x86_64.f
+6f 6f 03 62 61 72                                     oo.bar
+</pre>
+<div class="caution" style="margin-left: 0.5in; margin-right: 0.5in;">
+
+<div class="admon-title">
+Caution
+</div>
+<p>
+          Currently, multibyte character sets such as UCS2, UTF16 and
+          UTF32 are not supported.
+</p>
+</div>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+<div class="admon-title">
+Note
+</div>
+<p>
+          If client wants to have a secure SSL connection and sets
+          <a class="link" href="capability-flags.html#flag-CLIENT_SSL"><code class="literal">CLIENT_SSL</code></a>
+          flag it should first send the
+          <a class="link" href="connection-phase-packets.html#packet-Protocol::SSLRequest" title="Protocol::SSLRequest:"><code class="literal">SSL
+          Request Packet</code></a> and only then, after
+          establishing the secure connection, it should send the
+          Handshake Response Packet.
+</p>
+</div>
+<h4><a name="packet-Protocol::HandshakeResponse320"></a>Protocol::HandshakeResponse320:</h4>
+<p>
+        Old Handshake Response Packet used by old clients or if the
+        server doesn't support
+        <a class="link" href="capability-flags.html#flag-CLIENT_PROTOCOL_41"><code class="literal">CLIENT_PROTOCOL_41</code></a>
+        capability.
+</p>
+<h4><a name="idm139751354128912"></a>Payload</h4>
+<pre class="programlisting">
+2              capability flags, CLIENT_PROTOCOL_41 never set
+3              max-packet size
+string[NUL]    username
+  if capabilities &amp; CLIENT_CONNECT_WITH_DB {
+string[NUL]    auth-response
+string[NUL]    database
+  } else {
+string[EOF]    auth-response
+  }
+</pre>
+<h4><a name="idm139751354127280"></a>Fields</h4>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="strong"><strong>capability_flags</strong></span>
+            (<a class="link" href="describing-packets.html#type-2"><span class="emphasis"><em>2</em></span></a>) --
+            capability flags of the client as defined in
+            <a class="link" href="capability-flags.html#packet-Protocol::CapabilityFlags" title="Protocol::CapabilityFlags:"><code class="literal">Protocol::CapabilityFlags</code></a>
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>max_packet_size</strong></span>
+            (<a class="link" href="describing-packets.html#type-3"><span class="emphasis"><em>3</em></span></a>) --
+            max size of a command packet that the client wants to send
+            to the server
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth-response</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- opaque authentication response data generated by
+            <a class="link" href="authentication-method.html" title="14.3 Authentication Method"><span class="emphasis"><em>Authentication
+            Method</em></span></a> indicated by the <code class="literal">plugin
+            name</code> field.
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>database</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- initail database for the connection -- this string should
+            be interpreted using the character set indicated by
+            <code class="literal">character set</code> field.
+</p></li></ul>
+</div>
+<h4><a name="idm139751354113152"></a>Example</h4>
+<pre class="programlisting">
+11 00 00 01 85 24 00 00    00 6f 6c 64 00 47 44 53    .....$...old.GDS
+43 51 59 52 5f                                        CQYR_
+</pre>
+<div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+
+<div class="admon-title">
+Note
+</div>
+<p>
+          if <code class="literal">auth-response</code> field is followed by a
+          <code class="literal">database</code> field it has to be 0-terminated.
+</p>
+</div>
+<h4><a name="packet-Protocol::SSLRequest"></a>Protocol::SSLRequest:</h4>
+<p>
+        SSL Connection Request Packet. It is like Handshake Response
+        Packet but is truncated right before <code class="literal">username</code>
+        field. If server supports
+        <a class="link" href="capability-flags.html#flag-CLIENT_SSL"><code class="literal">CLIENT_SSL</code></a>
+        capability, client can send this packet to request a secure SSL
+        connection. The
+        <a class="link" href="capability-flags.html#flag-CLIENT_SSL"><code class="literal">CLIENT_SSL</code></a>
+        capability flag must be set inside the SSL Connection Request
+        Packet.
+</p>
+<h4><a name="idm139751354104720"></a>Payload</h4>
+<pre class="programlisting">
+4              capability flags, CLIENT_SSL always set
+4              max-packet size
+1              character set
+string[23]     reserved (all [0])
+</pre>
+<h4><a name="packet-Protocol::AuthSwitchRequest"></a>Protocol::AuthSwitchRequest:</h4>
+<p>
+        Authentication Method Switch Request Packet. If both server and
+        client support
+        <a class="link" href="capability-flags.html#flag-CLIENT_PLUGIN_AUTH"><code class="literal">CLIENT_PLUGIN_AUTH</code></a>
+        capability, server can send this packet to ask client to use
+        another authentication method.
+</p>
+<h4><a name="idm139751354100480"></a>Payload</h4>
+<pre class="programlisting">
+1              [fe]
+string[NUL]    plugin name
+string[EOF]    auth plugin data
+</pre>
+<h4><a name="idm139751354099040"></a>Fields</h4>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="strong"><strong>status</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            <code class="literal">0xfe</code>
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_method_name</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.NUL"><span class="emphasis"><em>string.NUL</em></span></a>)
+            -- name of the authentication method to switch to
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_method_data</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.EOF"><span class="emphasis"><em>string.EOF</em></span></a>)
+            -- initial auth-data for that authentication method
+</p></li></ul>
+</div>
+<h4><a name="idm139751354090176"></a>Returns</h4>
+<p>
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::AuthSwitchResponse" title="Protocol::AuthSwitchResponse:"><code class="literal">Protocol::AuthSwitchResponse</code></a>
+        or connection close
+</p>
+<h4><a name="idm139751354087936"></a>Example</h4>
+<p>
+        If
+        <a class="link" href="capability-flags.html#flag-CLIENT_PLUGIN_AUTH"><code class="literal">CLIENT_PLUGIN_AUTH</code></a>
+        was set and the server wants the client to authenticate with the
+        <a class="link" href="secure-password-authentication.html#packet-Authentication::Native41"><code class="literal">Authentication::Native41</code></a>
+        method it sends:
+      </p><pre class="programlisting">
+2c 00 00 02 fe 6d 79 73    71 6c 5f 6e 61 74 69 76    ,....mysql_nativ
+65 5f 70 61 73 73 77 6f    72 64 00 7a 51 67 34 69    e_password.zQg4i
+36 6f 4e 79 36 3d 72 48    4e 2f 3e 2d 62 29 41 00    6oNy6=rHN/&gt;-b)A.
+</pre>
+<h4><a name="packet-Protocol::OldAuthSwitchRequest"></a>Protocol::OldAuthSwitchRequest:</h4>
+<p>
+        Old Authentication Method Switch Request Packet consisting of a
+        single 0xfe byte. It is sent by server to request client to
+        switch to
+        <a class="link" href="old-password-authentication.html#packet-Authentication::Old"><code class="literal">Old Password
+        Authentication</code></a> if
+        <a class="link" href="capability-flags.html#flag-CLIENT_PLUGIN_AUTH"><code class="literal">CLIENT_PLUGIN_AUTH</code></a>
+        capability is not supported (by either the client or the server)
+</p>
+<h4><a name="idm139751354079488"></a>Payload</h4>
+<pre class="programlisting">
+1     [fe]
+</pre>
+<h4><a name="idm139751354078112"></a>Fields</h4>
+<p>
+        <span class="strong"><strong>status</strong></span>
+        (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+        <code class="literal">0xfe</code>
+</p>
+<h4><a name="idm139751354074816"></a>Returns</h4>
+<p>
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::AuthSwitchResponse" title="Protocol::AuthSwitchResponse:"><code class="literal">Protocol::AuthSwitchResponse</code></a>
+        with old password hash
+</p>
+<h4><a name="idm139751354072576"></a>Example</h4>
+<pre class="programlisting">
+01 00 00 02 fe
+</pre>
+<h4><a name="packet-Protocol::AuthSwitchResponse"></a>Protocol::AuthSwitchResponse:</h4>
+<p>
+        Authentication Method Switch Response Packet which contains
+        response data generated by the authenticatication method
+        requested in Authentication Method Switch Request Packet. This
+        data is opaque to the protocol.
+</p>
+<h4><a name="idm139751354069536"></a>Payload</h4>
+<pre class="programlisting">
+string[EOF]    auth plugin response
+</pre>
+<h4><a name="idm139751354068144"></a>Fields</h4>
+<p>
+        <span class="strong"><strong>data</strong></span>
+        (<a class="link" href="describing-packets.html#type-string.EOF"><span class="emphasis"><em>string.EOF</em></span></a>)
+        -- authentication response data
+</p>
+<h4><a name="idm139751354065472"></a>Returns</h4>
+<p>
+        <a class="link" href="connection-phase-packets.html#packet-Protocol::AuthMoreData" title="Protocol::AuthMoreData:"><code class="literal">Protocol::AuthMoreData</code></a>
+        or
+        <a class="link" href="packet-OK_Packet.html" title="14.1.3.1 OK_Packet"><code class="literal">OK_Packet</code></a>
+        or
+        <a class="link" href="packet-ERR_Packet.html" title="14.1.3.2 ERR_Packet"><code class="literal">ERR_Packet</code></a>
+</p>
+<h4><a name="idm139751354061056"></a>Example</h4>
+<p>
+        If the client sends a <code class="literal">mysql_native_password</code>
+        response, but the server has a
+        <code class="literal">mysql_old_password</code> for that user, it will ask
+        the client to switch to <code class="literal">mysql_old_password</code>
+        and client would reply with:
+      </p><pre class="programlisting">
+09 00 00 03 5c 49 4d 5e    4e 58 4f 47 00             ....\IM^NXOG.
+</pre><p>
+        In the case it is the other way around (<code class="literal">mysql
+        --default-auth=mysql_old_password</code> against a
+        <code class="literal">mysql_native_password</code> user) the client will
+        respond with the reply of the
+        <code class="literal">mysql_native_password</code> plugin:
+      </p><pre class="programlisting">
+14 00 00 03 f4 17 96 1f    79 f3 ac 10 0b da a6 b3    ........y.......
+b5 c2 0e ab 59 85 ff b8                               ....Y...
+</pre><p>
+        More examples in
+        <a class="link" href="auth-method-switch.html" title="14.12.3 Auth Method Switch"><span class="emphasis"><em>Auth Method
+        Switch</em></span></a>
+</p>
+<h4><a name="packet-Protocol::AuthMoreData"></a>Protocol::AuthMoreData:</h4>
+
+<h4><a name="idm139751354051200"></a>Payload</h4>
+<pre class="programlisting">
+1              [01]
+string[EOF]    plugin data
+</pre>
+<h4><a name="idm139751354049792"></a>Fields</h4>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+            <span class="strong"><strong>status</strong></span>
+            (<a class="link" href="describing-packets.html#type-1"><span class="emphasis"><em>1</em></span></a>) --
+            <code class="literal">0x01</code>
+          </p></li><li class="listitem"><p>
+            <span class="strong"><strong>auth_method_data</strong></span>
+            (<a class="link" href="describing-packets.html#type-string.EOF"><span class="emphasis"><em>string.EOF</em></span></a>)
+            -- extra auth-data beyond the initial challenge
+</p></li></ul>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="cs-sect-expired-password.html" title="14.2.4.2 Expired Password">Previous</a> / <a rel="next" href="capability-flags.html" title="14.2.6 Capability Flags">Next</a> / <a rel="up" href="connection-phase.html" title="14.2 Connection Phase">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="connection-phase-packets" />
+          <input type="hidden" name="return" value="/doc/internals/en/connection-phase-packets.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="cs-sect-expired-password.html" title="14.2.4.2 Expired Password">Previous</a> / <a rel="next" href="capability-flags.html" title="14.2.6 Capability Flags">Next</a> / <a rel="up" href="connection-phase.html" title="14.2 Connection Phase">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

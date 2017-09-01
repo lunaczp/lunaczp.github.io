@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 11.1 MySQL .frm File Format</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="fileformats.html" title="11 File Formats"/><link rel="next" href="selects.html?ff=nopfpls" title="12 How MySQL Performs Different Selects"/><link rel="up" href="fileformats.html" title="11 File Formats"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Ffrm-file-format.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="fileformats.html">11 File Formats</a> :: 11.1 MySQL .frm File Format</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="fileformats.html" title="Previous Section">&laquo; 11 File Formats</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="selects.html" title="Next Section">12 How MySQL Performs Different Selects  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="fileformats.html">11 File Formats</a></li><li class="self">11.1 MySQL .frm File Format</li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="frm-file-format"></a>11.1 MySQL .frm File Format</h2>
+</div>
+</div>
+</div>
+<p>
+      Regardless of the storage engine you choose, every MySQL table you
+      create is represented on disk by a <code class="filename">.frm</code> file
+      that describes the table's format (that is, the table definition).
+      The file bears the same name as the table, with an
+      <code class="filename">.frm</code> extension. The <code class="filename">.frm</code>
+      format is the same on all platforms, but in the description of the
+      <code class="filename">.frm</code> format that follows, the examples come
+      from tables created under the Linux operating system.
+    </p><p>
+      First, let's create an example table, using the
+      <span class="command"><strong>mysql</strong></span> client:
+    </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>CREATE TABLE table1 (column1 CHAR(5)) ENGINE=MYISAM COMMENT '*';</code></strong>
+Query OK, 0 rows affected (0.00 sec)
+</pre><p>
+      The <code class="filename">.frm</code> file associated with
+      <code class="literal">table1</code> can be found in the directory that
+      represents the database (or schema) to which the table belongs.
+      The <code class="literal">datadir</code> system variable contains the name
+      of this directory:
+    </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>SHOW VARIABLES LIKE 'datadir';</code></strong>
+ +---------------+-----------------------+
+ | Variable_name | Value                 |
+ +---------------+-----------------------+
+ | datadir       | /usr/local/mysql/var/ |
+ +---------------+-----------------------+
+ 1 row in set (0.00 sec)
+</pre><p>
+      The <code class="literal">DATABASE()</code> function contains the name of
+      the relevant database:
+    </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>SELECT DATABASE();</code></strong>
+ +------------+
+ | DATABASE() |
+ +------------+
+ | ff         |
+ +------------+
+ 1 row in set (0.00 sec)
+</pre><p>
+      Since MySQL stores <code class="filename">.frm</code> files in
+      <code class="filename">datadir/<em class="replaceable"><code>database_name</code></em></code>,
+      it's a simple matter to locate the corresponding
+      <code class="filename">.frm</code> file for <code class="literal">table1</code>. For
+      example, within a Linux shell:
+    </p><pre class="programlisting">
+shell&gt; <strong class="userinput"><code>su root</code></strong>
+shell&gt; <strong class="userinput"><code>cd /usr/local/mysql/var/ff</code></strong>
+shell&gt; <strong class="userinput"><code>ls table1.*</code></strong>
+  table1.frm  table1.MYD  table1.MYI
+shell&gt; <strong class="userinput"><code>ls -l table1.*</code></strong>
+-rw-rw----  1 root root 8566 2006-09-22 11:22 table1.frm
+-rw-rw----  1 root root    0 2006-09-22 11:22 table1.MYD
+-rw-rw----  1 root root 1024 2006-09-22 11:22 table1.MYI
+</pre><p>
+      The <code class="filename">.MYD</code> (data) and <code class="filename">.MYI</code>
+      (index) files are not our concern here; they are described at
+      <a class="xref" href="myisam-record-structure.html" title="20.1 MyISAM Record Structure">Section 20.1, “MyISAM Record Structure”</a>. To understand the
+      <code class="filename">.frm</code> format, let's look at
+      <code class="filename">table1.frm</code> using a hexadecimal-dump utility:
+    </p><pre class="programlisting">
+shell&gt; <strong class="userinput"><code>hexdump -v -C table1.frm</code></strong>
+  00000000  fe 01 09 09 03 00 00 10  01 00 00 30 00 00 10 00  |...........0....|
+  00000010  06 00 00 00 00 00 00 00  00 00 00 02 08 00 08 00  |................|
+  00000020  00 05 00 00 00 00 08 00  00 00 00 00 00 00 00 10  |................|
+  00000030  00 00 00 c0 c3 00 00 10  00 00 00 00 00 00 00 00  |................|
+  00000040  2f 2f 00 00 20 00 00 00  00 00 00 00 00 00 00 00  |//.. ...........|
+  ...                                                         | (many 0s)      |
+  00001000  00 00 00 00 02 00 ff 00  00 00 00 00 00 00 00 00  |................|
+  00001010  ff 20 20 20 20 20 00 00  06 00 4d 79 49 53 41 4d  |.     ....MyISAM|
+  ...                                                         | (many 0s)      |
+  00002000  6c 01 00 10 00 00 00 00  00 00 00 00 00 00 00 00  |l...............|
+  00002010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+  00002020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 01 2a  |...............*|
+  ...
+  00002100  01 00 01 00 3b 00 05 00  00 00 06 00 0a 00 00 00  |....;...........|
+  00002110  00 00 00 00 00 00 50 00  16 00 01 00 00 00 00 00  |......P.........|
+  00002120  3b 00 02 01 02 14 29 20  20 20 20 20 20 20 20 20  |;.....)         |
+  00002130  20 20 20 20 20 20 20 20  20 20 20 20 20 20 20 20  |                |
+  00002140  20 20 20 20 20 20 20 20  20 20 20 20 20 20 20 00  |               .|
+  00002150  04 00 08 63 6f 6c 75 6d  6e 31 00 04 08 05 05 00  |...column1......|
+  00002160  02 00 00 00 80 00 00 00  fe 08 00 00 ff 63 6f 6c  |.............col|
+  00002170  75 6d 6e 31 ff 00                                 |umn1..|
+  00002176
+</pre><p>
+      The details just shown might change, especially since there is a
+      transition underway from an old (<span class="quote">“<span class="quote">binary</span>”</span>) format to
+      a new (<span class="quote">“<span class="quote">text based</span>”</span>) <code class="filename">.frm</code>
+      format. You can confirm that the details are correct by comparing
+      this description with the statements in
+      <code class="filename">sql/table.cc</code>,
+      <code class="literal">create_frm()</code>. The following tables explain the
+      meaning of each byte in the hexadecimal dump shown in the
+      preceding example:
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          Offset: The byte position in the file.
+        </p></li><li class="listitem"><p>
+          Length: The number of bytes.
+        </p></li><li class="listitem"><p>
+          Value: What's in the given byte position for the given length
+          (remember that storage is <span class="quote">“<span class="quote">low byte first</span>”</span>, so
+          0010 means 0x1000, not 0x0010!).
+        </p></li><li class="listitem"><p>
+          Explanation: A brief explanation of the contents.
+</p></li></ul>
+</div>
+
+<div class="table">
+<a name="idm139751355809584"></a><p class="title"><b>Table 11.1 .frm File Header Section</b></p>
+<div class="table-contents">
+<table summary=".frm File Header Section" border="1"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th scope="col">Offset</th><th scope="col">Length</th><th scope="col">Value</th><th scope="col">Explanation</th></tr></thead><tbody><tr><td scope="row"><p>
+                0000
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                fe
+              </p></td><td><p>
+                Always
+              </p></td></tr><tr><td scope="row"><p>
+                0001
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                01
+              </p></td><td><p>
+                Always
+              </p></td></tr><tr><td scope="row"><p>
+                0002
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                09
+              </p></td><td><p>
+                <code class="literal">FRM_VER</code> (which is in
+                <code class="filename">include/mysql_version.h</code>) +3
+                +<code class="literal">test(create_info-&gt;varchar)</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0003
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                09
+              </p></td><td><p>
+                See <code class="literal">enum legacy_db_type</code> in
+                <code class="filename">sql/handler.h</code>. For example, 09 is
+                <code class="literal">DB_TYPE_MYISAM</code>, but 14 if MyISAM with
+                partitioning.
+              </p></td></tr><tr><td scope="row"><p>
+                0004
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                03
+              </p></td><td><p>
+                 ??
+              </p></td></tr><tr><td scope="row"><p>
+                0005
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                Always
+              </p></td></tr><tr><td scope="row"><p>
+                0006
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0010
+              </p></td><td><p>
+                <code class="literal">IO_SIZE</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0008
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0100
+              </p></td><td><p>
+                 ??
+              </p></td></tr><tr><td scope="row"><p>
+                000a
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                00300000
+              </p></td><td><p>
+                Length, based on <code class="literal">key_length + rec_length +
+                create_info-&gt;extra_size</code>
+              </p></td></tr><tr><td scope="row"><p>
+                000e
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                1000
+              </p></td><td><p>
+                "tmp_key_length", based on <code class="literal">key_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0010
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0600
+              </p></td><td><p>
+                <code class="literal">rec_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0012
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                00000000
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;max_rows</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0016
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                00000000
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;min_rows</code>
+              </p></td></tr><tr><td scope="row"><p>
+                001b
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                02
+              </p></td><td><p>
+                Always (means <span class="quote">“<span class="quote">use long pack-fields</span>”</span>)
+              </p></td></tr><tr><td scope="row"><p>
+                001c
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0800
+              </p></td><td><p>
+                <code class="literal">key_info_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                001e
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0800
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;table_options</code> also
+                known as <code class="literal">db_create_options?</code> one
+                possible option is <code class="literal">HA_LONG_BLOB_PTR</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0020
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                Always
+              </p></td></tr><tr><td scope="row"><p>
+                0021
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                05
+              </p></td><td><p>
+                Always (means <span class="quote">“<span class="quote">version 5 frm file</span>”</span>)
+              </p></td></tr><tr><td scope="row"><p>
+                0022
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                00000000
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;avg_row_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0026
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                08
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;default_table_charset</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0027
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                Always
+              </p></td></tr><tr><td scope="row"><p>
+                0028
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;row_type</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0029
+              </p></td><td><p>
+                6
+              </p></td><td><p>
+                00..00
+              </p></td><td><p>
+                Always (formerly used for RAID support)
+              </p></td></tr><tr><td scope="row"><p>
+                002f
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                10000000
+              </p></td><td><p>
+                <code class="literal">key_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0033
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                c0c30000
+              </p></td><td><p>
+                <code class="literal">MYSQL_VERSION_ID</code> from
+                <code class="filename">include/mysql_version.h</code>
+              </p></td></tr><tr><td scope="row"><p>
+                0037
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                10000000
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;extra_size</code>
+              </p></td></tr><tr><td scope="row"><p>
+                003b
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0000
+              </p></td><td><p>
+                Reserved for <code class="literal">extra_rec_buf_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                003d
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                Reserved for <code class="literal">default_part_db_type</code>,
+                but 09 if MyISAM with partitioning
+              </p></td></tr><tr><td scope="row"><p>
+                003e
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0000
+              </p></td><td><p>
+                <code class="literal">create_info-&gt;key_block_size</code>
+</p></td></tr></tbody></table>
+</div>
+
+</div>
+<br class="table-break">
+<div class="table">
+<a name="idm139751355706624"></a><p class="title"><b>Table 11.2 .frm File Key Information Section</b></p>
+<div class="table-contents">
+<table summary=".frm File Key Information Section" border="1"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th scope="col">Offset</th><th scope="col">Length</th><th scope="col">Value</th><th scope="col">Explanation</th></tr></thead><tbody><tr><td scope="row"><p>
+                1000
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                Always 00 when there are no keys (that is, indexes)
+              </p></td></tr><tr><td scope="row"><p>
+                ...
+              </p></td><td><p>
+                 ??
+              </p></td><td><p>
+                 ??
+              </p></td><td><p>
+                 ??
+              </p></td></tr><tr><td scope="row"><p>
+                101a
+              </p></td><td><p>
+                6
+              </p></td><td><p>
+                "MyISAM"
+              </p></td><td><p>
+                Name of engine. If partitioning, the partition clauses
+                are here
+</p></td></tr></tbody></table>
+</div>
+
+</div>
+<br class="table-break">
+<div class="table">
+<a name="idm139751355690448"></a><p class="title"><b>Table 11.3 .frm File Comment Section</b></p>
+<div class="table-contents">
+<table summary=".frm File Comment Section" border="1"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th scope="col">Offset</th><th scope="col">Length</th><th scope="col">Value</th><th scope="col">Explanation</th></tr></thead><tbody><tr><td scope="row"><p>
+                202e
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                01
+              </p></td><td><p>
+                Length of comment
+              </p></td></tr><tr><td scope="row"><p>
+                202f
+              </p></td><td><p>
+                40
+              </p></td><td><p>
+                "*"
+              </p></td><td><p>
+                The string in the <code class="literal">COMMENT</code> table
+                option
+</p></td></tr></tbody></table>
+</div>
+
+</div>
+<br class="table-break">
+<div class="table">
+<a name="idm139751355677232"></a><p class="title"><b>Table 11.4 .frm File Column Information Section</b></p>
+<div class="table-contents">
+<table summary=".frm File Column Information Section" border="1"><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th scope="col">Offset</th><th scope="col">Length</th><th scope="col">Value</th><th scope="col">Explanation</th></tr></thead><tbody><tr><td scope="row"><p>
+                2100
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                01
+              </p></td><td><p>
+                Always
+              </p></td></tr><tr><td scope="row"><p>
+                2102
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0100
+              </p></td><td><p>
+                <code class="literal">share-&gt;fields</code> (number of columns)
+              </p></td></tr><tr><td scope="row"><p>
+                2104
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                3b00
+              </p></td><td><p>
+                <code class="literal">pos</code> (<span class="quote">“<span class="quote">length of all
+                screens</span>”</span>). Goes up if
+                <code class="literal">column-name</code> length increases. Doesn't
+                go up if add comment.
+              </p></td></tr><tr><td scope="row"><p>
+                2106
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0500
+              </p></td><td><p>
+                Based on number of bytes in row.
+              </p></td></tr><tr><td scope="row"><p>
+                210c
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0500
+              </p></td><td><p>
+                <code class="literal">n_length</code>. Goes up if row length
+                increases.
+              </p></td></tr><tr><td scope="row"><p>
+                210e
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0000
+              </p></td><td><p>
+                <code class="literal">interval_count</code>. Number of different
+                <code class="literal">ENUM</code>/<code class="literal">SET</code> columns.
+              </p></td></tr><tr><td scope="row"><p>
+                2110
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0000
+              </p></td><td><p>
+                <code class="literal">interval_parts</code>. Number of different
+                strings in
+                <code class="literal">ENUM</code>/<code class="literal">SET</code> columns.
+              </p></td></tr><tr><td scope="row"><p>
+                2112
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0000
+              </p></td><td><p>
+                <code class="literal">int_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                211a
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0100
+              </p></td><td><p>
+                <code class="literal">share-&gt;null_fields</code>. Number of
+                nullable columns.
+              </p></td></tr><tr><td scope="row"><p>
+                211c
+              </p></td><td><p>
+                2
+              </p></td><td><p>
+                0000
+              </p></td><td><p>
+                <code class="literal">com_length</code>
+              </p></td></tr><tr><td scope="row"><p>
+                2152
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                08
+              </p></td><td><p>
+                Length of column-name including <code class="literal">'\0'</code>
+                termination
+              </p></td></tr><tr><td scope="row"><p>
+                2153
+              </p></td><td><p>
+                3
+              </p></td><td><p>
+                "column1\0"
+              </p></td><td><p>
+                column-name
+              </p></td></tr><tr><td scope="row"><p>
+                215b
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                04
+              </p></td><td><p>
+                 ??
+              </p></td></tr><tr><td scope="row"><p>
+                215c
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                03
+              </p></td><td><p>
+                 ??
+              </p></td></tr><tr><td scope="row"><p>
+                215d
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                05
+              </p></td><td><p>
+                Number of bytes in column
+              </p></td></tr><tr><td scope="row"><p>
+                215e
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                05
+              </p></td><td><p>
+                Number of bytes in column
+              </p></td></tr><tr><td scope="row"><p>
+                215f
+              </p></td><td><p>
+                4
+              </p></td><td><p>
+                00020000
+              </p></td><td><p>
+                 ??
+              </p></td></tr><tr><td scope="row"><p>
+                2163
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                00
+              </p></td><td><p>
+                Flags for zerofill, unsigned, etc.
+              </p></td></tr><tr><td scope="row"><p>
+                2164
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                80
+              </p></td><td><p>
+                Additional flags, and scale if decimal/numeric
+              </p></td></tr><tr><td scope="row"><p>
+                2168
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                fe
+              </p></td><td><p>
+                Data type (fe=<code class="literal">char</code>,
+                02=<code class="literal">smallint</code>,
+                03=<code class="literal">int</code>, etc.) see <code class="literal">enum
+                field_types</code> in
+                <code class="filename">include/mysql_com.h</code>
+              </p></td></tr><tr><td scope="row"><p>
+                2169
+              </p></td><td><p>
+                1
+              </p></td><td><p>
+                08
+              </p></td><td><p>
+                Character set or geometry type
+              </p></td></tr><tr><td scope="row"><p>
+                (later)
+              </p></td><td><p>
+                 ??
+              </p></td><td><p>
+                 ??
+              </p></td><td><p>
+                Column names again, defaults,
+                <code class="literal">ENUM</code>/<code class="literal">SET</code> strings,
+                column comments ... at end of row. not shown.
+</p></td></tr></tbody></table>
+</div>
+
+</div>
+<br class="table-break"><p>
+      The <code class="filename">.frm</code> file for a partitioned table
+      contains partition information, in clear text, in addition to the
+      usual table definition details. Let's create a partitioned table
+      and do a hexadecimal dump of its <code class="filename">.frm</code> file:
+    </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>CREATE TABLE table2 (column1 INT) ENGINE=MYISAM COMMENT '*'
+       PARTITION BY HASH(column1) PARTITIONS 2;</code></strong>
+Query OK, 0 rows affected (0.00 sec)
+</pre><p>
+      The hexadecimal dump from <code class="literal">table2</code> is shown here:
+    </p><pre class="programlisting">
+00000000  fe 01 09 14 03 00 00 10  01 00 00 30 00 00 10 00  |...........0....|
+00000010  05 00 00 00 00 00 00 00  00 00 00 02 08 00 08 00  |................|
+00000020  00 05 00 00 00 00 08 00  00 00 00 00 00 00 00 10  |................|
+00000030  00 00 00 c0 c3 00 00 3d  00 00 00 00 00 09 00 00  |.......=........|
+00000040  2f 2f 00 00 20 00 00 00  00 00 00 00 00 00 00 00  |//.. ...........|
+00000050  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+...
+00001000  00 00 00 00 02 00 ff 00  00 00 00 00 00 00 00 00  |................|
+00001010  ff 00 00 00 00 00 00 09  00 70 61 72 74 69 74 69  |.........partiti|
+00001020  6f 6e 2a 00 00 00 20 50  41 52 54 49 54 49 4f 4e  |on*... PARTITION|
+00001030  20 42 59 20 48 41 53 48  20 28 63 6f 6c 75 6d 6e  | BY HASH (column|
+00001040  31 29 20 50 41 52 54 49  54 49 4f 4e 53 20 32 20  |1) PARTITIONS 2 |
+00001050  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+...
+00002000  76 01 00 10 00 00 00 00  00 00 00 00 00 00 00 00  |v...............|
+00002010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+00002020  00 00 00 00 00 00 00 00  00 00 00 00 00 00 01 2a  |...............*|
+00002030  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+...
+00002100  01 00 01 00 3b 00 0b 00  00 00 05 00 0a 00 00 00  |....;...........|
+00002110  00 00 00 00 00 00 50 00  16 00 01 00 00 00 00 00  |......P.........|
+00002120  3b 00 02 01 02 14 29 20  20 20 20 20 20 20 20 20  |;.....)         |
+00002130  20 20 20 20 20 20 20 20  20 20 20 20 20 20 20 20  |                |
+00002140  20 20 20 20 20 20 20 20  20 20 20 20 20 20 20 00  |               .|
+00002150  04 00 08 63 6f 6c 75 6d  6e 31 00 04 08 0b 0b 00  |...column1......|
+00002160  02 00 00 1b 80 00 00 00  03 08 00 00 ff 63 6f 6c  |.............col|
+00002170  75 6d 6e 31 ff 00                                 |umn1..|
+00002176
+</pre><p>
+      In the example output, notice that position 00001010 and following
+      contains the clear text of the <code class="literal">CREATE TABLE ...
+      PARTITION</code> clause and not just the
+      <code class="literal">MYISAM</code> engine information, as in
+      <code class="literal">table1</code>, which shows the
+      <code class="filename">.frm</code> of a nonpartitioned table.
+    </p><p>
+      Finally, <code class="literal">CREATE VIEW</code> also causes creation of a
+      <code class="filename">.frm</code> file, but a view
+      <code class="filename">.frm</code> bears no resemblance to a base table
+      <code class="filename">.frm</code>; it's purely textual. Here's an example
+      of a <code class="filename">.frm</code> for a view made with:
+    </p><pre class="programlisting">
+mysql&gt; <strong class="userinput"><code>CREATE VIEW v AS SELECT 5;</code></strong>
+Query OK, 0 rows affected (0.00 sec)
+</pre><p>
+      Just looking at the text will tell you what it's about:
+    </p><pre class="programlisting">
+00000000  54 59 50 45 3d 56 49 45  57 0a 71 75 65 72 79 3d  |TYPE=VIEW.query=|
+00000010  73 65 6c 65 63 74 20 35  20 41 53 20 60 35 60 0a  |select 5 AS `5`.|
+00000020  6d 64 35 3d 38 64 39 65  32 62 62 66 64 35 33 35  |md5=8d9e2bbfd535|
+00000030  66 35 37 39 64 34 61 39  34 39 62 39 65 62 37 64  |f579d4a949b9eb7d|
+00000040  32 33 34 39 0a 75 70 64  61 74 61 62 6c 65 3d 30  |2349.updatable=0|
+00000050  0a 61 6c 67 6f 72 69 74  68 6d 3d 30 0a 64 65 66  |.algorithm=0.def|
+00000060  69 6e 65 72 5f 75 73 65  72 3d 72 6f 6f 74 0a 64  |iner_user=root.d|
+00000070  65 66 69 6e 65 72 5f 68  6f 73 74 3d 6c 6f 63 61  |efiner_host=loca|
+00000080  6c 68 6f 73 74 0a 73 75  69 64 3d 32 0a 77 69 74  |lhost.suid=2.wit|
+00000090  68 5f 63 68 65 63 6b 5f  6f 70 74 69 6f 6e 3d 30  |h_check_option=0|
+000000a0  0a 72 65 76 69 73 69 6f  6e 3d 31 0a 74 69 6d 65  |.revision=1.time|
+000000b0  73 74 61 6d 70 3d 32 30  30 36 2d 30 39 2d 32 32  |stamp=2006-09-22|
+000000c0  20 31 32 3a 31 34 3a 34  38 0a 63 72 65 61 74 65  | 12:14:48.create|
+000000d0  2d 76 65 72 73 69 6f 6e  3d 31 0a 73 6f 75 72 63  |-version=1.sourc|
+000000e0  65 3d 73 65 6c 65 63 74  20 35 0a                 |e=select 5.|
+</pre>
+</div>
+
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="fileformats.html" title="11 File Formats">Previous</a> / <a rel="next" href="selects.html" title="12 How MySQL Performs Different Selects">Next</a> / <a rel="up" href="fileformats.html" title="11 File Formats">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="frm-file-format" />
+          <input type="hidden" name="return" value="/doc/internals/en/frm-file-format.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="fileformats.html" title="11 File Formats">Previous</a> / <a rel="next" href="selects.html" title="12 How MySQL Performs Different Selects">Next</a> / <a rel="up" href="fileformats.html" title="11 File Formats">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>

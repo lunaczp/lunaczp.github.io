@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <!--[if IE ]>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
+    <![endif]-->
+    <title>MySQL ::   MySQL Internals Manual :: 10.13 Functions in the mysys Library</title>
+
+    
+    <link rel="stylesheet" media="screen,projection" href="common/css/mysql.css?v=20140618" />
+    <link rel="stylesheet" media="print" href="common/css/print.css?v=20111230" />
+
+            <link rel="stylesheet" href="doc/docs.css" />
+        
+    
+    
+    
+    <link rel="contents" href="index.html" title="MySQL Manual" /><link rel="start" href="index.html" title="MySQL Manual" /><link rel="prev" href="error-flags.html" title="10.12 Error Flags and Functions"/><link rel="next" href="bitmaps.html?ff=nopfpls" title="10.14 Bitmaps"/><link rel="up" href="algorithms.html" title="10 Important Algorithms and Structures"/>        <link rel="shortcut icon" href="common/themes/sakila/favicon.ico" />
+
+    
+        
+    
+    
+</head>
+
+<body class="doc" >
+
+<div id="container">
+
+<!--UdmComment-->
+<a class="skipToContent" href="#mainContent">Skip navigation links</a>
+
+    <div id="header" >
+
+    <div class="left">
+
+    <div id="logo">
+                                            <a href="http://dev.mysql.com/" title="MySQL">
+                            <img src="common/logos/logo-mysql-110x57.png" alt="MySQL" width="110" height="57" /></a>
+            </div>
+            <div id="tagline">The world's most popular open source database</div>
+
+    </div>
+
+    <div class="right">
+                <div id="login">
+            <p>
+                <a class="contact_us" href="http://www.mysql.com/about/contact/">Contact MySQL</a> |
+        
+                             <a href="https://dev.mysql.com/auth/login/?dest=http%3a%2f%2fdev.mysql.com%2Fdoc%2Finternals%2Fen%2Fmysys-functions.html">Login</a> | <a href="https://dev.mysql.com/auth/register/">Register</a>
+                        </p>
+        </div>
+
+        <div id="search_box"> <!-- Start Search -->
+        		<form id="searchform" name="searchform" method="get" action="http://search.oracle.com/search/search">
+			<input type="text" id="q" name="q" value="Search" class="swap_value" onfocus="this.value='';" />
+			<input type="hidden" id="search_dest" name="group" value="MySQL"/>
+			<input type="image" src="common/themes/sakila/search_g.png" id="go" alt="Search" title="Search" />
+		    </form>        </div> <!-- End Search -->
+
+    </div>
+
+    </div> 
+
+    <!-- MySQL Navigation -->
+    <div id="nav_container">
+    
+    <div id="flags">
+        <ul>
+            <li style="position: relative; top: -5px;">
+                <!-- Icons from http://icondock.com/free/vector-social-media-icons //-->
+                <a href="http://www.facebook.com/mysql"><img class="facebook-icon" src="common/themes/sakila/sp.gif" alt="fb" title="Join us on Facebook" width="20" height="20" /></a>&nbsp;
+                <a href="https://plus.google.com/+mysql"><img class="googleplus-icon" src="common/themes/sakila/sp.gif" alt="g+" title="Join Google+ to follow MySQL" width="20" height="20" /></a>&nbsp;
+                <a href="https://twitter.com/#!/mysql"><img class="twitter-icon" src="common/themes/sakila/sp.gif" alt="tw" title="Follow us on Twitter" width="20" height="20" /></a>&nbsp;
+                <a href="http://www.youtube.com/mysqlchannel"><img class="youtube-icon" src="common/themes/sakila/sp.gif" alt="yt" title="Visit our YouTube channel" width="20" height="20" /></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </li>
+                            
+                        </ul>
+    </div>
+
+        <div id="nav-tabs">
+    <ul>
+        <li class="off-left-end"></li>
+        <li><a href="http://www.mysql.com">MySQL.com</a></li>
+        <li class="off-mid"></li>
+        <li><a href="http://www.mysql.com/downloads/">Downloads</a></li>
+        <li class="on-left"></li>
+        <li class="current"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+        <li class="on-right"></li>
+        <li><a href="http://dev.mysql.com">Developer Zone</a></li>
+        <li class="off-right-end"></li>
+    </ul>
+    </div>
+
+        
+        <div id="mysql_menu">
+            <ul>
+	<li class="current"><a class="current " href="/doc/">MySQL Server</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-enterprise.html">MySQL Enterprise</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-gui.html">Workbench</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-utils-fabric.html">Utilities/Fabric</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-cluster.html">Cluster</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-connectors.html">Connectors</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-topic.html">Topic Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-expert.html">Expert Guides</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-other.html">Other Docs</a>
+	
+		
+		
+	</li>
+	
+	<li class="link"><a  href="/doc/index-archive.html">Archives</a>
+	
+		
+		
+	</li>
+	
+	<li class="link last"><a  href="/doc/index-about.html">About</a>
+	
+		
+		
+	</li>
+	
+</ul>
+        </div>
+
+                        <div id="og_sakila">&nbsp;</div>
+                    <div id="og_title">&nbsp;</div>
+        
+    </div>
+    <!-- End Navigation Container -->
+
+<!--/UdmComment-->
+
+<div class="page_container">
+    <div class="page_sidebar">
+	<!--UdmCommentTest-->
+
+	<div id="menu_title"></div>
+
+	<div id="menu">
+		<ul>
+			<li class="current"><a class="current subitems" href="/doc/index.html">Documentation Library</a>
+
+			<ul class="subitems1">
+				 <li><a href="index.html"><b>Table of Contents</b></a>
+
+
+				 <ul class="subitems2">
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.7 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.6 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.5 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.1 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 5.0 Manual</a>  					
+				 	</li>
+
+				 
+				 					 		<li>
+					 	<a href="" >MySQL 3.23/4.0/4.1 Manual</a>  					
+				 	</li>
+
+				 
+				 </ul>
+
+
+
+				 </li>
+
+
+			</ul>
+
+
+			</li>
+		</ul>
+
+	 <div class="searchmanual">
+			<form action="http://search.oracle.com/search/search" method="get" id="docsearch">
+		<strong><label for="searchq">Search manual:</label></strong>
+		<br />
+		<input id="searchq" type="text" name="q" value="" size="14" />
+		<input id="searchsubmit" type="submit" value="Go" />
+		<input id="searchgroup" type="hidden" name="group" value="MySQL" />
+	</form>	 </div>
+
+
+	</div>
+
+	
+</div>  
+<!-- Main content -->
+
+<div id="page" class="sidebar" >
+
+    
+
+
+
+
+	<!--UdmComment-->
+
+<div id="docheader"><a href="index.html"> MySQL Internals Manual</a> :: <a href="algorithms.html">10 Important Algorithms and Structures</a> :: 10.13 Functions in the mysys Library</div>
+
+	 
+	
+
+	
+<script language="javascript">
+
+<!--
+function toggle(what){
+ if(document.getElementById(what).style.display == "none"){
+   document.getElementById(what).style.display = "block";
+ }else{
+   document.getElementById(what).style.display = "none";
+ }
+}
+//-->
+
+</script>
+<noscript></noscript>
+
+<div style="float: right; width: 250px; margin: 0px 0px 8px 8px; background: white">
+	<div style="text-align: right; font-size: 90%; margin-bottom: 4px">
+		<div style="text-align: left;"><a style="text-decoration: none" href="error-flags.html" title="Previous Section">&laquo; 10.12 Error Flags and Functions</a></div>
+		<hr size="1" noshade="noshade" align="center" width="40" style="margin: 0px auto 2px auto" />		<a style="text-decoration: none" href="bitmaps.html" title="Next Section">10.14 Bitmaps  &raquo;</a>	</div>
+	<div style="padding: 4px 0px 0px 4px; border: 2px dotted #ccc; border-right: none;">
+		<b>Section Navigation</b> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="#" onclick="toggle('sectionnav');"  onkeypress="if (event.keyCode == 13) { toggle('sectionnav'); }">Toggle</a>]</small>
+			<ul id="sectionnav">
+				<li class="p"><a href="algorithms.html">10 Important Algorithms and Structures</a></li><li><a href="item-class.html">10.1 The Item Class</a></li>
+<li><a href="filesort.html">10.2 How MySQL Does Sorting (filesort)</a></li>
+<li><a href="bulk-insert.html">10.3 Bulk Insert</a></li>
+<li><a href="caching.html">10.4 How MySQL Does Caching</a></li>
+<li><a href="join-buffer-size.html">10.5 How MySQL Uses the Join Buffer Cache</a></li>
+<li><a href="flush-tables.html">10.6 How MySQL Handles FLUSH TABLES</a></li>
+<li><a href="full-text-search.html">10.7 Full-Text Search</a></li>
+<li><a href="floating-point-types.html">10.8 FLOAT and DOUBLE Data Type Representation</a></li>
+<li><a href="date-and-time-data-type-representation.html">10.9 Date and Time Data Type Representation</a></li>
+<li><a href="threads.html">10.10 Threads</a></li>
+<li><a href="charsets.html">10.11 Character Sets and Collations</a></li>
+<li><a href="error-flags.html">10.12 Error Flags and Functions</a></li>
+<li class="self">10.13 Functions in the mysys Library</li>
+<li><a href="bitmaps.html">10.14 Bitmaps</a></li>
+</ul>
+
+			</ul>		
+	</div>
+
+</div>
+<!--/UdmComment-->
+
+<div class="section">
+<div class="titlepage">
+<div>
+<div>
+<h2 class="title"><a name="mysys-functions"></a>10.13 Functions in the mysys Library</h2>
+
+</div>
+
+</div>
+
+</div>
+<p>
+      Functions in <code class="literal">mysys</code>: (For flags see
+      <code class="literal">my_sys.h</code>)
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_copy _A((const char *from, const char *to, myf
+          MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Copy file from <code class="literal">from</code> to <code class="literal">to</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_rename _A((const char *from, const char *to,
+          myf MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Rename file from <code class="literal">from</code> to <code class="literal">to</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_delete _A((const char *name, myf
+          MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Delete file <code class="literal">name</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_redel _A((const char *from, const char *to,
+          int MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Delete <code class="literal">from</code> before rename of
+      <code class="literal">to</code> to <code class="literal">from</code>. Copies state
+      from old file to new file. If <code class="literal">MY_COPY_TIME</code> is
+      set, sets old time.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_getwd _A((string buf, uint size, myf
+          MyFlags));</code> , <code class="literal">int my_setwd _A((const char
+          *dir, myf MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Get and set working directory.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">string my_tempnam _A((const char *dir, const char
+          *pfx, myf MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Make a unique temporary file name by using <code class="literal">dir</code>
+      and adding something after <code class="literal">pfx</code> to make the name
+      unique. The file name is made by adding a unique six character
+      string and <code class="literal">TMP_EXT</code> after
+      <code class="literal">pfx</code>. Returns pointer to
+      <code class="literal">malloc()</code>'ed area for filename. Should be freed
+      by <code class="literal">free()</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">File my_open _A((const char *FileName,int Flags,myf
+          MyFlags));</code> , <code class="literal">File my_create _A((const char
+          *FileName, int CreateFlags, int AccsesFlags, myf
+          MyFlags));</code> , <code class="literal">int my_close _A((File Filedes,
+          myf MyFlags));</code> , <code class="literal">uint my_read _A((File
+          Filedes, byte *Buffer, uint Count, myf MyFlags));</code> ,
+          <code class="literal">uint my_write _A((File Filedes, const byte *Buffer,
+          uint Count, myf MyFlags));</code> , <code class="literal">ulong my_seek
+          _A((File fd,ulong pos,int whence,myf MyFlags));</code> ,
+          <code class="literal">ulong my_tell _A((File fd,myf MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Use instead of open, open-with-create-flag, close, read, and write
+      to get automatic error messages (flag <code class="literal">MYF_WME</code>)
+      and only have to test for != MY_NABP&lt;/code&gt;).
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">FILE *my_fopen _A((const char *FileName,int Flags,myf
+          MyFlags));</code> , <code class="literal">FILE *my_fdopen _A((File
+          Filedes,int Flags,myf MyFlags));</code> , <code class="literal">int
+          my_fclose _A((FILE *fd,myf MyFlags));</code> ,
+          <code class="literal">uint my_fread _A((FILE *stream,byte *Buffer,uint
+          Count,myf MyFlags));</code> , <code class="literal">uint my_fwrite
+          _A((FILE *stream,const byte *Buffer,uint Count, myf
+          MyFlags));</code> , <code class="literal">ulong my_fseek _A((FILE
+          *stream,ulong pos,int whence,myf MyFlags));</code> ,
+          <code class="literal">ulong my_ftell _A((FILE *stream,myf
+          MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Same read-interface for streams as for files.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">gptr _mymalloc _A((uint uSize,const char *sFile,uint
+          uLine, myf MyFlag));</code> , <code class="literal">gptr _myrealloc
+          _A((string pPtr,uint uSize,const char *sFile,uint uLine, myf
+          MyFlag));</code> , <code class="literal">void _myfree _A((gptr
+          pPtr,const char *sFile,uint uLine));</code> , <code class="literal">int
+          _sanity _A((const char *sFile,unsigned int uLine));</code>
+          , <code class="literal">gptr _myget_copy_of_memory _A((const byte
+          *from,uint length,const char *sFile, uint uLine,myf
+          MyFlag));</code>
+</p></li></ul>
+</div>
+<p>
+      <code class="literal">malloc(size,myflag)</code> is mapped to these
+      functions if not compiled with <code class="literal">-DSAFEMALLOC</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void TERMINATE _A((void));</code>
+</p></li></ul>
+</div>
+<p>
+      Writes <code class="literal">malloc()</code> info on
+      <code class="literal">stdout</code> if compiled with
+      <code class="literal">-DSAFEMALLOC</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_chsize _A((File fd, ulong newlength, myf
+          MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Change size of file <code class="literal">fd</code> to
+      <code class="literal">newlength</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void my_error _D((int nr, myf MyFlags,
+          ...));</code>
+</p></li></ul>
+</div>
+<p>
+      Writes message using error number (see
+      <code class="literal">mysys/errors.h</code>) on <code class="literal">stdout</code>,
+      or using curses, if <code class="literal">MYSYS_PROGRAM_USES_CURSES()</code>
+      has been called.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void my_message _A((const char *str, myf
+          MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Writes <code class="literal">str</code> on <code class="literal">stdout</code>, or
+      using curses, if <code class="literal">MYSYS_PROGRAM_USES_CURSES()</code>
+      has been called.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void my_init _A((void ));</code>
+</p></li></ul>
+</div>
+<p>
+      Start each program (in <code class="literal">main()</code>) with this.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void my_end _A((int infoflag));</code>
+</p></li></ul>
+</div>
+<p>
+      Gives info about program. If <code class="literal">infoflag &amp;
+      MY_CHECK_ERROR</code>, prints if some files are left open. If
+      <code class="literal">infoflag &amp; MY_GIVE_INFO</code>, prints timing info
+      and <code class="literal">malloc()</code> info about program.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int my_copystat _A((const char *from, const char *to,
+          int MyFlags));</code>
+</p></li></ul>
+</div>
+<p>
+      Copy state from old file to new file. If
+      <code class="literal">MY_COPY_TIME</code> is set, sets old time.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">string my_filename _A((File fd));</code>
+</p></li></ul>
+</div>
+<p>
+      Returns filename of open file.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int dirname _A((string to, const char
+          *name));</code>
+</p></li></ul>
+</div>
+<p>
+      Copy name of directory from filename.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int test_if_hard_path _A((const char
+          *dir_name));</code>
+</p></li></ul>
+</div>
+<p>
+      Test if <code class="literal">dir_name</code> is a hard path (starts from
+      root).
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void convert_dirname _A((string name));</code>
+</p></li></ul>
+</div>
+<p>
+      Convert dirname according to system. On Windows, changes all
+      characters to capitals and changes '<code class="literal">/</code>' to
+      '<code class="literal">\</code>'.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">string fn_ext _A((const char *name));</code>
+</p></li></ul>
+</div>
+<p>
+      Returns pointer to extension in filename.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">string fn_format _A((string to,const char *name,const
+          char *dsk,const char *form,int flag));</code>
+</p></li></ul>
+</div>
+<p>
+      Format a filename with replacement of library and extension and
+      convert between different systems. The <code class="literal">to</code> and
+      <code class="literal">name</code> parameters may be identical. Function
+      doesn't change name if <code class="literal">name</code> !=
+      <code class="literal">to</code>. <code class="literal">flag</code> may be:
+</p>
+<div class="informaltable">
+<table border="1"><colgroup><col class="c1"><col class="c2"></colgroup><tbody><tr><td scope="row"><p>
+                1
+              </p></td><td><p>
+                Force replace filenames library with 'dsk'
+              </p></td></tr><tr><td scope="row"><p>
+                2
+              </p></td><td><p>
+                Force replace extension with 'form' */
+              </p></td></tr><tr><td scope="row"><p>
+                4
+              </p></td><td><p>
+                Force unpack filename (replace <code class="literal">~</code> with
+                home directory)
+              </p></td></tr><tr><td scope="row"><p>
+                8
+              </p></td><td><p>
+                Pack filename as short as possible for output to user
+</p></td></tr></tbody></table>
+</div>
+<p>
+      All open requests should always use at least
+      <code class="literal">open(fn_format(temp_buffer, name, " ", " ", 4),
+      ...)</code> to unpack home and convert filename to system-form.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">string fn_same _A((string toname, const char *name,
+          int flag));</code>
+</p></li></ul>
+</div>
+<p>
+      Copies directory and extension from <code class="literal">name</code> to
+      <code class="literal">toname</code> if needed. Copying can be forced by same
+      flags used in <code class="literal">fn_format()</code>.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int wild_compare _A((const char *str, const char
+          *wildstr));</code>
+</p></li></ul>
+</div>
+<p>
+      Compare if <code class="literal">str</code> matches
+      <code class="literal">wildstr</code>. <code class="literal">wildstr</code> can contain
+      '<code class="literal">*</code>' and '<code class="literal">?</code>' as wildcard
+      characters. Returns 0 if <code class="literal">str</code> and
+      <code class="literal">wildstr</code> match.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void get_date _A((string to, int
+          timeflag));</code>
+</p></li></ul>
+</div>
+<p>
+      Get current date in a form ready for printing.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void soundex _A((string out_pntr, string
+          in_pntr))</code>
+</p></li></ul>
+</div>
+<p>
+      Makes <code class="literal">in_pntr</code> to a 5 char long string. All
+      words that sound alike have the same string.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">int init_key_cache _A((ulong use_mem, ulong
+          leave_this_much_mem));</code>
+</p></li></ul>
+</div>
+<p>
+      Use caching of keys in MISAM, PISAM, and ISAM.
+      <code class="literal">KEY_CACHE_SIZE</code> is a good size. Remember to lock
+      databases for optimal caching.
+</p>
+<div class="itemizedlist">
+<ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p>
+          <code class="literal">void end_key_cache _A((void));</code>
+</p></li></ul>
+</div>
+<p>
+      End key caching.
+</p>
+</div>
+<div class="copyright-footer">
+
+</div>
+<!--UdmComment--><div id="docnav"><a rel="prev" href="error-flags.html" title="10.12 Error Flags and Functions">Previous</a> / <a rel="next" href="bitmaps.html" title="10.14 Bitmaps">Next</a> / <a rel="up" href="algorithms.html" title="10 Important Algorithms and Structures">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--><br class="clear" /><!--UdmComment--><div id="comments"><h1>User Comments</h1><p><form method="POST" action="/doc/mysql/comment.php">
+          <input type="hidden" name="sect" value="mysys-functions" />
+          <input type="hidden" name="return" value="/doc/internals/en/mysys-functions.html" />
+          <input type="submit" value="Add your own comment" />
+          </form></p></div><!--UdmComment--><div id="docnav"><a href="#">Top</a> / <a rel="prev" href="error-flags.html" title="10.12 Error Flags and Functions">Previous</a> / <a rel="next" href="bitmaps.html" title="10.14 Bitmaps">Next</a> / <a rel="up" href="algorithms.html" title="10 Important Algorithms and Structures">Up</a> / <a rel="contents" href="index.html">Table of Contents</a></div><!--/UdmComment--></div></div>
+
+
+
+
+
+</div> <!--End Container -->
+
+
+
+
+ </div> 
+</div> 
+<div id="footer">
+    <div class="five-col">
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com">Developer Zone</a></li>
+                <li><a href="http://dev.mysql.com/articles/">Developer Articles</a></li>
+                <li><a href="http://forums.mysql.com/">Forums</a></li>
+                <li><a href="http://bugs.mysql.com/">Bugs</a></li>
+                <li><a href="http://dev.mysql.com/worklog/">Worklog</a></li>
+                                <li><a href="http://planet.mysql.com/">Planet MySQL</a></li>
+                            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/downloads/">Downloads</a></li>
+                <li><a href="http://dev.mysql.com/downloads/mysql/">MySQL Community Server</a></li>
+                <li><a href="http://dev.mysql.com/downloads/cluster/">MySQL Cluster</a></li>
+                <li><a href="http://dev.mysql.com/downloads/fabric/">MySQL Fabric</a></li>
+                <li><a href="http://dev.mysql.com/downloads/utilities/">MySQL Utilities</a></li>
+                <li><a href="http://dev.mysql.com/downloads/workbench/">MySQL Workbench</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://dev.mysql.com/doc/">Documentation</a></li>
+                <li><a href="http://dev.mysql.com/doc/">MySQL Reference Manuals</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-gui.html">MySQL Workbench</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-expert.html">Expert Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-topic.html">Topic Guides</a></li>
+                <li><a href="http://dev.mysql.com/doc/index-cluster.html">MySQL Cluster</a></li>
+            </ul>
+        </div>
+
+
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/">About MySQL</a></li>
+                <li><a href="http://www.mysql.com/about/contact/">Contact Us</a></li>
+                                 <li><a href="http://www.mysql.com/buy-mysql/">How to Buy</a></li>
+                <li><a href="http://www.mysql.com/partners/">Partners</a></li>
+                <li><a href="http://www.mysql.com/about/jobs/">Job Opportunities</a></li>
+                <li><a href="http://www.mysql.com/sitemap.html">Site Map</a></li>
+            </ul>
+        </div>
+    
+        <div class="links">
+            <ul>
+                <li class="top"><a href="http://www.mysql.com/about/legal/">Legal</a></li>
+                <li><a href="http://www.mysql.com/about/legal/">Legal Policies</a></li>
+                <li><a href="http://www.oracle.com/us/legal/privacy/index.htm">Your Privacy Rights</a></li>
+                <li><a href="http://www.oracle.com/us/legal/terms/index.html">Terms of Use</a></li>
+                <li><a href="http://www.oracle.com/us/legal/third-party-trademarks/index.html">Trademark Policy</a></li>
+                <li><a href="http://www.oracle.com/technetwork/community/oca-486395.html">Contributor Agreement</a></li>
+            </ul>
+        </div>
+    
+                <div id="search" class="en">
+                <form id="footer_search" action="http://search.oracle.com/search/search" method="get">
+            <input type="text" id="f_q" name="q" value="" class="swap_value" />
+	    <input type="hidden"  name="group" value="MySQL"/>
+	    <input type="image" src="common/themes/sakila/footer_search_g.png" id="f_go" alt="Search" title="Search" />
+        </form>        </div>
+            
+    </div>
+</div><!-- End Footer -->
+
+<div id="copyright-oracle"><a href="http://www.oracle.com/"><img src="common/logos/logo-oracle-red-91x22.gif" alt="Oracle" width="91" height="22" /></a>&nbsp;&nbsp;<span>&copy; 2015, Oracle Corporation and/or its affiliates</span></div>
+
+
+<script src="common/js/metrics/s_code_remote.js"></script>
+
+</body>
+</html>
