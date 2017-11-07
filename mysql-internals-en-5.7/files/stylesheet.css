@@ -1,0 +1,893 @@
+.admon-title {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.75em;
+    font-weight: bold
+    }
+.blockquote {
+    display: block;
+    margin-bottom: 1em;
+    margin-left: 1em;
+    margin-right: 1em;
+    margin-top: 1em
+    }
+.c {
+    display: table-column
+    }
+.calibre {
+    color: #000;
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    margin-bottom: 0;
+    margin-left: 5pt;
+    margin-right: 5pt;
+    margin-top: 0;
+    padding-left: 0;
+    padding-right: 0
+    }
+.calibre1 {
+    display: block;
+    font-size: 1.83333em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0.67em
+    }
+.calibre2 {
+    display: block;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em
+    }
+.calibre3 {
+    font-weight: bold
+    }
+.calibre4 {
+    display: block;
+    page-break-after: always
+    }
+.calibre5 {
+    display: block;
+    margin-left: 40px
+    }
+.calibre6 {
+    display: block;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0
+    }
+.calibre7 {
+    line-height: 1.2
+    }
+.calibre8 {
+    border-bottom-color: currentColor;
+    border-bottom-style: inset;
+    border-bottom-width: 1px;
+    border-left-color: currentColor;
+    border-left-style: inset;
+    border-left-width: 1px;
+    border-right-color: currentColor;
+    border-right-style: inset;
+    border-right-width: 1px;
+    border-top-color: currentColor;
+    border-top-style: inset;
+    border-top-width: 1px;
+    color: gray;
+    display: block;
+    height: 2px;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0.5em
+    }
+.calibre9 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1.2;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em;
+    max-width: 720px
+    }
+.calibre10 {
+    background-color: inherit;
+    color: inherit;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 0.75em;
+    font-weight: bold;
+    padding-bottom: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px
+    }
+.calibre11 {
+    background-color: inherit;
+    color: inherit;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    padding-bottom: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px
+    }
+.calibre12 {
+    background-color: white;
+    color: #033;
+    font-size: 1em;
+    font-style: italic;
+    font-weight: normal
+    }
+.calibre13 {
+    background-color: white;
+    color: #033;
+    font-style: italic;
+    font-weight: bold
+    }
+.calibre14 {
+    background-color: white;
+    color: #033;
+    font-size: 1em;
+    font-style: italic;
+    font-weight: normal;
+    line-height: 1.2
+    }
+.calibre15 {
+    background-color: inherit;
+    color: inherit;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.2;
+    padding-bottom: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px
+    }
+.calibre16 {
+    border-bottom-color: currentColor;
+    border-bottom-style: none;
+    border-bottom-width: medium;
+    border-collapse: separate;
+    border-left-color: currentColor;
+    border-left-style: none;
+    border-left-width: medium;
+    border-right-color: currentColor;
+    border-right-style: none;
+    border-right-width: medium;
+    border-spacing: 2px;
+    border-top-color: currentColor;
+    border-top-style: none;
+    border-top-width: medium;
+    display: table;
+    margin-bottom: 0;
+    margin-top: 0;
+    max-width: 660px;
+    text-indent: 0
+    }
+.calibre17 {
+    display: table-column-group
+    }
+.calibre18 {
+    display: table-row-group;
+    vertical-align: middle
+    }
+.calibre19 {
+    display: table-row;
+    vertical-align: top
+    }
+.calibre20 {
+    border-bottom-color: gray;
+    border-bottom-style: outset;
+    border-bottom-width: 0.1em;
+    border-left-color: gray;
+    border-left-style: outset;
+    border-left-width: 0.1em;
+    border-right-color: gray;
+    border-right-style: outset;
+    border-right-width: 0.1em;
+    border-top-color: gray;
+    border-top-style: outset;
+    border-top-width: 0.1em;
+    display: table-cell;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    padding-bottom: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0;
+    text-align: inherit;
+    vertical-align: inherit
+    }
+.calibre21 {
+    background-color: white;
+    color: black;
+    font-family: Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: bold
+    }
+.calibre22 {
+    display: table-header-group;
+    vertical-align: middle
+    }
+.calibre23 {
+    background-color: white;
+    border-bottom-color: gray;
+    border-bottom-style: solid;
+    border-bottom-width: 0.1em;
+    border-left-color: gray;
+    border-left-style: solid;
+    border-left-width: 0.1em;
+    border-right-color: gray;
+    border-right-style: solid;
+    border-right-width: 0.1em;
+    border-top-color: gray;
+    border-top-style: solid;
+    border-top-width: 0.1em;
+    color: black;
+    display: table-cell;
+    font-family: Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: bold;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    padding-bottom: 3px;
+    padding-left: 3px;
+    padding-right: 3px;
+    padding-top: 3px;
+    vertical-align: inherit
+    }
+.calibre24 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.58333em;
+    font-weight: bold;
+    margin-bottom: 2.33em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 2.33em
+    }
+.calibre25 {
+    font-size: 0.75em;
+    line-height: normal;
+    vertical-align: super
+    }
+.calibre26 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.75em;
+    font-weight: bold;
+    margin-bottom: 1.67em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1.67em
+    }
+.calibre27 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    margin-bottom: 1.33em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1.33em
+    }
+.calibre28 {
+    background-color: white;
+    color: #0e4075;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 0.75em;
+    font-weight: normal
+    }
+.calibre29 {
+    height: auto;
+    width: auto
+    }
+.calibre30 {
+    border-bottom-color: gray;
+    border-bottom-style: outset;
+    border-bottom-width: 0.1em;
+    border-left-color: gray;
+    border-left-style: outset;
+    border-left-width: 0.1em;
+    border-right-color: gray;
+    border-right-style: outset;
+    border-right-width: 0.1em;
+    border-top-color: gray;
+    border-top-style: outset;
+    border-top-width: 0.1em;
+    display: table-cell;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    padding-bottom: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0;
+    text-align: left;
+    vertical-align: inherit
+    }
+.calibre31 {
+    background-color: inherit;
+    color: inherit;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    padding-bottom: 1px;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 1px;
+    text-decoration: underline
+    }
+.calibre32 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 0.75em;
+    height: 100%;
+    line-height: 125%;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 5px;
+    max-width: 720px
+    }
+.calibre33 {
+    border-bottom-color: gray;
+    border-bottom-style: outset;
+    border-bottom-width: 0.1em;
+    border-left-color: gray;
+    border-left-style: outset;
+    border-left-width: 0.1em;
+    border-right-color: gray;
+    border-right-style: outset;
+    border-right-width: 0.1em;
+    border-top-color: gray;
+    border-top-style: outset;
+    border-top-width: 0.1em;
+    display: table-cell;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1.2;
+    padding-bottom: 0;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 0;
+    text-align: inherit;
+    vertical-align: inherit
+    }
+.calibre34 {
+    color: #026789;
+    display: block;
+    font-size: 1.83333em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em
+    }
+.caution {
+    border-left-color: yellow;
+    border-left-style: solid;
+    border-left-width: 5px;
+    display: block;
+    margin-left: 0.5in;
+    margin-right: 0.5in;
+    padding-left: 5px
+    }
+.filename {
+    background-color: white;
+    color: #900;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.2
+    }
+.filename1 {
+    background-color: white;
+    color: #900;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: normal
+    }
+.filename2 {
+    background-color: white;
+    color: #900;
+    font-family: monospace;
+    font-size: 1em
+    }
+.firstterm {
+    border-bottom-color: green;
+    border-bottom-style: dotted;
+    border-bottom-width: 1px;
+    color: black;
+    font-size: 1em;
+    font-style: normal;
+    text-decoration: none
+    }
+.footnote {
+    font-size: 0.75em;
+    font-weight: normal;
+    line-height: normal;
+    margin-left: 3px;
+    vertical-align: super
+    }
+.itemizedlist {
+    display: block;
+    list-style-type: disc;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em
+    }
+.itemizedlist1 {
+    display: block;
+    list-style-type: circle;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0
+    }
+.itemizedlist2 {
+    display: block;
+    list-style-type: disc;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0
+    }
+.itemizedlist3 {
+    display: block;
+    list-style-type: square;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0
+    }
+.listitem {
+    display: list-item;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1.2;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: decimal;
+    vertical-align: middle
+    }
+.listitem1 {
+    display: list-item;
+    font-size: 1em;
+    line-height: 1.2;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: disc;
+    vertical-align: middle
+    }
+.listitem2 {
+    display: list-item;
+    font-size: 1em;
+    line-height: 1.2;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: square;
+    vertical-align: middle
+    }
+.listitem3 {
+    display: list-item;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1.2;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: lower-alpha;
+    vertical-align: middle
+    }
+.listitem4 {
+    display: list-item;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    line-height: 1.2;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: square;
+    vertical-align: middle
+    }
+.listitem5 {
+    display: list-item;
+    font-size: 1em;
+    line-height: 1.2;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: circle;
+    vertical-align: middle
+    }
+.literal {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.2
+    }
+.literal1 {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold
+    }
+.literal2 {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    text-decoration: underline
+    }
+.literal3 {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 0.75em;
+    font-weight: bold
+    }
+.literal4 {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: bold;
+    line-height: 1.2;
+    text-decoration: underline
+    }
+.literal5 {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 0.75em;
+    font-weight: bold;
+    text-decoration: underline
+    }
+.literal6 {
+    background-color: white;
+    color: #026789;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1.125em;
+    font-weight: bold;
+    line-height: 1.2
+    }
+.literal7 {
+    font-family: monospace;
+    font-size: 1em
+    }
+.literal8 {
+    font-family: monospace;
+    font-size: 1em;
+    line-height: 1.2
+    }
+.note {
+    border-left-color: black;
+    border-left-style: solid;
+    border-left-width: 5px;
+    display: block;
+    margin-left: 0.5in;
+    margin-right: 0.5in;
+    padding-left: 5px
+    }
+.option {
+    background-color: white;
+    color: #0e4075;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: normal;
+    text-decoration: underline
+    }
+.option1 {
+    background-color: white;
+    color: #0e4075;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: normal
+    }
+.option2 {
+    background-color: white;
+    color: #0e4075;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.2;
+    text-decoration: underline
+    }
+.option3 {
+    background-color: white;
+    color: #0e4075;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    font-weight: normal;
+    line-height: 1.2
+    }
+.orderedlist {
+    display: block;
+    list-style-type: decimal;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em
+    }
+.orderedlist1 {
+    display: block;
+    list-style-type: decimal;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0
+    }
+.para {
+    font-size: 1em;
+    font-weight: normal;
+    line-height: normal;
+    margin-left: 3px;
+    vertical-align: super
+    }
+.programlisting {
+    background: #eee;
+    background-color: white;
+    color: black;
+    display: block;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    line-height: 20px;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em;
+    max-width: 720px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    white-space: pre
+    }
+.programlisting1 {
+    background: #eee;
+    color: black;
+    display: block;
+    font-family: monospace;
+    font-size: 1em;
+    line-height: 20px;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em;
+    max-width: 720px;
+    padding-bottom: 2px;
+    padding-left: 2px;
+    padding-right: 2px;
+    padding-top: 2px;
+    white-space: pre
+    }
+.quote {
+    border-bottom-color: currentColor;
+    border-bottom-style: none;
+    border-bottom-width: 0;
+    border-left-color: currentColor;
+    border-left-style: none;
+    border-left-width: 0;
+    border-right-color: currentColor;
+    border-right-style: none;
+    border-right-width: 0;
+    border-top-color: currentColor;
+    border-top-style: none;
+    border-top-width: 0;
+    font-family: inherit;
+    font-size: 1em;
+    font-style: inherit;
+    font-weight: inherit;
+    line-height: 1.2;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    width: 100%
+    }
+.quote1 {
+    border-bottom-color: currentColor;
+    border-bottom-style: none;
+    border-bottom-width: 0;
+    border-left-color: currentColor;
+    border-left-style: none;
+    border-left-width: 0;
+    border-right-color: currentColor;
+    border-right-style: none;
+    border-right-width: 0;
+    border-top-color: currentColor;
+    border-top-style: none;
+    border-top-width: 0;
+    font-family: inherit;
+    font-size: 1em;
+    font-style: inherit;
+    font-weight: inherit;
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    width: 100%
+    }
+.replaceable {
+    font-size: 1em;
+    font-style: italic
+    }
+.replaceable1 {
+    font-size: 1em;
+    font-style: italic;
+    line-height: 1.2
+    }
+.screen {
+    background-color: white;
+    color: #a1520f;
+    display: block;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em;
+    white-space: pre
+    }
+.screen1 {
+    background-color: white;
+    color: #a1520f;
+    display: block;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 0.75em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em;
+    white-space: pre
+    }
+.tip {
+    display: block;
+    margin-left: 0.5in;
+    margin-right: 0.5in
+    }
+.title {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 2em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0.67em
+    }
+.title1 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em;
+    max-width: 720px
+    }
+.title2 {
+    background-color: white;
+    color: black;
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.66667em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 0.83em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0.83em
+    }
+.title3 {
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.83333em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0.67em
+    }
+.title4 {
+    background-color: white;
+    color: black;
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.41667em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1em
+    }
+.title5 {
+    background-color: white;
+    color: black;
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.41667em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 1.33em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1.33em
+    }
+.title6 {
+    background-color: white;
+    color: black;
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1.125em;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 1.67em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 1.67em
+    }
+.title7 {
+    background-color: white;
+    color: black;
+    display: block;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 1em;
+    font-weight: bold;
+    margin-bottom: 2.33em;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 2.33em
+    }
+.toc {
+    display: block
+    }
+.type {
+    display: table-column;
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 1em
+    }
+.type1 {
+    font-family: "Courier New", Courier, fixed, monospace;
+    font-size: 0.75em
+    }
+.warning {
+    border-left-color: red;
+    border-left-style: solid;
+    border-left-width: 5px;
+    display: block;
+    margin-left: 0.5in;
+    margin-right: 0.5in;
+    padding-left: 5px
+    }
+.pcalibre:visited {
+    color: rgb(1, 90, 132);
+    text-decoration: underline
+    }
+.pcalibre1:link {
+    color: #00759f;
+    text-decoration: underline
+    }

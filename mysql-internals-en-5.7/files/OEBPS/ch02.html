@@ -1,0 +1,4433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <title>Chapter 2 Coding Guidelines</title>
+    <meta name="generator" content="DocBook XSL Stylesheets V1.78.1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <link href="../stylesheet.css" rel="stylesheet" type="text/css"/>
+<link href="../page_styles.css" rel="stylesheet" type="text/css"/>
+
+  
+
+
+<link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet" />
+
+</head>
+<body>
+
+<div class="calibreMeta">
+  <div class="calibreMetaTitle">
+  
+  
+    
+    <h1>
+      <a href="../../index.html">MySQL Internals Manual
+</a>
+    </h1>
+    
+    
+  
+  </div>
+  <div class="calibreMetaAuthor">
+    Oracle
+
+  </div>
+</div>
+
+<div class="calibreMain">
+
+  <div class="calibreEbookContent">
+    
+      <div class="calibreEbNavTop">
+        
+          <a href="ch01s10.html" class="calibreAPrev">previous page</a>
+        
+
+        
+          <a href="ch02s02.html" class="calibreANext"> next page</a>
+        
+      </div>
+    
+
+    
+  <div class="toc">
+    <div class="toc">
+      <div class="toc">
+        <div class="toc">
+          <h1 class="title"><a id="coding-guidelines" class="calibre7 pcalibre pcalibre1"></a>Chapter 2 Coding Guidelines</h1>
+        </div>
+      </div>
+    </div>
+    <div class="toc">
+      <p class="title1">
+        <strong class="calibre3">Table of Contents</strong>
+      </p>
+      <dl class="calibre2">
+        <dt class="toc">
+          <span>
+            <a href="ch02.html#general-development-guidelines" class="pcalibre pcalibre1">2.1 General Development Guidelines</a>
+          </span>
+        </dt>
+        <dd class="calibre5">
+          <dl class="calibre6">
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#coding-guidelines-c" class="pcalibre pcalibre1">2.1.1 C/C++ Coding Guidelines of MySQL Server</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#maintaining-coding-guidelines" class="pcalibre pcalibre1">2.1.2 How We Maintain the Server Coding Guidelines</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#indentation-spacing" class="pcalibre pcalibre1">2.1.3 Indentation and Spacing</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#naming-conventions" class="pcalibre pcalibre1">2.1.4 Naming Conventions</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#commenting-code" class="pcalibre pcalibre1">2.1.5 Commenting Code</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#header-files" class="pcalibre pcalibre1">2.1.6 Header Files</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#additional-suggestions" class="pcalibre pcalibre1">2.1.7 Additional Suggestions</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#suggested-mode-emacs" class="pcalibre pcalibre1">2.1.8 Suggested Mode in emacs</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#basic-vim-setup" class="pcalibre pcalibre1">2.1.9 Basic vim Setup</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#alternative-vim-setup" class="pcalibre pcalibre1">2.1.10 Another vim Setup</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02.html#example-setup-ctags" class="pcalibre pcalibre1">2.1.11 Example Setup for ctags</a>
+              </span>
+            </dt>
+          </dl>
+        </dd>
+        <dt class="toc">
+          <span>
+            <a href="ch02s02.html" class="pcalibre pcalibre1">2.2 C++ Coding Guidelines for the NDB Storage Engine</a>
+          </span>
+        </dt>
+        <dd class="calibre5">
+          <dl class="calibre6">
+            <dt class="toc">
+              <span>
+                <a href="ch02s02.html#braces" class="pcalibre pcalibre1">2.2.1 Braces</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02s02.html#assignment" class="pcalibre pcalibre1">2.2.2 Assignment</a>
+              </span>
+            </dt>
+            <dt class="toc">
+              <span>
+                <a href="ch02s02.html#ndbrequire" class="pcalibre pcalibre1">2.2.3 Use of ndbrequire</a>
+              </span>
+            </dt>
+          </dl>
+        </dd>
+        <dt class="toc">
+          <span>
+            <a href="ch02s03.html" class="pcalibre pcalibre1">2.3 DBUG Tags</a>
+          </span>
+        </dt>
+      </dl>
+    </div>
+    <p class="title1">
+    This section shows the guidelines that MySQL's developers follow
+    when writing new code. Consistent style is important for us, because
+    everyone must know what to expect. For example, after we become
+    accustomed to seeing that everything inside an
+    <span><em class="calibre12">if</em></span> is indented two spaces, we can glance at a
+    listing and understand what's nested within what. Writing
+    non-conforming code can be bad. For example, if we want to find
+    where assignments are made to variable
+    <span><em class="calibre12">mutex_count</em></span>, we might search for
+    <span><em class="calibre12">mutex_count</em></span> with an editor and miss assignments
+    that look like <span><em class="calibre12">mutex_count =</em></span> with a space
+    before the equal sign (which is non-conforming). Knowing our rules,
+    you'll find it easier to read our code, and when you decide to
+    contribute (which we hope you'll consider!) we'll find it easier to
+    read and review your code.
+  </p>
+    <div class="toc">
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <h1 class="title"><a id="general-development-guidelines" class="calibre7 pcalibre pcalibre1"></a>2.1 General Development Guidelines</h1>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <ul class="itemizedlist">
+          <li class="listitem1">
+            <p class="calibre9">
+          We use Bazaar for source management.
+        </p>
+          </li>
+          <li class="listitem1">
+            <p class="calibre9">
+          You should use the TRUNK source tree (currently called
+          "mysql-trunk") for all new developments.The public development
+          branch can be downloaded with
+        </p>
+          </li>
+        </ul>
+      </div>
+      <p class="title1">
+      <code class="literal1">shell&gt; bzr branch lp:mysql-server
+      mysql-trunk</code>
+    </p>
+      <div class="toc">
+        <ul class="itemizedlist">
+          <li class="listitem1">
+            <p class="calibre9">
+          Before making big design decisions, please begin by posting a
+          summary of what you want to do, why you want to do it, and how
+          you plan to do it. This way we can easily provide you with
+          feedback and also discuss it thoroughly. Perhaps another
+          developer can assist you.
+        </p>
+          </li>
+        </ul>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="coding-guidelines-c" class="calibre7 pcalibre pcalibre1"></a>2.1.1 C/C++ Coding Guidelines of MySQL Server</h2>
+            </div>
+          </div>
+        </div>
+        <p class="title1">
+        This section covers guidelines for C/C++ code for the MySQL
+        server. The guidelines do not necessarily apply for other
+        projects such as MySQL Connector/J or Connector/ODBC.
+      </p>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="maintaining-coding-guidelines" class="calibre7 pcalibre pcalibre1"></a>2.1.2 How We Maintain the Server Coding Guidelines</h2>
+            </div>
+          </div>
+        </div>
+        <p class="title1">
+        We are committed to have a single coding style for core MySQL
+        server. Storage engines, however, may have an own coding style:
+        Falcon and NDB styles are documented later in this manual.
+      </p>
+        <p class="title1">
+        The server coding style is governed by a group of
+        representatives from each technical team: Optimizer, Runtime,
+        Replication, Backup Engines and the "general" team.
+      </p>
+        <p class="title1">
+        Currently these representatives are:
+      </p>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Runtime: Alexander Nozdrin
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Replication: Mats Kindahl
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Backup: Chuck Bell
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Optimizer: Tor Didriksen
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            General: Sergey Vojtovich
+          </p>
+            </li>
+          </ul>
+        </div>
+        <p class="title1">
+        The group accepts and considers change proposals. Each proposal
+        must include an implementation strategy, and is first published
+        on Internals mailing list for a public discussion. When the
+        discussion is over, the group of representatives holds a vote,
+        and the change is accepted if it's approved by a simple majority
+        of the ballots. The submitter of the change request then carries
+        out its implementation.
+      </p>
+        <p class="title1">
+        Now to the coding style itself.
+      </p>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="indentation-spacing" class="calibre7 pcalibre pcalibre1"></a>2.1.3 Indentation and Spacing</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            For indentation use space; do not use the tab (\t)
+            character. See the editor configuration tips at the end of
+            this section for instructions on configuring a vim or emacs
+            editor to use spaces instead of tabs.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Avoid trailing whitespace, in code and comments.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <p class="title1">
+        Correct:
+      </p>
+        <pre class="programlisting">if (a) </pre>
+        <p class="title1">
+        Incorrect:
+      </p>
+        <pre class="programlisting">if (a)&lt;SP&gt;&lt;SP&gt;&lt;TAB&gt;&lt;SP&gt; </pre>
+        <p class="title1">
+        Remove trailing spaces if you are already changing a line,
+        otherwise leave existing code intact.
+      </p>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Use line feed (\n) for line breaks. Do not use carriage
+            return + line feed (\r\n); that can cause problems for other
+            users and for builds. This rule is particularly important if
+            you use a Windows editor.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            To begin indenting, add two spaces. To end indenting,
+            subtract two spaces. For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+{
+  code, code, code
+  {
+    code, code, code
+  }
+}
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            An exception to the rule above: namespaces (named or
+            unnamed) do not introduce a new level of indentation.
+            Example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">namespace foo
+{
+class Bar
+{
+  Bar();
+};
+}  // namespace foo
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            The maximum line width is 80 characters. If you are writing
+            a longer line, try to break it at a logical point and
+            continue on the next line with the same indenting. Use of
+            backslash is okay; however, multi-line literals might cause
+            less confusion if they are defined before the function
+            start.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            You may use empty lines (two line breaks in a row) wherever
+            it seems helpful for readability. But never use two or more
+            empty lines in a row. The only exception is after a function
+            definition (see below).
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            To separate two functions, use three line breaks (two empty
+            lines). To separate a list of variable declarations from
+            executable statements, use two line breaks (one empty line).
+            For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+int function_1()
+{
+  int i;
+  int j;
+
+  function0();
+}
+
+
+int function2()
+{
+  return;
+}
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Matching '<code class="literal">{}</code>' (left and right braces)
+            should be in the same column, that is, the closing '}'
+            should be directly below the opening '{'. Do not put any
+            non-space characters on the same line as a brace, not even a
+            comment. Indent within braces. Exception: if there is
+            nothing between two braces, that is, '{}', they should
+            appear together. For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+if (code, code, code)
+{
+  code, code, code;
+}
+for (code, code, code)
+{}
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Indent <code class="literal">switch</code> like this:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+switch (condition)
+{
+case XXX:
+  statements;
+case YYY:
+  {
+    statements;
+  }
+}
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            You may align variable declarations like this:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+Type      value;
+int       var2;
+ulonglong var3;
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            When assigning to a variable, put zero spaces after the
+            target variable name, then the assignment operator ('=''+='
+            etc.), then space(s). For single assignments, there should
+            be only one space after the equal sign. For multiple
+            assignments, add additional spaces so that the source values
+            line up. For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+a/= b;
+return_value= my_function(arg1);
+...
+int x=          27;
+int new_var=    18;
+</pre>
+        <p class="title1">
+        Align assignments from one structure to another, like this:
+      </p>
+        <pre class="programlisting">
+foo-&gt;member=      bar-&gt;member;
+foo-&gt;name=        bar-&gt;name;
+foo-&gt;name_length= bar-&gt;name_length;
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Put separate statements on separate lines. This applies for
+            both variable declarations and executable statements. For
+            example, this is wrong:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+int x= 11; int y= 12;
+
+z= x; y+= x;
+</pre>
+        <p class="title1">
+        This is right:
+      </p>
+        <pre class="programlisting">
+int x= 11;
+int y= 12;
+
+z= x;
+y+= x;
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Put spaces both before and after binary comparison operators
+            ('&gt;', '==', '&gt;=', etc.), binary arithmetic operators
+            ('+' etc.), and binary Boolean operators ('||' etc.). Do not
+            put spaces around unary operators like '!' or '++'. Do not
+            put spaces around [de-]referencing operators like '-&gt;' or
+            '[]'. Do not put space after '*' when '*' introduces a
+            pointer. Do not put spaces after '('. Put one space after
+            ')' if it ends a condition, but not if it ends a list of
+            function arguments. For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+int *var;
+
+if ((x == y + 2) &amp;&amp; !param-&gt;is_signed)
+  function_call();
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            When a function has multiple arguments separated by commas
+            ('<code class="literal">,</code>'), put one space after each comma.
+            For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">ln= mysql_bin_log.generate_name(opt_bin_logname, "-bin", 1, buf); </pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Put one space after a keyword which introduces a condition,
+            such as <code class="literal">if</code> or <code class="literal">for</code> or
+            <code class="literal">while</code>.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            After <code class="literal">if</code> or <code class="literal">else</code> or
+            <code class="literal">while</code>, when there is only one instruction
+            after the condition, braces are not necessary and the
+            instruction goes on the next line, indented.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+if (sig != MYSQL_KILL_SIGNAL &amp;&amp; sig != 0)
+  unireg_abort(1);
+else
+  unireg_end();
+while (*val &amp;&amp; my_isspace(mysqld_charset, *val))
+  *val++;
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            In function declarations and invocations: there is no space
+            between function name and '('; there is no space or line
+            break between '(' and the first argument; if the arguments
+            do not fit on one line then align them. Examples:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+Return_value_type *Class_name::method_name(const char *arg1,
+                                           size_t arg2, Type *arg3)
+return_value= function_name(argument1, argument2, long_argument3,
+                            argument4,
+                            function_name2(long_argument5,
+                                           long_argument6));
+return_value=
+  long_long_function_name(long_long_argument1, long_long_argument2,
+                          long_long_long_argument3,
+                          long_long_argument4,
+                          long_function_name2(long_long_argument5,
+                                              long_long_argument6));
+Long_long_return_value_type *
+Long_long_class_name::
+long_long_method_name(const char *long_long_arg1, size_t long_long_arg2,
+                      Long_long_type *arg3)
+</pre>
+        <p class="title1">
+        (You may but don't have to split
+        <code class="literal1">Class_name::method_name</code> into two lines.) When
+        arguments do not fit on one line, consider renaming them.
+      </p>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Format constructors in the following way:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+Item::Item(int a_arg, int b_arg, int c_arg)
+  :a(a_arg), b(b_arg), c(c_arg)
+{}
+</pre>
+        <p class="title1">
+        But keep lines short to make them more readable:
+      </p>
+        <pre class="programlisting">
+Item::Item(int longer_arg, int more_longer_arg)
+  :longer(longer_arg),
+  more_longer(more_longer_arg)
+{}
+</pre>
+        <p class="title1">
+        If a constructor can fit into one line:
+      </p>
+        <pre class="programlisting">Item::Item(int a_arg) :a(a_arg) {} </pre>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="naming-conventions" class="calibre7 pcalibre pcalibre1"></a>2.1.4 Naming Conventions</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            For identifiers formed from multiple words, separate each
+            component with underscore rather than capitalization. Thus,
+            use <code class="literal">my_var</code> instead of
+            <code class="literal">myVar</code> or <code class="literal">MyVar</code>.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Avoid capitalization except for class names; class names
+            should begin with a capital letter.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+class Item;
+class Query_arena;
+class Log_event;
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Avoid function names, structure elements, or variables that
+            begin or end with '<code class="literal">_</code>'.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Use long function and variable names in English. This will
+            make your code easier to read for all developers.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            We used to have the rule: "Structure types are
+            <code class="literal">typedef</code>'ed to an all-upper-case
+            identifier." This has been deprecated for C++ code. Do not
+            add typedefs for structs/classes in C++
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            All <code class="literal">#define</code> declarations should be in
+            upper case.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">#define MY_CONSTANT 15 </pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Enumeration names should begin with
+            <code class="literal">enum_</code>.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Function declarations (forward declarations) have parameter
+            names in addition to parameter types.
+          </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="commenting-code" class="calibre7 pcalibre pcalibre1"></a>2.1.5 Commenting Code</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Comment your code when you do something that someone else
+            may think is not trivial.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Comments for pure virtual functions, documentation for API
+            usage should be placed in front of (member, or non-member)
+            function declarations. Description of implementation
+            details, algorithms, anything that does not impact usage,
+            should be put in front of implementation. Please try to not
+            duplicate information. Make a reference to the declaration
+            from the implementation if necessary. If the implementation
+            and usage are too interleaved, put a reference from the
+            interface to the implementation, and keep the entire comment
+            in a single place.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Class comments should be put in front of class declaration.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            When writing multi-line comments please put the '/*' and
+            '*/' on their own lines, put the '*/' below the '/*', put a
+            line break and a two-space indent after the '/*', do not use
+            additional asterisks on the left of the comment.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+/*
+  This is how a multi-line comment in the middle of code
+  should look.  Note it not Doxygen-style if it's not at the 
+  beginning of a code enclosure (function or class).
+*/
+
+ /* ********* This comment is bad. It's indented incorrectly, it has
+ *            additional asterisks. Don't write this way.
+ *  *********/
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            When writing single-line comments, the '/*' and '*/" are on
+            the same line. For example:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting"> /* We must check if stack_size = Solaris 2.9 can return 0 here. */ </pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Single-line comments like this are OK in C++
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting"> // We must check if stack_size = Solaris 2.9 can return 0 here. </pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            For a short comment at the end of a line, you may use either
+            /* ... */ or a <code class="literal">//</code> double slash. In C
+            files or in header files used by C files, avoid
+            <code class="literal">//</code> comments.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Align short side <code class="literal">//</code> or /* ... */ comments
+            by 48 column (start the comment in column 49).
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting"> { qc*= 2; /* double the estimation */ } </pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            When commenting members of a structure or a class, align
+            comments by 48th column. If a comment doesn't fit into one
+            line, move it to a separate line. Do not create multiline
+            comments aligned by 48th column.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+struct st_mysql_stmt
+{
+...
+  MYSQL_ROWS     *data_cursor;         /**&lt; current row in cached result */
+  /* copy of mysql-&gt;affected_rows after statement execution */
+  my_ulonglong   affected_rows;
+  my_ulonglong   insert_id;            /**&lt; copy of mysql-&gt;insert_id */
+  /*
+    mysql_stmt_fetch() calls this function to fetch one row (it's different
+    for buffered, unbuffered and cursor fetch).
+  */
+  int            (*read_row_func)(struct st_mysql_stmt *stmt,
+...
+};
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            All comments should be in English.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Each standalone comment must start with a Capital letter.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            There is a '.' at the end of each statement in a comment
+            paragraph (for the last one as well).
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+/*
+  This is a standalone comment. The comment is aligned to fit 79 
+  characters per line. There is a dot at the end of each sentence.
+  Including the last one.
+*/
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Every structure, class, method or function should have a
+            description unless it is very short and its purpose is
+            obvious.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Use the below example as a template for function or method
+            comments.
+          </p>
+              <div class="toc">
+                <ul class="itemizedlist1">
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Please refer to the
+                <a class="pcalibre pcalibre1" href="http://www.stack.nl/~dimitri/doxygen/manual.html">Doxygen
+                Manual</a> for additional information.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Note the IN and OUT parameters. IN is implicit, but can
+                (but usually shouldn't) be specified with tag
+                @param[in]. For OUT and INOUT parameters you should use
+                tags @param[out] and @param[in,out] respectively.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Parameter specifications in @param section start with
+                lowercase and are <span><em class="calibre14">not</em></span> terminated
+                with a full stop/period.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Section headers are aligned at 2 spaces. This must be a
+                sentence with a full stop/period at the end. Iff the
+                sentence must express a subject that contains a full
+                stop such that Doxygen would be fooled into stopping
+                early, then use the <span><em class="calibre14">@brief</em></span> and
+                <span><em class="calibre14">@details</em></span> to explicitly mark them.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Align <span><em class="calibre14">@retval</em></span> specifications at 4
+                spaces if they follow a <span><em class="calibre14">@return</em></span>
+                description. Else, align at two spaces.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Separate sections with an empty line.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                All function comments should be no longer than 79
+                characters per line.
+              </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                Put two line breaks (one empty line) between a function
+                comment and its description.
+              </p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+/**
+  Initialize SHA1Context.  
+
+  Set initial values in preparation for computing a new SHA1 message digest.
+ 
+  @param[in,out]  context  the context to reset
+ 
+  @return Operation status
+    @retval SHA_SUCCESS      OK
+    @retval != SHA_SUCCESS   sha error Code
+*/
+ 
+int sha1_reset(SHA1_CONTEXT *context)
+{
+  ...
+</pre>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="header-files" class="calibre7 pcalibre pcalibre1"></a>2.1.6 Header Files</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Use headers guards. Put the header guard in the first line
+            of the header, before the copyright. Use all-uppercase name
+            for the header guard. Derive the header guard name from the
+            file name, and append _INCLUDED to create a macro name.
+            Example: sql_base.h -&gt; SQL_BASE_INCLUDED.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Include directives shall be first in the file. In class
+            implementation, include the header file with class
+            declaration before all other header files, to make sure that
+            the header is self-sufficient.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Every header file should be self-sufficient in the sense
+            that for a header file my_header.h, the following should
+            compile without errors:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting"> #include "my_header.h"</pre>
+        <p class="title1">
+        An exception is made for generated files, for example, those
+        generated by Yacc and Lex, since it is not possible to re-write
+        the generators to produce "correct" files.
+      </p>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="additional-suggestions" class="calibre7 pcalibre pcalibre1"></a>2.1.7 Additional Suggestions</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Try to write code in a lot of black boxes that can be reused
+            or at least use a clean, easy to change interface.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Reuse code; There are already many algorithms in MySQL that
+            can be reused for list handling, queues, dynamic and hashed
+            arrays, sorting, etc.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Use the <code class="literal">my_*</code> functions like
+            <code class="literal">my_read()</code>/<code class="literal">my_write()</code>/
+            <code class="literal">my_malloc()</code> that you can find in the
+            <code class="literal">mysys</code> library, instead of the direct
+            system calls; This will make your code easier to debug and
+            more portable.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Use <code class="literal">libstring</code> functions (in the
+            <code class="literal">strings</code> directory, declared in
+            <code class="literal">include/m_string.h</code>) instead of standard
+            <code class="literal">libc</code> string functions whenever possible.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Try to always write optimized code, so that you don't have
+            to go back and rewrite it a couple of months later. It's
+            better to spend 3 times as much time designing and writing
+            an optimal function than having to do it all over again
+            later on.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Avoid CPU wasteful code, even when its use is trivial, to
+            avoid developing sloppy coding habits.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            If you can do something in fewer lines, please do so (as
+            long as the code will not be slower or much harder to read).
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Do not check the same pointer for <code class="literal">NULL</code>
+            more than once.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Never use a macro when an (inline) function would work as
+            well.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Do not make a function inline if you don't have a very good
+            reason for it. In many cases, the extra code that is
+            generated is more likely to slow down the resulting code
+            than give a speed increase because the bigger code will
+            cause more data fetches and instruction misses in the
+            processor cache.
+          </p>
+            </li>
+          </ul>
+        </div>
+        <p class="title1">
+        It is okay to use inline functions are which satisfy most of the
+        following requirements:
+      </p>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            </p>
+              <div class="toc">
+                <ul class="itemizedlist1">
+                  <li class="listitem2">
+                    <p class="calibre9">
+                  The function is very short (just a few lines).
+                </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                  The function is used in a speed critical place and is
+                  executed over and over again.
+                </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                  The function is handling the normal case, not some
+                  extra functionality that most users will not use.
+                </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                  The function is rarely called. (This restriction must
+                  be followed unless the function translates to fewer
+                  than 16 assembler instructions.)
+                </p>
+                  </li>
+                  <li class="listitem2">
+                    <p class="calibre9">
+                  The compiler can do additional optimizations with
+                  inlining and the resulting function will be only a
+                  fraction of size of the original one.
+                </p>
+                  </li>
+                </ul>
+              </div>
+              <p class="calibre9">
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Think assembly - make it easier for the compiler to optimize
+            your code.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Avoid using <code class="literal">malloc()</code>, which is very slow.
+            For memory allocations that only need to live for the
+            lifetime of one thread, use <code class="literal">sql_alloc()</code>
+            instead.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            All functions that can report an error (usually an
+            allocation error), should return
+            <code class="literal">0/FALSE/false</code> on success,
+            <code class="literal">1/TRUE/true</code> on failure. Other return
+            values should go in an output argument. If you have a
+            predicate function which returns <code class="literal">bool</code>,
+            and cannot fail, document that fact clearly (in the header
+            file). Recommendation when writing new code: use return type
+            int, to distinguish from predicate functions. Returning
+            <code class="literal">true</code> on error, allows us to write:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+if (a() || b() || c())
+  error("something went wrong");
+</pre>
+        <p class="title1">
+        However, short-circuit evaluation like that above is not the
+        best method for evaluating options.
+      </p>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Beware of truncation when returning
+            <code class="literal">TRUE/true</code> to indicate an error:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+my_bool foo(int val)      { return val; } /* Bad. */
+int     foo(longlong val) { return val; } /* Bad. */
+</pre>
+        <pre class="programlisting">
+my_bool foo(int val)      { return test(val); } /* Good. */
+int     foo(longlong val) { return test(val); } /* Good. */
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Using <code class="literal">goto</code> is okay if not abused.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            If you have an 'if' statement that ends with a 'goto' or
+            'return' you should NOT have an else statement:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+if (a == b)
+  return 5;
+else return 6;
+
+-&gt;
+
+if (a == b)
+  return 5;
+return 6;
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Avoid default variable initializations. Use
+            <code class="literal">LINT_INIT()</code> if the compiler complains
+            after making sure that there is really no way the variable
+            can be used uninitialized.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            In C code, use <code class="literal">TRUE</code> and
+            <code class="literal">FALSE</code> rather than <code class="literal">1/0</code>
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            In C++ code, it is OK to use <code class="literal">true</code> and
+            <code class="literal">false</code> (do not use
+            <code class="literal">1/0</code>). You can use C++
+            <code class="literal">bool/true/false</code> when calling C functions
+            (values will be safely promoted to my_bool).
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            <code class="literal">bool</code> exists only in C++. In C, you have
+            to use <code class="literal">my_bool</code> (which is
+            <code class="literal">char</code>); it has different cast rules than
+            <code class="literal">bool</code>:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+int c= 256*2;
+bool a= c;          /* a gets 'true' */
+my_bool b= c;       /* b gets zero, that is, 'false': BAD */
+my_bool b= test(c); /* b gets 'true': GOOD */
+</pre>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Do not instantiate a class if you do not have to.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Use pointers rather than array indexing when operating on
+            strings.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Never pass parameters with the
+            <code class="literal">&amp;variable_name</code> construct in C++.
+            Always use a pointer instead!
+          </p>
+            </li>
+          </ul>
+        </div>
+        <p class="title1">
+        The reason is that the above makes it much harder for the one
+        reading the caller function code to know what is happening and
+        what kind of code the compiler is generating for the call.
+      </p>
+        <div class="toc">
+          <ul class="itemizedlist">
+            <li class="listitem1">
+              <p class="calibre9">
+            Do not use the <code class="literal">%p</code> marker of
+            <code class="literal">printf()</code> (<code class="literal">fprintf()</code>,
+            <code class="literal">vprintf()</code>, etc) because it leads to
+            different outputs (for example on some Linux and Mac OS X
+            the output starts with <code class="literal">0x</code> while it does
+            not on some Solaris). In MySQL 5.5 and later, use
+            <code class="literal">my_vsnprint</code>,
+            <code class="literal">DBUG_PRINT</code> with %p for pointer
+            formatting consistent across different platforms. In earlier
+            versions, use printf-family functions with
+            <code class="literal">0x%lx</code>, but beware it truncates pointers
+            on 64-bit Windows. Being sure that there is always
+            <code class="literal">0x</code> enables us to quickly identify pointer
+            values in the DBUG trace.
+          </p>
+            </li>
+            <li class="listitem1">
+              <p class="calibre9">
+            Relying on loop counter variables being local to the loop
+            body if declared in the <code class="literal">for</code> statement is
+            not portable. Some compilers still don't implement this ANSI
+            C++ specification. The symptom of such use is an error like
+            this:
+          </p>
+            </li>
+          </ul>
+        </div>
+        <pre class="programlisting">
+c-1101 CC: ERROR File = listener.cc, Line = 187
+  "i" has already been declared in the current scope.
+
+    for (int i= 0; i &lt; num_sockets; i++)
+</pre>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="suggested-mode-emacs" class="calibre7 pcalibre pcalibre1"></a>2.1.8 Suggested Mode in emacs</h2>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">
+(require 'font-lock)
+(require 'cc-mode)
+(setq global-font-lock-mode t) ;;colors in all buffers that support it
+(setq font-lock-maximum-decoration t) ;;maximum color
+(c-add-style "MY"
+ '("K&amp;R"
+     (c-basic-offset . 2)
+     (c-comment-only-line-offset . 0)
+     (c-offsets-alist . ((statement-block-intro . +)
+                         (knr-argdecl-intro . 0)
+                         (substatement-open . 0)
+                         (label . -)
+                         (statement-cont . +)
+                         (arglist-intro . c-lineup-arglist-intro-after-paren)
+                         (arglist-close . c-lineup-arglist)
+                         (innamespace . 0)
+                         (inline-open . 0)
+                         (statement-case-open . +)
+                         ))
+     ))
+
+(defun mysql-c-mode-hook ()
+  (interactive)
+  (require 'cc-mode)
+  (c-set-style "MY")
+  (setq indent-tabs-mode nil)
+  (setq comment-column 48))
+
+(add-hook 'c-mode-common-hook 'mysql-c-mode-hook)
+</pre>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="basic-vim-setup" class="calibre7 pcalibre pcalibre1"></a>2.1.9 Basic vim Setup</h2>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">
+set tabstop=8
+set shiftwidth=2
+set backspace=2
+set softtabstop
+set smartindent
+set cindent
+set cinoptions=g0:0t0c2C1(0f0l1
+set expandtab
+</pre>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="alternative-vim-setup" class="calibre7 pcalibre pcalibre1"></a>2.1.10 Another vim Setup</h2>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">
+set tabstop=8
+set shiftwidth=2
+set bs=2
+set et
+set sts=2
+set tw=78
+set formatoptions=cqroa1
+set cinoptions=g0:0t0c2C1(0f0l1
+set cindent
+
+function InsertShiftTabWrapper()
+  let num_spaces = 48 - virtcol('.')
+  let line = ' '
+  while (num_spaces &gt; 0)
+    let line = line . ' '
+    let num_spaces = num_spaces - 1
+  endwhile
+  return line
+endfunction
+" jump to 48th column by Shift-Tab - to place a comment there
+inoremap &lt;S-tab&gt; &lt;c-r&gt;=InsertShiftTabWrapper()&lt;cr&gt;
+" highlight trailing spaces as errors
+let c_space_errors=1
+</pre>
+      </div>
+      <div class="toc">
+        <div class="toc">
+          <div class="toc">
+            <div class="toc">
+              <h2 class="title2"><a id="example-setup-ctags" class="calibre7 pcalibre pcalibre1"></a>2.1.11 Example Setup for ctags</h2>
+            </div>
+          </div>
+        </div>
+        <p class="title1">
+        Put this configuration into your ~/.ctags file:
+      </p>
+        <pre class="programlisting">
+--c++-kinds=+p
+--fields=+iaS
+--extra=+q
+--langdef=errmsg
+--regex-errmsg=/^(ER_[A-Z0-9_]+)/\1/
+--langmap=errmsg:(errmsg*.txt),c:+.ic,yacc:+.yy
+</pre>
+      </div>
+    </div>
+  </div>
+
+
+  </div>
+
+  
+  <div class="calibreToc">
+    <h2><a href="../../index.html"> Table of contents</a></h2>
+     <div>
+  <ul>
+    <li>
+      <a href="index.html">MySQL Internals Manual</a>
+      <ul>
+        <li>
+          <a href="pr01.html">Preface and Legal Notice</a>
+        </li>
+        <li>
+          <a href="ch01.html">1 A Guided Tour Of The MySQL Source Code</a>
+          <ul>
+            <li>
+              <a href="ch01.html#getting-source-tree">1.1 Getting the Source Tree</a>
+              <ul>
+                <li>
+                  <a href="ch01.html#getting-source-tree-git">1.1.1 Getting the Source Tree (Git)</a>
+                </li>
+                <li>
+                  <a href="ch01.html#getting-source-tree-bazaar">1.1.2 Getting the Source Tree (Bazaar)</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch01s02.html">1.2 The Major Directories</a>
+              <ul>
+                <li>
+                  <a href="ch01s02.html#guided-tour-majordir-build">1.2.1 Major Directories: BUILD</a>
+                  <ul>
+                    <li>
+                      <a href="ch01s02.html#gnu-debugger">1.2.1.1 GNU Debugger</a>
+                    </li>
+                    <li>
+                      <a href="ch01s02.html#guided-tour-major-directories-test">1.2.1.2 Running a Test with the Debugger</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch01s02.html#guided-tour-majordir-client">1.2.2 Major Directories: client</a>
+                </li>
+                <li>
+                  <a href="ch01s02.html#guided-tour-majordir-myisam">1.2.3 Major Directories: myisam</a>
+                </li>
+                <li>
+                  <a href="ch01s02.html#guided-tour-majordir-mysys">1.2.4 Major Directories: mysys</a>
+                </li>
+                <li>
+                  <a href="ch01s02.html#guided-tour-majordir-sql">1.2.5 Major Directories: sql</a>
+                </li>
+                <li>
+                  <a href="ch01s02.html#guided-tour-majordir-vio">1.2.6 Major Directories: vio</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch01s03.html">1.3 The Flow</a>
+            </li>
+            <li>
+              <a href="ch01s04.html">1.4 The Open-Source Directories</a>
+            </li>
+            <li>
+              <a href="ch01s05.html">1.5 The Internal and External Storage Engine Directories</a>
+            </li>
+            <li>
+              <a href="ch01s06.html">1.6 The OS-Specific Directories</a>
+            </li>
+            <li>
+              <a href="ch01s07.html">1.7 Odds and Ends</a>
+            </li>
+            <li>
+              <a href="ch01s08.html">1.8 A Chunk of Code in /sql/sql_update.cc</a>
+            </li>
+            <li>
+              <a href="ch01s09.html">1.9 The Skeleton of the Server Code</a>
+            </li>
+            <li>
+              <a href="ch01s10.html">1.10 Recap</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch02.html">2 Coding Guidelines</a>
+          <ul>
+            <li>
+              <a href="ch02.html#general-development-guidelines">2.1 General Development Guidelines</a>
+              <ul>
+                <li>
+                  <a href="ch02.html#coding-guidelines-c">2.1.1 C/C++ Coding Guidelines of MySQL Server</a>
+                </li>
+                <li>
+                  <a href="ch02.html#maintaining-coding-guidelines">2.1.2 How We Maintain the Server Coding Guidelines</a>
+                </li>
+                <li>
+                  <a href="ch02.html#indentation-spacing">2.1.3 Indentation and Spacing</a>
+                </li>
+                <li>
+                  <a href="ch02.html#naming-conventions">2.1.4 Naming Conventions</a>
+                </li>
+                <li>
+                  <a href="ch02.html#commenting-code">2.1.5 Commenting Code</a>
+                </li>
+                <li>
+                  <a href="ch02.html#header-files">2.1.6 Header Files</a>
+                </li>
+                <li>
+                  <a href="ch02.html#additional-suggestions">2.1.7 Additional Suggestions</a>
+                </li>
+                <li>
+                  <a href="ch02.html#suggested-mode-emacs">2.1.8 Suggested Mode in emacs</a>
+                </li>
+                <li>
+                  <a href="ch02.html#basic-vim-setup">2.1.9 Basic vim Setup</a>
+                </li>
+                <li>
+                  <a href="ch02.html#alternative-vim-setup">2.1.10 Another vim Setup</a>
+                </li>
+                <li>
+                  <a href="ch02.html#example-setup-ctags">2.1.11 Example Setup for ctags</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch02s02.html">2.2 C++ Coding Guidelines for the NDB Storage Engine</a>
+              <ul>
+                <li>
+                  <a href="ch02s02.html#braces">2.2.1 Braces</a>
+                </li>
+                <li>
+                  <a href="ch02s02.html#assignment">2.2.2 Assignment</a>
+                </li>
+                <li>
+                  <a href="ch02s02.html#ndbrequire">2.2.3 Use of ndbrequire</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch02s03.html">2.3 DBUG Tags</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch03.html">3 Reusable Classes and Templates</a>
+          <ul>
+            <li>
+              <a href="ch03.html#containers">3.1 Containers</a>
+              <ul>
+                <li>
+                  <a href="ch03.html#array">3.1.1 Array</a>
+                </li>
+                <li>
+                  <a href="ch03.html#i-p-list">3.1.2 I_P_List</a>
+                </li>
+                <li>
+                  <a href="ch03.html#i-list">3.1.3 I_List</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch03s02.html">3.2 Memory Management</a>
+              <ul>
+                <li>
+                  <a href="ch03s02.html#mem-root">3.2.1 MEM_ROOT</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch03s03.html">3.3 How to Extend This Page</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch04.html">4 Building MySQL Server with CMake</a>
+          <ul>
+            <li>
+              <a href="ch04.html#cmake-prerequisites">4.1 CMake Prerequisites</a>
+            </li>
+            <li>
+              <a href="ch04s02.html">4.2 How to Install CMake</a>
+            </li>
+            <li>
+              <a href="ch04s03.html">4.3 Quick How-to-Build Instructions</a>
+              <ul>
+                <li>
+                  <a href="ch04s03.html#cmake-howto-quick-release-configuration">4.3.1 Release Configuration</a>
+                </li>
+                <li>
+                  <a href="ch04s03.html#cmake-howto-quick-debug-configuration">4.3.2 Debug Configuration</a>
+                </li>
+                <li>
+                  <a href="ch04s03.html#cmake-build-options-official-mysql">4.3.3 Building Using the Same Options as MySQL Official Releases</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch04s04.html">4.4 Detailed How-to-Build Instructions</a>
+              <ul>
+                <li>
+                  <a href="ch04s04.html#creating-build-directory">4.4.1 Create the Build Directory</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#configuration-step">4.4.2 Configure the Build</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#listing-configuration-options">4.4.3 Listing Configuration Options</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#changing-configuration-options">4.4.4 Changing Configuration Options</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#debug-configurations">4.4.5 Building Debug Configurations</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#building-with-cmake">4.4.6 Building With CMake</a>
+                  <ul>
+                    <li>
+                      <a href="ch04s04.html#cmake-build-types">4.4.6.1 CMake Build Types</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#controlling-compilers-and-flags">4.4.6.2 How to Specify Compilers and Compiler Flags</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#predefined-option-sets">4.4.6.3 Predefined Option and Compiler Flag Sets</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#creating-binary-packages">4.4.6.4 Creating Binary Packages</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#make-install-make-test">4.4.6.5 make install, make test</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#fine-tuning-installation-paths">4.4.6.6 Fine-Tuning Installation Paths</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#packager-friendly-build-options">4.4.6.7 Packager-Friendly Build Options (Unix)</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch04s04.html#configure-emulation">4.4.7 ./configure Emulation</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#writing-platform-checks">4.4.8 For Developers: How to Write Platform Checks</a>
+                  <ul>
+                    <li>
+                      <a href="ch04s04.html#debug-only-options">4.4.8.1 Debug-Only Options</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#adding-platform-checks">4.4.8.2 Adding Platform Checks/Compiler Flags for a Specific OS</a>
+                    </li>
+                    <li>
+                      <a href="ch04s04.html#troubleshooting-platform-checks">4.4.8.3 Troubleshooting Platform Checks or Configuration Errors</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch04s04.html#troubleshooting-cmake-code">4.4.9 Troubleshooting CMake Code</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#tips-for-cmake-developers">4.4.10 Developer CMake Tips</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#mysql-specific-cmake-macros">4.4.11 MySQL-Specific CMake Macros</a>
+                </li>
+                <li>
+                  <a href="ch04s04.html#cmake-interface-to-third-party-tools">4.4.12 Interface to Third-Party Tools</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch04s05.html">4.5 FAQ / Miscellany</a>
+              <ul>
+                <li>
+                  <a href="ch04s05.html#running-mysql-test-run-out-of-source">4.5.1 Running mysql-test-run.pl in an Out-of-Source Build</a>
+                </li>
+                <li>
+                  <a href="ch04s05.html#running-mysql-test-run-visual-studio">4.5.2 Running mysql-test-run.pl with Visual Studio or Xcode Projects</a>
+                </li>
+                <li>
+                  <a href="ch04s05.html#make-distclean">4.5.3 make distclean</a>
+                </li>
+                <li>
+                  <a href="ch04s05.html#compiling-for-different-hardware-achitectures">4.5.4 Compiling for Different Hardware Architectures</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch04s06.html">4.6 Autotools to CMake Transition Guide</a>
+              <ul>
+                <li>
+                  <a href="ch04s06.html#command-invocation-syntax">4.6.1 Command Invocation Syntax</a>
+                </li>
+                <li>
+                  <a href="ch04s06.html#installation-layout-options">4.6.2 Installation Layout Options</a>
+                </li>
+                <li>
+                  <a href="ch04s06.html#storage-engine-options">4.6.3 Storage Engine Options</a>
+                </li>
+                <li>
+                  <a href="ch04s06.html#library-options">4.6.4 Library Options</a>
+                </li>
+                <li>
+                  <a href="ch04s06.html#miscellaneous-options">4.6.5 Miscellaneous Options</a>
+                </li>
+                <li>
+                  <a href="ch04s06.html#debugging-configuration-process">4.6.6 Debugging the Configuration Process</a>
+                </li>
+                <li>
+                  <a href="ch04s06.html#interface-to-third-party-tools">4.6.7 Interface to Third-Party Tools</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch05.html">5 Plugins</a>
+          <ul>
+            <li>
+              <a href="ch05.html#cmake-variables-controlling-plugin-building">5.1 CMake Variables to Control Plugin Building (MySQL 5.5 and Later)</a>
+            </li>
+            <li>
+              <a href="ch05s02.html">5.2 CMake Macro to Define the Plugin</a>
+            </li>
+            <li>
+              <a href="ch05s03.html">5.3 Autotools configure Support (MySQL 5.1)</a>
+            </li>
+            <li>
+              <a href="ch05s04.html">5.4 Autotools Plugin Macros</a>
+            </li>
+            <li>
+              <a href="ch05s05.html">5.5 Specifying mysqld Variables Within a Plugin</a>
+            </li>
+            <li>
+              <a href="ch05s06.html">5.6 Additional Accessors for Plugins</a>
+            </li>
+            <li>
+              <a href="ch05s07.html">5.7 MySQL Services for Plugins</a>
+              <ul>
+                <li>
+                  <a href="ch05s07.html#plugin-services-components">5.7.1 Plugin Services Components</a>
+                </li>
+                <li>
+                  <a href="ch05s07.html#writing-services-for-use-from-plugins">5.7.2 Writing Services for Use from Within Plugins</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch06.html">6 Transaction Handling in the Server</a>
+          <ul>
+            <li>
+              <a href="ch06.html#transactions-historical-note">6.1 Historical Note</a>
+            </li>
+            <li>
+              <a href="ch06s02.html">6.2 Current Situation</a>
+            </li>
+            <li>
+              <a href="ch06s03.html">6.3 Data Layout</a>
+            </li>
+            <li>
+              <a href="ch06s04.html">6.4 Transaction Life Cycle</a>
+            </li>
+            <li>
+              <a href="ch06s05.html">6.5 Roles and Responsibilities</a>
+            </li>
+            <li>
+              <a href="ch06s06.html">6.6 Additional Notes on DDL and the Normal Transaction</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch07.html">7 The Optimizer</a>
+          <ul>
+            <li>
+              <a href="ch07.html#optimizer-code-concepts">7.1 Code and Concepts</a>
+              <ul>
+                <li>
+                  <a href="ch07.html#optimizer-definitions">7.1.1 Definitions</a>
+                </li>
+                <li>
+                  <a href="ch07.html#optimizer-code">7.1.2 The Optimizer Code</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch07s02.html">7.2 Primary Optimizations</a>
+              <ul>
+                <li>
+                  <a href="ch07s02.html#optimizer-handling-constant-relations">7.2.1 Optimizing Constant Relations</a>
+                  <ul>
+                    <li>
+                      <a href="ch07s02.html#optimizer-constant-propagation">7.2.1.1 Constant Propagation</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-eliminating-dead-code">7.2.1.2 Eliminating Dead Code</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-folding-constants">7.2.1.3 Folding of Constants</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-constants-constant-tables">7.2.1.4 Constants and Constant Tables</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch07s02.html#optimizer-joins">7.2.2 Optimizing Joins</a>
+                  <ul>
+                    <li>
+                      <a href="ch07s02.html#optimizer-determining-join-type">7.2.2.1 Determining the Join Type</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-joins-access-methods">7.2.2.2 Joins and Access Methods</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-range-join-type">7.2.2.3 The range Join Type</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-index-join-type">7.2.2.4 The index Join Type</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-index-merge-join-type">7.2.2.5 The Index Merge Join Type</a>
+                      <ul>
+                        <li>
+                          <a href="ch07s02.html#optimizer-index-merge-overview">7.2.2.5.1 Overview</a>
+                        </li>
+                        <li>
+                          <a href="ch07s02.html#optimizer-index-merge-optimizer">7.2.2.5.2 Index Merge Optimizer</a>
+                        </li>
+                        <li>
+                          <a href="ch07s02.html#optimizer-index-merge-range-optimizer">7.2.2.5.3 The range Optimizer</a>
+                        </li>
+                        <li>
+                          <a href="ch07s02.html#optimizer-index-merge-row-retrieval-algorithm">7.2.2.5.4 Row Retrieval Algorithm</a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch07s02.html#optimizer-transpositions">7.2.3 Transpositions</a>
+                  <ul>
+                    <li>
+                      <a href="ch07s02.html#optimizer-and-relations">7.2.3.1 AND Relations</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-or-relations">7.2.3.2 OR Relations</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-union-queries">7.2.3.3 UNION Queries</a>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-not-relations">7.2.3.4 NOT (&lt;&gt;) Relations</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch07s02.html#optimizer-order-by-clauses">7.2.4 ORDER BY Clauses</a>
+                </li>
+                <li>
+                  <a href="ch07s02.html#optimizer-group-by-related-conditions">7.2.5 GROUP BY and Related Conditions</a>
+                </li>
+                <li>
+                  <a href="ch07s02.html#optimizer-other-optimizations">7.2.6 Other Optimizations</a>
+                  <ul>
+                    <li>
+                      <a href="ch07s02.html#optimizer-nulls-filtering">7.2.6.1 NULLs Filtering for ref and eq_ref Access</a>
+                      <ul>
+                        <li>
+                          <a href="ch07s02.html#optimizer-early-nulls-filtering">7.2.6.1.1 Early NULLs Filtering</a>
+                        </li>
+                        <li>
+                          <a href="ch07s02.html#optimizer-late-nulls-filtering">7.2.6.1.2 Late NULLs Filtering</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="ch07s02.html#optimizer-partitioning-related">7.2.6.2 Partitioning-Related Optimizations</a>
+                      <ul>
+                        <li>
+                          <a href="ch07s02.html#optimizer-partition-pruning">7.2.6.2.1 Partition Pruning</a>
+                          <ul>
+                            <li>
+                              <a href="ch07s02.html#optimizer-partition-pruning-overview">7.2.6.2.1.1 Partition Pruning Overview</a>
+                            </li>
+                            <li>
+                              <a href="ch07s02.html#optimizer-partitioning-intervals">7.2.6.2.1.2 Partitioning Intervals</a>
+                              <ul>
+                                <li>
+                                  <a href="ch07s02.html#optimizer-single-point-intervals">7.2.6.2.1.2.1 Single-Point Intervals</a>
+                                </li>
+                                <li>
+                                  <a href="ch07s02.html#optimizer-interval-walking">7.2.6.2.1.2.2 Interval Walking</a>
+                                </li>
+                                <li>
+                                  <a href="ch07s02.html#optimizer-interval-mapping">7.2.6.2.1.2.3 Interval Mapping</a>
+                                </li>
+                              </ul>
+                            </li>
+                            <li>
+                              <a href="ch07s02.html#optimizer-subpartitioning-intervals">7.2.6.2.1.3 Subpartitioning Intervals</a>
+                            </li>
+                            <li>
+                              <a href="ch07s02.html#optimizer-where-clause-to-intervals">7.2.6.2.1.4 From WHERE Clauses to Intervals</a>
+                            </li>
+                            <li>
+                              <a href="ch07s02.html#optimizer-partition-pruning-source-code">7.2.6.2.1.5 Partition Pruning in the Source Code</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="ch07s02.html#optimizer-partition-selection">7.2.6.2.2 Partition Selection</a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch08.html">8 Tracing the Optimizer</a>
+          <ul>
+            <li>
+              <a href="ch08.html#optimizer-tracing-typical-usage">8.1 Typical Usage</a>
+            </li>
+            <li>
+              <a href="ch08s02.html">8.2 System Variables Controlling the Trace</a>
+            </li>
+            <li>
+              <a href="ch08s03.html">8.3 The INFORMATION_SCHEMA.OPTIMIZER_TRACE Table</a>
+            </li>
+            <li>
+              <a href="ch08s04.html">8.4 Traceable Queries</a>
+            </li>
+            <li>
+              <a href="ch08s05.html">8.5 Automatic Trace Purging</a>
+            </li>
+            <li>
+              <a href="ch08s06.html">8.6 Tuning Trace Purging</a>
+            </li>
+            <li>
+              <a href="ch08s07.html">8.7 Tracing Memory Usage</a>
+            </li>
+            <li>
+              <a href="ch08s08.html">8.8 Privilege Checking</a>
+            </li>
+            <li>
+              <a href="ch08s09.html">8.9 Interaction with the --debug Option</a>
+            </li>
+            <li>
+              <a href="ch08s10.html">8.10 The optimizer_trace System Variable</a>
+            </li>
+            <li>
+              <a href="ch08s11.html">8.11 The end_markers_in_json System Variable</a>
+            </li>
+            <li>
+              <a href="ch08s12.html">8.12 Selecting Optimizer Features to Trace</a>
+            </li>
+            <li>
+              <a href="ch08s13.html">8.13 General Trace Structure</a>
+            </li>
+            <li>
+              <a href="ch08s14.html">8.14 Example</a>
+            </li>
+            <li>
+              <a href="ch08s15.html">8.15 Nicely Displaying a Trace</a>
+            </li>
+            <li>
+              <a href="ch08s16.html">8.16 Preventing Use of Optimizer Trace</a>
+            </li>
+            <li>
+              <a href="ch08s17.html">8.17 Testing</a>
+            </li>
+            <li>
+              <a href="ch08s18.html">8.18 Implementation</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch09.html">9 Memory Allocation</a>
+          <ul>
+            <li>
+              <a href="ch09.html#memory-allocation-mysql-server">9.1 Memory Allocation in the MySQL Server (sql Directory)</a>
+            </li>
+            <li>
+              <a href="ch09s02.html">9.2 Memory Allocation in a Library or Storage Engine</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch10.html">10 Important Algorithms and Structures</a>
+          <ul>
+            <li>
+              <a href="ch10.html#item-class">10.1 The Item Class</a>
+            </li>
+            <li>
+              <a href="ch10s02.html">10.2 How MySQL Does Sorting (filesort)</a>
+            </li>
+            <li>
+              <a href="ch10s03.html">10.3 Bulk Insert</a>
+            </li>
+            <li>
+              <a href="ch10s04.html">10.4 How MySQL Does Caching</a>
+            </li>
+            <li>
+              <a href="ch10s05.html">10.5 How MySQL Uses the Join Buffer Cache</a>
+            </li>
+            <li>
+              <a href="ch10s06.html">10.6 How MySQL Handles FLUSH TABLES</a>
+            </li>
+            <li>
+              <a href="ch10s07.html">10.7 Full-Text Search</a>
+            </li>
+            <li>
+              <a href="ch10s08.html">10.8 FLOAT and DOUBLE Data Type Representation</a>
+            </li>
+            <li>
+              <a href="ch10s09.html">10.9 Date and Time Data Type Representation</a>
+            </li>
+            <li>
+              <a href="ch10s10.html">10.10 Threads</a>
+            </li>
+            <li>
+              <a href="ch10s11.html">10.11 Character Sets and Collations</a>
+            </li>
+            <li>
+              <a href="ch10s12.html">10.12 Error Flags and Functions</a>
+            </li>
+            <li>
+              <a href="ch10s13.html">10.13 Functions in the mysys Library</a>
+            </li>
+            <li>
+              <a href="ch10s14.html">10.14 Bitmaps</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch11.html">11 File Formats</a>
+          <ul>
+            <li>
+              <a href="ch11.html#frm-file-format">11.1 MySQL .frm File Format</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch12.html">12 How MySQL Performs Different Selects</a>
+          <ul>
+            <li>
+              <a href="ch12.html#select-steps">12.1 Steps of Select Execution</a>
+            </li>
+            <li>
+              <a href="ch12s02.html">12.2 select_resultClass</a>
+            </li>
+            <li>
+              <a href="ch12s03.html">12.3 SIMPLE or PRIMARY SELECT</a>
+            </li>
+            <li>
+              <a href="ch12s04.html">12.4 Structure Of Complex Select</a>
+            </li>
+            <li>
+              <a href="ch12s05.html">12.5 Non-Subquery UNION Execution</a>
+            </li>
+            <li>
+              <a href="ch12s06.html">12.6 Derived Table Execution</a>
+            </li>
+            <li>
+              <a href="ch12s07.html">12.7 Subqueries</a>
+            </li>
+            <li>
+              <a href="ch12s08.html">12.8 Single Select Engine</a>
+            </li>
+            <li>
+              <a href="ch12s09.html">12.9 Union Engine</a>
+            </li>
+            <li>
+              <a href="ch12s10.html">12.10 Special Engines</a>
+            </li>
+            <li>
+              <a href="ch12s11.html">12.11 Explain Execution</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch13.html">13 How MySQL Transforms Subqueries</a>
+          <ul>
+            <li>
+              <a href="ch13.html#transformation-in">13.1 Item_in_subselect::select_transformer</a>
+              <ul>
+                <li>
+                  <a href="ch13.html#transformation-scalar-in">13.1.1 Scalar IN Subquery</a>
+                </li>
+                <li>
+                  <a href="ch13.html#transformations-row-in">13.1.2 Row IN Subquery</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch13s02.html">13.2 Item_allany_subselect</a>
+            </li>
+            <li>
+              <a href="ch13s03.html">13.3 Item_singlerow_subselect</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch14.html">14 MySQL Client/Server Protocol</a>
+          <ul>
+            <li>
+              <a href="ch14.html#overview">14.1 Overview</a>
+              <ul>
+                <li>
+                  <a href="ch14.html#basic-types">14.1.1 Basic Types</a>
+                  <ul>
+                    <li>
+                      <a href="ch14.html#integer">14.1.1.1 Integer Types</a>
+                      <ul>
+                        <li>
+                          <a href="ch14.html#fixed-length-integer">14.1.1.1.1 Fixed-Length Integer Types</a>
+                        </li>
+                        <li>
+                          <a href="ch14.html#length-encoded-integer">14.1.1.1.2 Length-Encoded Integer Type</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="ch14.html#string">14.1.1.2 String Types</a>
+                    </li>
+                    <li>
+                      <a href="ch14.html#describing-packets">14.1.1.3 Describing Packets</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14.html#mysql-packet">14.1.2 MySQL Packet</a>
+                  <ul>
+                    <li>
+                      <a href="ch14.html#sending-more-than-16mbyte">14.1.2.1 Sending More Than 16Mbyte</a>
+                    </li>
+                    <li>
+                      <a href="ch14.html#sequence-id">14.1.2.2 Sequence ID</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14.html#generic-response-packets">14.1.3 Generic Response Packets</a>
+                  <ul>
+                    <li>
+                      <a href="ch14.html#packet-OK_Packet">14.1.3.1 OK_Packet</a>
+                      <ul>
+                        <li>
+                          <a href="ch14.html#cs-sect-packet-ok-sessioninfo">14.1.3.1.1 Session State Information</a>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="ch14.html#packet-ERR_Packet">14.1.3.2 ERR_Packet</a>
+                    </li>
+                    <li>
+                      <a href="ch14.html#packet-EOF_Packet">14.1.3.3 EOF_Packet</a>
+                    </li>
+                    <li>
+                      <a href="ch14.html#status-flags">14.1.3.4 Status Flags</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14.html#character-set">14.1.4 Character Set</a>
+                </li>
+                <li>
+                  <a href="ch14.html#connection-lifecycle">14.1.5 Connection Lifecycle</a>
+                </li>
+                <li>
+                  <a href="ch14.html#command-phase">14.1.6 Command Phase</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s02.html">14.2 Connection Phase</a>
+              <ul>
+                <li>
+                  <a href="ch14s02.html#initial-handshake">14.2.1 Initial Handshake</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s02.html#plain-handshake">14.2.1.1 Plain Handshake</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#ssl-handshake">14.2.1.2 SSL Handshake</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#capability-negotiation">14.2.1.3 Capability Negotiation</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#determining-authentication-method">14.2.1.4 Determining Authentication Method</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s02.html#auth-phase-fast-path">14.2.2 Auth Phase Fast Path</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s02.html#successful-authentication">14.2.2.1 Successful Authentication</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#authentication-fails">14.2.2.2 Authentication Fails</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s02.html#authentication-method-mismatch">14.2.3 Authentication Method Mismatch</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s02.html#authentication-method-change">14.2.3.1 Authentication Method Change</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#insufficient-client-capabilities">14.2.3.2 Insufficient Client Capabilities</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#new-authentication-method-not-known-by-client">14.2.3.3 New Authentication Method Not Known by Client</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#non-client-plugin-auth-clients">14.2.3.4 Non-CLIENT_PLUGIN_AUTH Clients</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s02.html#authentication-after-com-change-user-command">14.2.4 Authentication After COM_CHANGE_USER Command</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s02.html#com-change-user-and-non-client-plugin-auth-clients">14.2.4.1 COM_CHANGE_USER and Non-CLIENT_PLUGIN_AUTH Clients</a>
+                    </li>
+                    <li>
+                      <a href="ch14s02.html#cs-sect-expired-password">14.2.4.2 Expired Password</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s02.html#connection-phase-packets">14.2.5 Connection Phase Packets</a>
+                </li>
+                <li>
+                  <a href="ch14s02.html#capability-flags">14.2.6 Capability Flags</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s03.html">14.3 Authentication Method</a>
+              <ul>
+                <li>
+                  <a href="ch14s03.html#limitations">14.3.1 Limitations</a>
+                </li>
+                <li>
+                  <a href="ch14s03.html#old-password-authentication">14.3.2 Old Password Authentication</a>
+                </li>
+                <li>
+                  <a href="ch14s03.html#secure-password-authentication">14.3.3 Secure Password Authentication</a>
+                </li>
+                <li>
+                  <a href="ch14s03.html#clear-text-authentication">14.3.4 Clear Text Authentication</a>
+                </li>
+                <li>
+                  <a href="ch14s03.html#windows-native-authentication">14.3.5 Windows Native Authentication</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s03.html#ntlm">14.3.5.1 NTLM</a>
+                    </li>
+                    <li>
+                      <a href="ch14s03.html#spnego">14.3.5.2 SPNEGO</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s03.html#sha256">14.3.6 SHA256</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s03.html#public-key-retrieval">14.3.6.1 Public Key Retrieval</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s04.html">14.4 Compression</a>
+              <ul>
+                <li>
+                  <a href="ch14s04.html#compressed-packet">14.4.1 Compressed Packet</a>
+                </li>
+                <li>
+                  <a href="ch14s04.html#compressed-packet-header">14.4.2 Compressed Packet Header</a>
+                </li>
+                <li>
+                  <a href="ch14s04.html#compressed-payload">14.4.3 Compressed Payload</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s04.html#example-one-mysql-packet">14.4.3.1 Example: One MySQL Packet</a>
+                    </li>
+                    <li>
+                      <a href="ch14s04.html#example-several-mysql-packets">14.4.3.2 Example: Several MySQL Packets</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s04.html#uncompressed-payload">14.4.4 Uncompressed Payload</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s05.html">14.5 SSL</a>
+            </li>
+            <li>
+              <a href="ch14s06.html">14.6 Text Protocol</a>
+              <ul>
+                <li>
+                  <a href="ch14s06.html#com-sleep">14.6.1 COM_SLEEP</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-quit">14.6.2 COM_QUIT</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-init-db">14.6.3 COM_INIT_DB</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-query">14.6.4 COM_QUERY</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s06.html#com-query-response">14.6.4.1 COM_QUERY Response</a>
+                      <ul>
+                        <li>
+                          <a href="ch14s06.html#text-resultset">14.6.4.1.1 Text Resultset</a>
+                          <ul>
+                            <li>
+                              <a href="ch14s06.html#column-type">14.6.4.1.1.1 Column Type</a>
+                            </li>
+                            <li>
+                              <a href="ch14s06.html#column-definition">14.6.4.1.1.2 Column Definition</a>
+                            </li>
+                            <li>
+                              <a href="ch14s06.html#text-resultset-row">14.6.4.1.1.3 Text Resultset Row</a>
+                            </li>
+                          </ul>
+                        </li>
+                        <li>
+                          <a href="ch14s06.html#local-infile-request">14.6.4.1.2 LOCAL INFILE Request</a>
+                          <ul>
+                            <li>
+                              <a href="ch14s06.html#local-infile-data">14.6.4.1.2.1 LOCAL INFILE Data</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-field-list">14.6.5 COM_FIELD_LIST</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s06.html#com-field-list-response">14.6.5.1 COM_FIELD_LIST Response</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-create-db">14.6.6 COM_CREATE_DB</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-drop-db">14.6.7 COM_DROP_DB</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-refresh">14.6.8 COM_REFRESH</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-shutdown">14.6.9 COM_SHUTDOWN</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-statistics">14.6.10 COM_STATISTICS</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-process-info">14.6.11 COM_PROCESS_INFO</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-connect">14.6.12 COM_CONNECT</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-process-kill">14.6.13 COM_PROCESS_KILL</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-debug">14.6.14 COM_DEBUG</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-ping">14.6.15 COM_PING</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-time">14.6.16 COM_TIME</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-delayed-insert">14.6.17 COM_DELAYED_INSERT</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-change-user">14.6.18 COM_CHANGE_USER</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-reset-connection">14.6.19 COM_RESET_CONNECTION</a>
+                </li>
+                <li>
+                  <a href="ch14s06.html#com-daemon">14.6.20 COM_DAEMON</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s07.html">14.7 Prepared Statements</a>
+              <ul>
+                <li>
+                  <a href="ch14s07.html#binary-protocol-resultset">14.7.1 Binary Protocol Resultset</a>
+                </li>
+                <li>
+                  <a href="ch14s07.html#binary-protocol-resultset-row">14.7.2 Binary Protocol Resultset Row</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s07.html#null-bitmap">14.7.2.1 NULL-Bitmap</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s07.html#binary-protocol-value">14.7.3 Binary Protocol Value</a>
+                </li>
+                <li>
+                  <a href="ch14s07.html#com-stmt-prepare">14.7.4 COM_STMT_PREPARE</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s07.html#com-stmt-prepare-response">14.7.4.1 COM_STMT_PREPARE Response</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s07.html#com-stmt-send-long-data">14.7.5 COM_STMT_SEND_LONG_DATA</a>
+                </li>
+                <li>
+                  <a href="ch14s07.html#com-stmt-execute">14.7.6 COM_STMT_EXECUTE</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s07.html#com-stmt-execute-response">14.7.6.1 COM_STMT_EXECUTE Response</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s07.html#com-stmt-close">14.7.7 COM_STMT_CLOSE</a>
+                </li>
+                <li>
+                  <a href="ch14s07.html#com-stmt-reset">14.7.8 COM_STMT_RESET</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s08.html">14.8 Stored Procedures</a>
+              <ul>
+                <li>
+                  <a href="ch14s08.html#multi-resultset">14.8.1 Multi-Resultset</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s08.html#out-parameter-set">14.8.1.1 OUT Parameter Set</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s08.html#multi-statement">14.8.2 Multi-Statement</a>
+                </li>
+                <li>
+                  <a href="ch14s08.html#com-set-option">14.8.3 COM_SET_OPTION</a>
+                </li>
+                <li>
+                  <a href="ch14s08.html#com-stmt-fetch">14.8.4 COM_STMT_FETCH</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s08.html#com-stmt-fetch-response">14.8.4.1 COM_STMT_FETCH Response</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s09.html">14.9 Replication Protocol</a>
+              <ul>
+                <li>
+                  <a href="ch14s09.html#binlog-file">14.9.1 Binlog File</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s09.html#binlog-file-header">14.9.1.1 Binlog File Header</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s09.html#binlog-network-stream">14.9.2 Binlog Network Stream</a>
+                </li>
+                <li>
+                  <a href="ch14s09.html#binlog-version">14.9.3 Binlog Version</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s09.html#determining-the-binlog-version">14.9.3.1 Determining the Binlog Version</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s09.html#binlog-event">14.9.4 Binlog Event</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s09.html#binlog-event-header">14.9.4.1 Binlog Event header</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#binlog-event-flag">14.9.4.2 Binlog Event Flag</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#binlog-event-type">14.9.4.3 Binlog Event Type</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#ignored-events">14.9.4.4 Ignored Cvents</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#start-event-v3">14.9.4.5 START_EVENT_V3</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#format-description-event">14.9.4.6 FORMAT_DESCRIPTION_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#rotate-event">14.9.4.7 ROTATE_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#stop-event">14.9.4.8 STOP_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#query-event">14.9.4.9 QUERY_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#load-event">14.9.4.10 LOAD_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#new-load-event">14.9.4.11 NEW_LOAD_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#create-file-event">14.9.4.12 CREATE_FILE_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#append-block-event">14.9.4.13 APPEND_BLOCK_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#exec-load-event">14.9.4.14 EXEC_LOAD_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#begin-load-query-event">14.9.4.15 BEGIN_LOAD_QUERY_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#execute-load-query-event">14.9.4.16 EXECUTE_LOAD_QUERY_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#delete-file-event">14.9.4.17 DELETE_FILE_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#rand-event">14.9.4.18 RAND_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#xid-event">14.9.4.19 XID_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#intvar-event">14.9.4.20 INTVAR_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#user-var-event">14.9.4.21 USER_VAR_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#incident-event">14.9.4.22 INCIDENT_EVENT</a>
+                    </li>
+                    <li>
+                      <a href="ch14s09.html#heartbeat-event">14.9.4.23 HEARTBEAT_EVENT</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s09.html#com-binlog-dump">14.9.5 COM_BINLOG_DUMP</a>
+                </li>
+                <li>
+                  <a href="ch14s09.html#com-binlog-dump-gtid">14.9.6 COM_BINLOG_DUMP_GTID</a>
+                </li>
+                <li>
+                  <a href="ch14s09.html#com-table-dump">14.9.7 COM_TABLE_DUMP</a>
+                </li>
+                <li>
+                  <a href="ch14s09.html#com-connect-out">14.9.8 COM_CONNECT_OUT</a>
+                </li>
+                <li>
+                  <a href="ch14s09.html#com-register-slave">14.9.9 COM_REGISTER_SLAVE</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s10.html">14.10 Row-Based Replication</a>
+              <ul>
+                <li>
+                  <a href="ch14s10.html#table-map-event">14.10.1 TABLE_MAP_EVENT</a>
+                </li>
+                <li>
+                  <a href="ch14s10.html#rows-event">14.10.2 ROWS_EVENT</a>
+                </li>
+                <li>
+                  <a href="ch14s10.html#rows-query-event">14.10.3 ROWS_QUERY_EVENT</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s11.html">14.11 Semi-Synchronous Replication</a>
+              <ul>
+                <li>
+                  <a href="ch14s11.html#semi-sync-binlog-event">14.11.1 Semi-Synchronous Binlog Event</a>
+                </li>
+                <li>
+                  <a href="ch14s11.html#semi-sync-ack-packet">14.11.2 Semi-Synchronous ACK Packet</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s12.html">14.12 Protocol Examples</a>
+              <ul>
+                <li>
+                  <a href="ch14s12.html#a-mysql-client-logs-in">14.12.1 A mysql Client Logs In</a>
+                </li>
+                <li>
+                  <a href="ch14s12.html#protocoltext-resultset">14.12.2 ProtocolText::Resultset</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s12.html#err-instead-of-eof">14.12.2.1 ERR Instead of EOF</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s12.html#auth-method-switch">14.12.3 Auth Method Switch</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s12.html#client-wants-native-server-wants-old">14.12.3.1 Client Wants Native, Server Wants Old</a>
+                    </li>
+                    <li>
+                      <a href="ch14s12.html#client-wants-old-server-wants-native">14.12.3.2 Client Wants Old, Server Wants Native</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch14s12.html#sha256-example">14.12.4 SHA256 Example</a>
+                  <ul>
+                    <li>
+                      <a href="ch14s12.html#fast-path">14.12.4.1 Fast Path</a>
+                    </li>
+                    <li>
+                      <a href="ch14s12.html#public-key-retrieval-example">14.12.4.2 Public Key Retrieval Example</a>
+                    </li>
+                    <li>
+                      <a href="ch14s12.html#not-so-fast-path">14.12.4.3 Not So Fast Path</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch14s13.html">14.13 Source Code Locations</a>
+              <ul>
+                <li>
+                  <a href="ch14s13.html#mysql-server">14.13.1 MySQL Server</a>
+                </li>
+                <li>
+                  <a href="ch14s13.html#binary-protocol-type-implementation">14.13.2 Binary Protocol Type Implementation</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch15.html">15 Stored Programs</a>
+          <ul>
+            <li>
+              <a href="ch15.html#sp-overview">15.1 Overview</a>
+            </li>
+            <li>
+              <a href="ch15s02.html">15.2 Persistent Representation</a>
+              <ul>
+                <li>
+                  <a href="ch15s02.html#sp-storage-sp_sf">15.2.1 Stored Procedure and Stored Function Storage</a>
+                </li>
+                <li>
+                  <a href="ch15s02.html#sp-storage-trigger">15.2.2 Table Trigger Storage</a>
+                </li>
+                <li>
+                  <a href="ch15s02.html#sp-storage-event">15.2.3 Event Storage</a>
+                </li>
+                <li>
+                  <a href="ch15s02.html#sp-storage-derived">15.2.4 Derived Attribute Storage</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch15s03.html">15.3 Internal Representation</a>
+              <ul>
+                <li>
+                  <a href="ch15s03.html#sp-internal-instr">15.3.1 Instructions</a>
+                </li>
+                <li>
+                  <a href="ch15s03.html#sp-internal-pcontext">15.3.2 Parsing Context</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch15s04.html">15.4 Stored Program Parser</a>
+              <ul>
+                <li>
+                  <a href="ch15s04.html#sp-parser-struct">15.4.1 Parser Structure</a>
+                </li>
+                <li>
+                  <a href="ch15s04.html#sp-parser-codegen">15.4.2 Single-Pass Code Generation</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch15s05.html">15.5 Flow Analysis Optimizations</a>
+              <ul>
+                <li>
+                  <a href="ch15s05.html#sp-optimizer-dead">15.5.1 Dead Code Removal</a>
+                </li>
+                <li>
+                  <a href="ch15s05.html#sp-optimizer-jump">15.5.2 Jump Shortcut Resolution</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch15s06.html">15.6 Stored Program Caches</a>
+              <ul>
+                <li>
+                  <a href="ch15s06.html#sp-cache-sp">15.6.1 Stored Procedure Cache</a>
+                </li>
+                <li>
+                  <a href="ch15s06.html#sp-cache-sf">15.6.2 Stored Function Cache</a>
+                </li>
+                <li>
+                  <a href="ch15s06.html#sp-cache-trg">15.6.3 Table Trigger Cache</a>
+                </li>
+                <li>
+                  <a href="ch15s06.html#sp-cache-evt">15.6.4 Events and Caching</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch15s07.html">15.7 Stored Program Execution</a>
+              <ul>
+                <li>
+                  <a href="ch15s07.html#sp-exec-rcont">15.7.1 Runtime Context</a>
+                  <ul>
+                    <li>
+                      <a href="ch15s07.html#sp-exec-rcont-var">15.7.1.1 Local Variables</a>
+                    </li>
+                    <li>
+                      <a href="ch15s07.html#sp-exec-rcont-cursor">15.7.1.2 Cursors</a>
+                    </li>
+                    <li>
+                      <a href="ch15s07.html#sp-exec-rcont-case">15.7.1.3 Case Expressions</a>
+                    </li>
+                    <li>
+                      <a href="ch15s07.html#sp-exec-rcont-handler">15.7.1.4 Exception Handlers</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch15s07.html#sp-exec-instr">15.7.2 Executing One Instruction</a>
+                </li>
+                <li>
+                  <a href="ch15s07.html#sp-exec-flow">15.7.3 Flow Control</a>
+                </li>
+                <li>
+                  <a href="ch15s07.html#sp-exec-handler">15.7.4 Exception Handling</a>
+                </li>
+                <li>
+                  <a href="ch15s07.html#sp-exec-nest">15.7.5 Call Nesting</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch16.html">16 Prepared Statement and Stored Routine Re-Execution</a>
+          <ul>
+            <li>
+              <a href="ch16.html#prepared-stored-reexecution">16.1 Statement Re-Execution Requirements</a>
+            </li>
+            <li>
+              <a href="ch16s02.html">16.2 Preparation of a Prepared Statement</a>
+            </li>
+            <li>
+              <a href="ch16s03.html">16.3 Execution of a Prepared Statement</a>
+            </li>
+            <li>
+              <a href="ch16s04.html">16.4 Execution of a Stored Procedure Statement</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch17.html">17 Writing a Procedure</a>
+          <ul>
+            <li>
+              <a href="ch17.html#class-procedure">17.1 Extend Class Procedure</a>
+              <ul>
+                <li>
+                  <a href="ch17.html#class-procedure-constructor">17.1.1 Constructor</a>
+                </li>
+                <li>
+                  <a href="ch17.html#class-procedure-change-columns">17.1.2 change_columns()</a>
+                </li>
+                <li>
+                  <a href="ch17.html#class-procedure-send-row">17.1.3 send_row()</a>
+                </li>
+                <li>
+                  <a href="ch17.html#class-procedure-add">17.1.4 add()</a>
+                </li>
+                <li>
+                  <a href="ch17.html#class-procedure-end-group">17.1.5 end_group()</a>
+                </li>
+                <li>
+                  <a href="ch17.html#class-procedure-end-of-records">17.1.6 end_of_records()</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch17s02.html">17.2 Initialization Callback</a>
+            </li>
+            <li>
+              <a href="ch17s03.html">17.3 Calling Sequence</a>
+            </li>
+            <li>
+              <a href="ch17s04.html">17.4 Required Server Code Patches</a>
+            </li>
+            <li>
+              <a href="ch17s05.html">17.5 Examples</a>
+              <ul>
+                <li>
+                  <a href="ch17s05.html#procedure-rownum">17.5.1 PROCEDURE ROWNUM(): Adding a RowNum Pseudo Column to a Result Set</a>
+                </li>
+                <li>
+                  <a href="ch17s05.html#procedure-calltrace">17.5.2 PROCEDURE CALLTRACE(): Simple Trace of Procedure Member Function Calls</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch18.html">18 Replication</a>
+          <ul>
+            <li>
+              <a href="ch18.html#replication-organization">18.1 Chapter Organization</a>
+            </li>
+            <li>
+              <a href="ch18s02.html">18.2 Source Code Files</a>
+            </li>
+            <li>
+              <a href="ch18s03.html">18.3 Principles</a>
+              <ul>
+                <li>
+                  <a href="ch18s03.html#binlog-formats">18.3.1 Binlog Formats</a>
+                </li>
+                <li>
+                  <a href="ch18s03.html#differences-master-slave">18.3.2 Differences Between Master and Slave</a>
+                  <ul>
+                    <li>
+                      <a href="ch18s03.html#replication-not-guaranteed">18.3.2.1 Exceptions: Situations Where We Do Not Guarantee Correct Replication</a>
+                    </li>
+                    <li>
+                      <a href="ch18s03.html#replication-correct">18.3.2.2 Additions: Special Situations Where We Do Support Correct Replication</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch18s03.html#replication-crashes">18.3.3 Crashes</a>
+                </li>
+                <li>
+                  <a href="ch18s03.html#binlog-files-and-indexes">18.3.4 Binlog Files and Indexes</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch18s04.html">18.4 Rules</a>
+              <ul>
+                <li>
+                  <a href="ch18s04.html#determining-logging-format">18.4.1 Determining the Logging Format</a>
+                </li>
+                <li>
+                  <a href="ch18s04.html#unsafe-statements">18.4.2 Unsafe Statements</a>
+                </li>
+                <li>
+                  <a href="ch18s04.html#logging-transactions">18.4.3 Logging Transactions</a>
+                  <ul>
+                    <li>
+                      <a href="ch18s04.html#logging-transactions-definitions">18.4.3.1 Definitions</a>
+                    </li>
+                    <li>
+                      <a href="ch18s04.html#logging-transactions-preliminary-rules">18.4.3.2 Preliminary Rules</a>
+                    </li>
+                    <li>
+                      <a href="ch18s04.html#logging-transactions-rules-for-non-committing-statements">18.4.3.3 Rules for Non-committing Statements, Except CREATE TEMPORARY TABLE...SELECT</a>
+                    </li>
+                    <li>
+                      <a href="ch18s04.html#logging-transactions-rules-for-create-table-select">18.4.3.4 Rules for CREATE [TEMPORARY] TABLE...SELECT</a>
+                    </li>
+                    <li>
+                      <a href="ch18s04.html#logging-transactions-rules-for-commmitting-statements">18.4.3.5 Rules for Committing Statements, Except CREATE [TEMPORARY] TABLE...SELECT</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch18s04.html#logging-updates-auto-incement-columns">18.4.4 Logging Updates to auto_increment Columns</a>
+                </li>
+                <li>
+                  <a href="ch18s04.html#logging-access-variables-functions">18.4.5 Logging Access to Variables and Functions</a>
+                </li>
+                <li>
+                  <a href="ch18s04.html#other-unsafe-statements">18.4.6 Other Unsafe Statements</a>
+                </li>
+                <li>
+                  <a href="ch18s04.html#binlog-row-image">18.4.7 binlog_row_image</a>
+                </li>
+                <li>
+                  <a href="ch18s04.html#replication-locks">18.4.8 Replication Locks</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch19.html">19 The Binary Log</a>
+          <ul>
+            <li>
+              <a href="ch19.html#binary-log-overview">19.1 Binary Log Overview</a>
+            </li>
+            <li>
+              <a href="ch19s02.html">19.2 High-Level Binary Log Structure and Contents</a>
+            </li>
+            <li>
+              <a href="ch19s03.html">19.3 Source Files Related to the Binary Log</a>
+              <ul>
+                <li>
+                  <a href="ch19s03.html#source-file-archaeological-notes">19.3.1 Source File Archaeological Notes</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch19s04.html">19.4 Generating Browsable Binary Log Information</a>
+            </li>
+            <li>
+              <a href="ch19s05.html">19.5 Event Classes and Types</a>
+              <ul>
+                <li>
+                  <a href="ch19s05.html#event-class-archaeological-notes">19.5.1 Event Class Archaeological Notes</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch19s06.html">19.6 Event Meanings</a>
+            </li>
+            <li>
+              <a href="ch19s07.html">19.7 Event Structure</a>
+              <ul>
+                <li>
+                  <a href="ch19s07.html#event-content-writing-conventions">19.7.1 Event Content-Writing Conventions</a>
+                </li>
+                <li>
+                  <a href="ch19s07.html#event-header-fields">19.7.2 Event Header Fields</a>
+                  <ul>
+                    <li>
+                      <a href="ch19s07.html#event-flags">19.7.2.1 Event Flags</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch19s07.html#event-data-fields">19.7.3 Event Data Fields (Event-Specific Information)</a>
+                  <ul>
+                    <li>
+                      <a href="ch19s07.html#event-data-field-notational-caveat">19.7.3.1 Event Data Field Notational Caveat</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch19s08.html">19.8 Binary Log Versions</a>
+              <ul>
+                <li>
+                  <a href="ch19s08.html#determining-binary-log-version">19.8.1 Determining the Binary Log Version</a>
+                </li>
+                <li>
+                  <a href="ch19s08.html#ensuring-compatibility-of-future-binary-log-versions">19.8.2 Ensuring Compatibility of Future Binary Log Versions</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch19s09.html">19.9 Event Data for Specific Event Types</a>
+              <ul>
+                <li>
+                  <a href="ch19s09.html#load-data-infile-events">19.9.1 LOAD DATA INFILE Events</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch19s10.html">19.10 Row-Based Binary Logging</a>
+            </li>
+            <li>
+              <a href="ch19s11.html">19.11 Additional Resources</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch20.html">20 MyISAM Storage Engine</a>
+          <ul>
+            <li>
+              <a href="ch20.html#myisam-record-structure">20.1 MyISAM Record Structure</a>
+              <ul>
+                <li>
+                  <a href="ch20.html#myisam-introduction">20.1.1 Introduction</a>
+                </li>
+                <li>
+                  <a href="ch20.html#myisam-column-attributes">20.1.2 Physical Attributes of Columns</a>
+                </li>
+                <li>
+                  <a href="ch20.html#myisam-more-information">20.1.3 Where to Look For More Information</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch20s02.html">20.2 The .MYI File</a>
+              <ul>
+                <li>
+                  <a href="ch20s02.html#myisam-files">20.2.1 MyISAM Files</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch20s03.html">20.3 MyISAM Dynamic Data File Layout</a>
+              <ul>
+                <li>
+                  <a href="ch20s03.html#layout-record-storage-frame">20.3.1 Layout of the Record Storage Frame (Record Part, Record Block)</a>
+                </li>
+                <li>
+                  <a href="ch20s03.html#record-contents">20.3.2 Record Contents</a>
+                </li>
+                <li>
+                  <a href="ch20s03.html#packed-record-layout">20.3.3 Packed Record Layout</a>
+                </li>
+                <li>
+                  <a href="ch20s03.html#in-memory-record-layout">20.3.4 In-memory Record Layout</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch20s04.html">20.4 MyISAM Compressed Data File Layout</a>
+              <ul>
+                <li>
+                  <a href="ch20s04.html#huffman-compression">20.4.1 Huffman Compression</a>
+                </li>
+                <li>
+                  <a href="ch20s04.html#myisampack">20.4.2 The myisampack Program</a>
+                </li>
+                <li>
+                  <a href="ch20s04.html#record-and-blob-length-encoding">20.4.3 Record and Blob Length Encoding</a>
+                </li>
+                <li>
+                  <a href="ch20s04.html#code-tree-representation">20.4.4 Code Tree Representation</a>
+                </li>
+                <li>
+                  <a href="ch20s04.html#index-file-usage">20.4.5 Usage of the Index File</a>
+                </li>
+                <li>
+                  <a href="ch20s04.html#myisampack-tricks">20.4.6 myisampackTricks</a>
+                </li>
+                <li>
+                  <a href="ch20s04.html#decoding-specification">20.4.7 Detailed Specification of the Decoding</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch20s05.html">20.5 MyISAM Key Cache</a>
+              <ul>
+                <li>
+                  <a href="ch20s05.html#myisam-concurrent-insert">20.5.1 MyISAM Concurrent Insert</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch21.html">21 InnoDB Storage Engine</a>
+          <ul>
+            <li>
+              <a href="ch21.html#innodb-record-structure">21.1 InnoDB Record Structure</a>
+              <ul>
+                <li>
+                  <a href="ch21.html#innodb-overview">21.1.1 High-Altitude Picture</a>
+                  <ul>
+                    <li>
+                      <a href="ch21.html#innodb-field-start-offsets">21.1.1.1 FIELD START OFFSETS</a>
+                    </li>
+                    <li>
+                      <a href="ch21.html#innodb-extra-bytes">21.1.1.2 EXTRA BYTES</a>
+                    </li>
+                    <li>
+                      <a href="ch21.html#innodb-field-contents">21.1.1.3 FIELD CONTENTS</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch21.html#innodb-more-information">21.1.2 Where to Look for More Information</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch21s02.html">21.2 InnoDB Page Structure</a>
+              <ul>
+                <li>
+                  <a href="ch21s02.html#innodb-page-overview">21.2.1 High-Altitude View</a>
+                  <ul>
+                    <li>
+                      <a href="ch21s02.html#innodb-fil-header">21.2.1.1 Fil Header</a>
+                    </li>
+                    <li>
+                      <a href="ch21s02.html#innodb-page-header">21.2.1.2 Page Header</a>
+                    </li>
+                    <li>
+                      <a href="ch21s02.html#innodb-infimum-and-supremum-records">21.2.1.3 The Infimum and Supremum Records</a>
+                    </li>
+                    <li>
+                      <a href="ch21s02.html#innodb-user-records">21.2.1.4 User Records</a>
+                    </li>
+                    <li>
+                      <a href="ch21s02.html#innodb-free-space">21.2.1.5 Free Space</a>
+                    </li>
+                    <li>
+                      <a href="ch21s02.html#innodb-page-directory">21.2.1.6 Page Directory</a>
+                    </li>
+                    <li>
+                      <a href="ch21s02.html#innodb-fil-trailer">21.2.1.7 Fil Trailer</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch21s02.html#innodb-page-example">21.2.2 Example</a>
+                </li>
+                <li>
+                  <a href="ch21s02.html#innodb-more-page-information">21.2.3 Where to Look For More Information</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch22.html">22 Writing a Custom Storage Engine</a>
+          <ul>
+            <li>
+              <a href="ch22.html#custom-engine-additional-resources">22.1 Additional Resources</a>
+            </li>
+            <li>
+              <a href="ch22s02.html">22.2 Overview</a>
+            </li>
+            <li>
+              <a href="ch22s03.html">22.3 Creating Storage Engine Source Files</a>
+            </li>
+            <li>
+              <a href="ch22s04.html">22.4 Adding Engine Specific Variables and Parameters</a>
+            </li>
+            <li>
+              <a href="ch22s05.html">22.5 Creating the handlerton</a>
+            </li>
+            <li>
+              <a href="ch22s06.html">22.6 Handling Handler Instantiation</a>
+            </li>
+            <li>
+              <a href="ch22s07.html">22.7 Defining Filename Extensions</a>
+            </li>
+            <li>
+              <a href="ch22s08.html">22.8 Creating Tables</a>
+            </li>
+            <li>
+              <a href="ch22s09.html">22.9 Opening a Table</a>
+            </li>
+            <li>
+              <a href="ch22s10.html">22.10 Implementing Basic Table Scanning</a>
+              <ul>
+                <li>
+                  <a href="ch22s10.html#implementing-store-lock-method">22.10.1 Implementing the store_lock() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s10.html#implementing-external-lock-method">22.10.2 Implementing the external_lock() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s10.html#implementing-rnd-init-method">22.10.3 Implementing the rnd_init() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s10.html#implementing-info-method">22.10.4 Implementing the info(uinf flag) Method</a>
+                </li>
+                <li>
+                  <a href="ch22s10.html#implementing-extra-method">22.10.5 Implementing the extra() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s10.html#implementing-rnd-next-method">22.10.6 Implementing the rnd_next() Method</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch22s11.html">22.11 Closing a Table</a>
+            </li>
+            <li>
+              <a href="ch22s12.html">22.12 Adding Support for INSERT to a Storage Engine</a>
+            </li>
+            <li>
+              <a href="ch22s13.html">22.13 Adding Support for UPDATE to a Storage Engine</a>
+            </li>
+            <li>
+              <a href="ch22s14.html">22.14 Adding Support for DELETE to a Storage Engine</a>
+            </li>
+            <li>
+              <a href="ch22s15.html">22.15 Supporting Non-Sequential Reads</a>
+              <ul>
+                <li>
+                  <a href="ch22s15.html#implementing-position-method">22.15.1 Implementing the position() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s15.html#implementing-rnd-pos-method">22.15.2 Implementing the rnd_pos() Method</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch22s16.html">22.16 Supporting Indexing</a>
+              <ul>
+                <li>
+                  <a href="ch22s16.html#indexing-overview">22.16.1 Indexing Overview</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#getting-index-information">22.16.2 Getting Index Information During CREATE TABLE Operations</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#creating-index-keys">22.16.3 Creating Index Keys</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#parsing-key-information">22.16.4 Parsing Key Information</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#providing-index-information-to-optimizer">22.16.5 Providing Index Information to the Optimizer</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s16.html#implementing-the-info-method">22.16.5.1 Implementing the info() Method</a>
+                    </li>
+                    <li>
+                      <a href="ch22s16.html#implementing-records-in-range-method">22.16.5.2 Implementing the records_in_range Method</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s16.html#preparing-for-index-use">22.16.6 Preparing for Index Use with index_init()</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#cleaning-up-with-index-end">22.16.7 Cleaning up with index_end()</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-index-read-method">22.16.8 Implementing the index_read() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-the-rnd-next-method">22.16.9 Implementing the index_read_idx() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-index-read-last-method">22.16.10 Implementing the index_read_last() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-index-next-method">22.16.11 Implementing the index_next() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-index-prev-method">22.16.12 Implementing the index_prev() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-index-first-method">22.16.13 Implementing the index_first() Method</a>
+                </li>
+                <li>
+                  <a href="ch22s16.html#implementing-index-last-method">22.16.14 Implementing the index_last() Method</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch22s17.html">22.17 Supporting Transactions</a>
+              <ul>
+                <li>
+                  <a href="ch22s17.html#transaction-overview">22.17.1 Transaction Overview</a>
+                </li>
+                <li>
+                  <a href="ch22s17.html#starting-transaction">22.17.2 Starting a Transaction</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s17.html#starting-transaction-from-start-stmt-call">22.17.2.1 Starting a Transaction from a start_stmt() Call</a>
+                    </li>
+                    <li>
+                      <a href="ch22s17.html#starting-transaction-from-external-lock-method">22.17.2.2 Starting a Transaction from a external_lock() Method</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s17.html#implementing-rollback">22.17.3 Implementing ROLLBACK</a>
+                </li>
+                <li>
+                  <a href="ch22s17.html#implementing-commit">22.17.4 Implementing COMMIT</a>
+                </li>
+                <li>
+                  <a href="ch22s17.html#support-for-savepoints">22.17.5 Adding Support for Savepoints</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s17.html#specifying-savepoint-offset">22.17.5.1 Specifying the Savepoint Offset</a>
+                    </li>
+                    <li>
+                      <a href="ch22s17.html#implementing-savepoint-set-method">22.17.5.2 Implementing the savepoint_set Method</a>
+                    </li>
+                    <li>
+                      <a href="ch22s17.html#implementing-savepoint-rollback-method">22.17.5.3 Implementing the savepoint_rollback() Method</a>
+                    </li>
+                    <li>
+                      <a href="ch22s17.html#implementing-savepoint-release-method">22.17.5.4 Implementing the savepoint_release() Method</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch22s18.html">22.18 API Reference</a>
+              <ul>
+                <li>
+                  <a href="ch22s18.html#bas-ext">22.18.1 bas_ext</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-purpose">22.18.1.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-synopsis">22.18.1.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-description">22.18.1.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-parameters">22.18.1.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-return-values">22.18.1.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-usage">22.18.1.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#bas-ext-default-implementation">22.18.1.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#close">22.18.2 close</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#close-purpose">22.18.2.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#close-synopsis">22.18.2.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#close-description">22.18.2.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#close-parameters">22.18.2.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#close-return-values">22.18.2.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#close-usage">22.18.2.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#create">22.18.3 create</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#create-purpose">22.18.3.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#create-synopsis">22.18.3.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#create-description">22.18.3.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#create-parameters">22.18.3.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#create-return-values">22.18.3.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#create-usage">22.18.3.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#delete-row">22.18.4 delete_row</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#delete-row-purpose">22.18.4.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-row-synopsis">22.18.4.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-row-description">22.18.4.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-row-parameters">22.18.4.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-row-return-values">22.18.4.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-row-usage">22.18.4.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-row-default-implementation">22.18.4.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#delete-table">22.18.5 delete_table</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#delete-table-purpose">22.18.5.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-table-synopsis">22.18.5.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-table-description">22.18.5.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-table-parameters">22.18.5.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-table-return-values">22.18.5.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#delete-table-usage">22.18.5.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#external-lock">22.18.6 external_lock</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#external-lock-purpose">22.18.6.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#external-lock-synopsis">22.18.6.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#external-lock-description">22.18.6.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#external-lock-parameters">22.18.6.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#external-lock-return-values">22.18.6.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#external-lock-default-implementation">22.18.6.6 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#extra">22.18.7 extra</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#extra-purpose">22.18.7.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#extra-synopsis">22.18.7.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#extra-description">22.18.7.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#extra-parameters">22.18.7.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#extra-return-values">22.18.7.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#extra-usage">22.18.7.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#extra-default-implementation">22.18.7.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-end">22.18.8 index_end</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-end-purpose">22.18.8.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-end-synopsis">22.18.8.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-end-description">22.18.8.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-end-parameters">22.18.8.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-end-return-values">22.18.8.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-end-usage">22.18.8.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-end-default-implementation">22.18.8.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-first">22.18.9 index_first</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-first-purpose">22.18.9.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-first-synopsis">22.18.9.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-first-description">22.18.9.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-first-parameters">22.18.9.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-first-return-values">22.18.9.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-first-usage">22.18.9.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-first-default-implementation">22.18.9.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-init">22.18.10 index_init</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-init-purpose">22.18.10.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-init-synopsis">22.18.10.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-init-description">22.18.10.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-init-parameters">22.18.10.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-init-return-values">22.18.10.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-init-usage">22.18.10.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-init-default-implementation">22.18.10.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-last">22.18.11 index_last</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-last-purpose">22.18.11.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-last-synopsis">22.18.11.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-last-description">22.18.11.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-last-parameters">22.18.11.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-last-return-values">22.18.11.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-last-usage">22.18.11.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-last-default-implementation">22.18.11.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-next">22.18.12 index_next</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-next-purpose">22.18.12.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-next-synopsis">22.18.12.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-next-description">22.18.12.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-next-parameters">22.18.12.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-next-return-values">22.18.12.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-next-usage">22.18.12.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-next-default-implementation">22.18.12.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-prev">22.18.13 index_prev</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-prev-purpose">22.18.13.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-prev-synopsis">22.18.13.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-prev-description">22.18.13.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-prev-parameters">22.18.13.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-prev-return-values">22.18.13.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-prev-usage">22.18.13.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-prev-default-implementation">22.18.13.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-read">22.18.14 index_read</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-read-purpose">22.18.14.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-synopsis">22.18.14.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-description">22.18.14.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-parameters">22.18.14.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-return-values">22.18.14.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-usage">22.18.14.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-default-implementation">22.18.14.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-read-idx">22.18.15 index_read_idx</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-read-idx-purpose">22.18.15.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-idx-synopsis">22.18.15.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-idx-description">22.18.15.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-idx-parameters">22.18.15.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-idx-return-values">22.18.15.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-idx-usage">22.18.15.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#index-read-last">22.18.16 index_read_last</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-purpose">22.18.16.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-synopsis">22.18.16.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-description">22.18.16.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-parameters">22.18.16.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-return-values">22.18.16.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-usage">22.18.16.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#index-read-last-default-implementation">22.18.16.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#info">22.18.17 info</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#info-purpose">22.18.17.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#info-synopsis">22.18.17.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#info-description">22.18.17.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#info-parameters">22.18.17.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#info-return-values">22.18.17.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#info-usage">22.18.17.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#open">22.18.18 open</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#open-purpose">22.18.18.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#open-synopsis">22.18.18.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#open-description">22.18.18.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#open-parameters">22.18.18.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#open-return-values">22.18.18.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#open-usage">22.18.18.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#position">22.18.19 position</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#position-purpose">22.18.19.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#position-synapsis">22.18.19.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#position-description">22.18.19.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#position-parameters">22.18.19.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#position-return-values">22.18.19.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#position-usage">22.18.19.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#records-in-range">22.18.20 records_in_range</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-purpose">22.18.20.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-synopsis">22.18.20.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-description">22.18.20.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-parameters">22.18.20.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-return-values">22.18.20.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-usage">22.18.20.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#records-in-range-default-implementation">22.18.20.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#rnd-init">22.18.21 rnd_init</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#rnd-init-purpose">22.18.21.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-init-synopsis">22.18.21.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-init-description">22.18.21.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-init-parameters">22.18.21.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-init-return-values">22.18.21.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-init-usage">22.18.21.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#rnd-next">22.18.22 rnd_next</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#rnd-next-purpose">22.18.22.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-next-synopsis">22.18.22.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-next-description">22.18.22.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-next-parameters">22.18.22.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-next-return-values">22.18.22.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-next-usage">22.18.22.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#rnd-pos">22.18.23 rnd_pos</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#rnd-pos-purpose">22.18.23.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-pos-synopsis">22.18.23.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-pos-description">22.18.23.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-pos-parameters">22.18.23.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-pos-return-values">22.18.23.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#rnd-pos-usage">22.18.23.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#start-stmt">22.18.24 start_stmt</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-purpose">22.18.24.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-synopsis">22.18.24.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-description">22.18.24.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-parameters">22.18.24.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-return-values">22.18.24.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-usage">22.18.24.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#start-stmt-default-implementation">22.18.24.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#store-lock">22.18.25 store_lock</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#store-lock-purpose">22.18.25.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#store-lock-synopsis">22.18.25.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#store-lock-description">22.18.25.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#store-lock-parameters">22.18.25.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#store-lock-return-values">22.18.25.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#store-lock-usage">22.18.25.6 Usage</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#update-row">22.18.26 update_row</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#update-row-purpose">22.18.26.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#update-row-synopsis">22.18.26.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#update-row-description">22.18.26.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#update-row-parameters">22.18.26.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#update-row-return-values">22.18.26.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#update-row-usage">22.18.26.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#update-row-default-implementation">22.18.26.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <a href="ch22s18.html#write-row">22.18.27 write_row</a>
+                  <ul>
+                    <li>
+                      <a href="ch22s18.html#write-row-purpose">22.18.27.1 Purpose</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#write-row-synopsis">22.18.27.2 Synopsis</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#write-row-description">22.18.27.3 Description</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#write-row-parameters">22.18.27.4 Parameters</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#write-row-return-values">22.18.27.5 Return Values</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#write-row-usage">22.18.27.6 Usage</a>
+                    </li>
+                    <li>
+                      <a href="ch22s18.html#write-row-default-implementation">22.18.27.7 Default Implementation</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch22s19.html">22.19 FAQ</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch23.html">23 Test Synchronization</a>
+          <ul>
+            <li>
+              <a href="ch23.html#sleep">23.1 Sleep</a>
+            </li>
+            <li>
+              <a href="ch23s02.html">23.2 Wait Condition</a>
+            </li>
+            <li>
+              <a href="ch23s03.html">23.3 Dbug Sleep</a>
+            </li>
+            <li>
+              <a href="ch23s04.html">23.4 Error Injection</a>
+            </li>
+            <li>
+              <a href="ch23s05.html">23.5 User-Level Locks</a>
+            </li>
+            <li>
+              <a href="ch23s06.html">23.6 Debug Sync Facility</a>
+              <ul>
+                <li>
+                  <a href="ch23s06.html#syntax-debug-sync-values">23.6.1 Formal Syntax for DEBUG_SYNC Values</a>
+                </li>
+                <li>
+                  <a href="ch23s06.html#debug-sync-activation-deactivation">23.6.2 Debug Sync Activation/Deactivation</a>
+                </li>
+                <li>
+                  <a href="ch23s06.html#debug-sync-implementation">23.6.3 Debug Sync Implementation</a>
+                </li>
+                <li>
+                  <a href="ch23s06.html#synchronization-pattern">23.6.4 A Typical Synchronization Pattern</a>
+                </li>
+                <li>
+                  <a href="ch23s06.html#cowork-with-dbug-facility">23.6.5 Co-work With the DBUG Facility</a>
+                </li>
+                <li>
+                  <a href="ch23s06.html#debug-sync-further-reading">23.6.6 Debug Sync Further Reading</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch23s07.html">23.7 Debug Sync Point (Obsolete)</a>
+              <ul>
+                <li>
+                  <a href="ch23s07.html#backup-breakpoint">23.7.1 Backup Breakpoint</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch24.html">24 Injecting Test Faults</a>
+          <ul>
+            <li>
+              <a href="ch24.html#test-faults-macros">24.1 Test Fault Macros</a>
+            </li>
+            <li>
+              <a href="ch24s02.html">24.2 Test Fault Macro Usage</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch25.html">25 How to Create Good Test Cases</a>
+          <ul>
+            <li>
+              <a href="ch25.html#formal-stuff">25.1 Formal Stuff</a>
+              <ul>
+                <li>
+                  <a href="ch25.html#coding-style">25.1.1 Coding Style</a>
+                </li>
+                <li>
+                  <a href="ch25.html#sql-statement-example">25.1.2 SQL Statement Example</a>
+                </li>
+                <li>
+                  <a href="ch25.html#avoid-too-dense-code">25.1.3 Please Avoid too Dense Code</a>
+                </li>
+                <li>
+                  <a href="ch25.html#header-of-scripts">25.1.4 Header of Scripts</a>
+                </li>
+                <li>
+                  <a href="ch25.html#header-example">25.1.5 Header Example</a>
+                </li>
+                <li>
+                  <a href="ch25.html#comments-within-boxes">25.1.6 Comments Within Boxes</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch25s02.html">25.2 Comments Everywhere</a>
+              <ul>
+                <li>
+                  <a href="ch25s02.html#complicated-test-architecture">25.2.1 Complicated test Architecture or Tricky Code</a>
+                </li>
+                <li>
+                  <a href="ch25s02.html#subtest-case">25.2.2 A Subtest Case is Able to Reveal a Bug</a>
+                </li>
+                <li>
+                  <a href="ch25s02.html#subtests">25.2.3 Subtests</a>
+                </li>
+                <li>
+                  <a href="ch25s02.html#make-test-protocols-more-understandable">25.2.4 Make Test Protocols More Understandable</a>
+                </li>
+                <li>
+                  <a href="ch25s02.html#better-protocols-example">25.2.5 Better Protocol Example</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch25s03.html">25.3 Some Rules Outside of the Formal Stuff</a>
+              <ul>
+                <li>
+                  <a href="ch25s03.html#error-masking">25.3.1 Error Masking</a>
+                </li>
+                <li>
+                  <a href="ch25s03.html#use-of-disable-abort-on-error">25.3.2 Use of the Option --disable_abort_on_error</a>
+                </li>
+                <li>
+                  <a href="ch25s03.html#perfect-cleanup">25.3.3 Perfect Cleanup at the End of a Test</a>
+                </li>
+                <li>
+                  <a href="ch25s03.html#os-specific-commands">25.3.4 Use of OS-Specific Commands</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch25s04.html">25.4 Negative Tests</a>
+            </li>
+            <li>
+              <a href="ch25s05.html">25.5 Tests with Several Variants</a>
+              <ul>
+                <li>
+                  <a href="ch25s05.html#variation-of-storage-engine">25.5.1 Variation of the Storage Engine</a>
+                </li>
+                <li>
+                  <a href="ch25s05.html#variation-of-protocol-option">25.5.2 Variation of the Protocol Option</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch25s06.html">25.6 Miscellaneous Tips</a>
+              <ul>
+                <li>
+                  <a href="ch25s06.html#stability-checks-for-random-timing-problems">25.6.1 Stability Checks for Random Timing Problems</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#stability-checks-for-hostname-problems">25.6.2 Stability Checks for Hostname-Related Problems</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#stability-checks-for-unexpected-problems">25.6.3 Stability Checks for Unexpected Problems</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#row-order-within-result-sets">25.6.4 Row Order Within Result Sets</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#test-case-behavior-depending-on-show">25.6.5 Test Case Behavior Should Depend on the Result of a SHOW</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#test-execution-hanging">25.6.6 Does a Test Execution Hang?</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#complicated-test-support-debugging">25.6.7 If Your Test is Complicated, Support Debugging</a>
+                </li>
+                <li>
+                  <a href="ch25s06.html#grepping-for-syntax">25.6.8 You Need to Know Some Syntax, an Option, Etc., but Hate Reading Manuals</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch25s07.html">25.7 Notes on MTR2</a>
+            </li>
+            <li>
+              <a href="ch25s08.html">25.8 Examples of Suspicious Tests and Scripts</a>
+              <ul>
+                <li>
+                  <a href="ch25s08.html#mismatch-of-focus-of-test-and-code-sequence">25.8.1 Probably Mismatch of Focus of Test and Code Sequence</a>
+                </li>
+                <li>
+                  <a href="ch25s08.html#too-greedy-test">25.8.2 Too Greedy Test</a>
+                </li>
+                <li>
+                  <a href="ch25s08.html#risky-handling-around-additional-sessions">25.8.3 Risky Handling Around Additional Sessions</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="ch26.html">26 Error Messages</a>
+          <ul>
+            <li>
+              <a href="ch26.html#error-message-adding">26.1 Adding New Error Messages to MySQL</a>
+              <ul>
+                <li>
+                  <a href="ch26.html#error-message-multiple-versions">26.1.1 Adding an Error Message to Multiple MySQL Versions</a>
+                </li>
+                <li>
+                  <a href="ch26.html#error-messages-5-0-3-higher">26.1.2 Adding Error Messages to MySQL 5.0.3 or Higher</a>
+                </li>
+                <li>
+                  <a href="ch26.html#error-messages-old-versions">26.1.3 Adding Error Messages to Old (&lt; MySQL 5.0) Versions</a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="ch26s02.html">26.2 Adding Storage Engine Error Messages</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="apa.html">A MySQL Source Code Distribution</a>
+          <ul>
+            <li>
+              <a href="apa.html#source-directory-listing">A.1 Directory Listing</a>
+              <ul>
+                <li>
+                  <a href="apa.html#build-directory">A.1.1 The BUILD Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#client-directory">A.1.2 The client Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#config-directory">A.1.3 The config Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#cmd-line-utils-directory">A.1.4 The cmd-line-utils Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#dbug-directory">A.1.5 The dbug Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#docs-directory">A.1.6 The Docs Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#extra-directory">A.1.7 The extra Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#heap-directory">A.1.8 The heap Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#include-directory">A.1.9 The include Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#innobase-directory">A.1.10 The innobase Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#libmysql-directory">A.1.11 The libmysql Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#libmysql-r-directory">A.1.12 The libmysql_r Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#libmysqld-directory">A.1.13 The libmysqld Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#man-directory">A.1.14 The man Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#myisam-directory">A.1.15 The myisam Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#myisammrg-directory">A.1.16 The myisammrg Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#mysql-test-directory">A.1.17 The mysql-test Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#mysys-directory">A.1.18 The mysys Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#ndb-directory">A.1.19 The ndb Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#netware-directory">A.1.20 The netware Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#new-rpms-directory">A.1.21 The NEW-RPMS Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#os-directory">A.1.22 The os2 Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#pstack-directory">A.1.23 The pstack Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#regex-directory">A.1.24 The regex Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#sccs-directory">A.1.25 The SCCS Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#scripts-directory">A.1.26 The scripts Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#server-tools-directory">A.1.27 The server-tools Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#sql-directory">A.1.28 The sql Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#sql-bench-directory">A.1.29 The sql-bench Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#sql-common-directory">A.1.30 The sql-common Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#ssl-directory">A.1.31 The SSL Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#strings-directory">A.1.32 The strings Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#support-files-directory">A.1.33 The support-files Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#tests-directory">A.1.34 The tests Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#tools-directory">A.1.35 The tools Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#vc-plus-plus-files-directory">A.1.36 The VC++Files Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#vio-directory">A.1.37 The vio Directory</a>
+                </li>
+                <li>
+                  <a href="apa.html#zlib-directory">A.1.38 The zlib Directory</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a href="apb.html">B InnoDB Source Code Distribution</a>
+        </li>
+        <li>
+          <a href="ix01.html">Index</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+
+  </div>
+  
+
+  <div class="calibreEbNav">
+    
+      <a href="ch01s10.html" class="calibreAPrev">previous page</a>
+    
+
+    <a href="../../index.html" class="calibreAHome"> start</a>
+
+    
+      <a href="ch02s02.html" class="calibreANext"> next page</a>
+    
+  </div>
+
+</div>
+
+</body>
+</html>
