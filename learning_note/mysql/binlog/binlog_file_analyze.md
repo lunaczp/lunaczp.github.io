@@ -10,7 +10,7 @@ mysqld  Ver 5.7.19-log for osx10.12 on x86_64 (Homebrew)
 - binlog files: 
 
 ```
-➜  mysql ll *mysql-bin*
+$mysql ll *mysql-bin*
 -rw-r-----  1 nuc  admin   974B 12  7 18:56 mysql-bin.000001
 -rw-r-----  1 nuc  admin    38K 12  8 15:44 mysql-bin.000002
 -rw-r-----  1 nuc  admin    38B 12  7 18:56 mysql-bin.index
@@ -18,7 +18,7 @@ mysqld  Ver 5.7.19-log for osx10.12 on x86_64 (Homebrew)
 
 ## 1. Look at the file
 ```
-➜  mysql xxd mysql-bin.000001|more
+$mysql xxd mysql-bin.000001|more
 00000000: fe62 696e 7bfd 285a 0f01 0000 0077 0000  .bin{.(Z.....w..
 00000010: 007b 0000 0000 0004 0035 2e37 2e31 392d  .{.......5.7.19-
 00000020: 6c6f 6700 0000 0000 0000 0000 0000 0000  log.............
@@ -26,7 +26,7 @@ mysqld  Ver 5.7.19-log for osx10.12 on x86_64 (Homebrew)
 00000040: 0000 0000 0000 0000 0000 007b fd28 5a13  ...........{.(Z.
 ```
 ```
-➜  mysql mysqlbinlog mysql-bin.000001|more
+$mysql mysqlbinlog mysql-bin.000001|more
 /*!50530 SET @@SESSION.PSEUDO_SLAVE_MODE=1*/;
 /*!50003 SET @OLD_COMPLETION_TYPE=@@COMPLETION_TYPE,COMPLETION_TYPE=0*/;
 DELIMITER /*!*/;
@@ -156,7 +156,7 @@ enum Log_event_type
 - `01 00 00 00`, server_id, below is my conf
 
 ```
-➜  mysql cat /etc/my.cnf
+$mysql cat /etc/my.cnf
 [mysqld]
 log-bin    = mysql-bin
 server-id  = 1
@@ -190,7 +190,7 @@ mysql> show variables like "%binlog_checksum%";
 So checksum is enabled. The data size would be 96, follows by 4 byte checksum. First event ends here, then comes the second event, which gives us
 
 ```
-➜  mysql xxd -s 23 -l 104 mysql-bin.000001
+$mysql xxd -s 23 -l 104 mysql-bin.000001
 00000017: 0400 352e 372e 3139 2d6c 6f67 0000 0000  ..5.7.19-log....
 00000027: 0000 0000 0000 0000 0000 0000 0000 0000  ................
 00000037: 0000 0000 0000 0000 0000 0000 0000 0000  ................
