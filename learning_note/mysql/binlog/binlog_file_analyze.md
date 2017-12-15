@@ -168,7 +168,10 @@ binlog_format=row
 	- `0-3`, 4 byte magic num
 	- `4-122`, 119 byte, first event
 	- `123-...`, starts the second event 	
-- `00 00` flag, configuration, see [mysql internal](https://dev.mysql.com/doc/internals/en/) for detail. 
+- `00 00` flag, configuration
+	- `0x20` means this is a artificial event (which means it'll never occur in a binlog file, but only in the network trasmission between master and slave)
+	- `0x1` means this binlog file is in use(mysql currentlly work on). And when rotate to a new file ,this flag will be clear.This is the only case that mysql will overwrite a written file.
+	- other flags, please see [mysql internal](https://dev.mysql.com/doc/internals/en/event-flags.html),`sql/log_event.h:462`.
 
 Above is common header which cost 19 bytes. then comes the specific event data, size shall be
 
