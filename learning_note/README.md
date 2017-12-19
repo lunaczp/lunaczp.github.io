@@ -1,3 +1,3 @@
-# mysql
+# Learning
 
-- [binlog](binlog)
+- [mysql](mysql)
