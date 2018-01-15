@@ -1,5 +1,5 @@
-# Bitcoin: A Peer-to-Peer Electronic Cash System
-本文讲述的是一个端到端的电子货币系统，所有的讨论都是针对电子货币系统而不是传统物理货币（纸质钞票）。
+# Note about: Bitcoin: A Peer-to-Peer Electronic Cash System
+本文讲述的是一个端到端的电子货币系统。
 
 ## 交换与货币的本质
 所有的买卖行为，都是价值交换，而价值交换的本质是_价值认同_。
