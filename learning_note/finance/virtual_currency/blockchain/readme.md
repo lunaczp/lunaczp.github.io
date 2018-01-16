@@ -38,11 +38,16 @@
 #### Hyperledger
 由Linux Foundation主导的项目，旨在打造一个基于区块链的分布式账本项目
 
-#### Fabric
+##### Fabric
 HyperLedger 子项目，提供了基础核心平台
 
-#### Cello
+##### Cello
 提供“Blockchain as a Service"”服务，给第三方接入使用
+
+
+#### NEO
+国人开发的开源区块链项目，旨在打造一个智能经济网络
+> NEO 是利用区块链技术和数字身份进行资产数字化，利用智能合约对数字资产进行自动化管理，实现“智能经济”的一种分布式网络。
 
 
 ### 服务平台
@@ -56,5 +61,4 @@ Azure云服务平台，目前已经提供区块链服务，支持Ethereum，和F
 ## Ref
 - [区块链-维基百科](https://zh.wikipedia.org/wiki/%E5%8C%BA%E5%9D%97%E9%93%BE)
 - [区块链指南-Gitbook](https://yeasy.gitbooks.io/blockchain_guide/content/intro/business.html)
-
-
+- [NEO](https://neo.org/)
