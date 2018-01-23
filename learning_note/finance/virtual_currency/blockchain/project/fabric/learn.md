@@ -50,3 +50,7 @@
 	- 如果某一个Peer安装了某个chaincode，则可以对该Peer执行读写操作。但所有的变更都会同步到所有Peer，不管它们是否安装了某个chaincode。
 	- 也就是说，账本是Channel内全局一致的。而chaincode可以只部署在某些Peer，用来提供读写服务/业务逻辑。
 	- 如上，当生产使用时候，可以把账本本身作为一个底层服务，而chaincode作为业务接入，这样分层后，更方便服务治理。
+
+
+## Reconfigure your network
+网络拓扑调整（加入新组织）很复杂，[参考](http://hyperledger-fabric.readthedocs.io/en/latest/channel_update.html)
