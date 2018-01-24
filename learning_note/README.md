@@ -2,3 +2,4 @@
 
 - [tech](tech)
 - [finance](finance)
+- [understand](understand)
