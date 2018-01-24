@@ -35,3 +35,6 @@ cp -f bin/* $GOPATH/bin
 ```
 
 重启fabric-ca-server，重新register，成功。
+
+_反思_
+- 新项目，文档可能有不详细或者无法完全测试过的地方
