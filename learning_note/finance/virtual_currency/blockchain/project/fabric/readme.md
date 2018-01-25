@@ -11,3 +11,6 @@
 - [CA](ca.md)
 - [MSP](msp.md)
 - [Orderer](orderer.md)
+
+## Evaluate and Test
+- [evaluate](evaluate.md)
