@@ -26,7 +26,7 @@ export CHANNEL_NAME=mychannel
 peer channel create -o orderer.example.com:7050 -c $CHANNEL_NAME -f ./channel-artifacts/channel.tx --tls --cafile /opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 ```
 
-此时，Orderer收到请求，创建channel，并为该channel生成一个区块链（注意此链不是该channel对数据链，而是Orderer用来记录channel配置的链）
+此时，Orderer收到请求，创建channel，并为该channel生成一个区块链
 ```
 root@d9df86737daf:/var/hyperledger/production/orderer/chains/mychannel# pwd
 /var/hyperledger/production/orderer/chains/mychannel
