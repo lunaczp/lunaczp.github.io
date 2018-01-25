@@ -27,7 +27,7 @@ Fabric CA组件在Fabric网络中，充当Certificate Authority的作用。其�
 fabric-ca-client register --id.name admin2 --id.affiliation org1.department1 --id.attrs 'hf.Revoker=true,admin=true:ecert'
 
 ```
-> The ”:ecert” suffix means that by default the “admin” attribute and its value will be inserted into the user’s enrollment certificate, which can then be used to make access control decisions.
+> The ':ecert' suffix means that by default the “admin” attribute and its value will be inserted into the user’s enrollment certificate, which can then be used to make access control decisions.
 这样，可以直接通过证书本身去做权限控制，而并不通过CA Server。
 
 
