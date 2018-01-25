@@ -4,6 +4,9 @@
 - [Basic Learning and Testing](learn.md)
 - [Troubleshooting](troubleshooting.md)
 
+## Scenario
+- [Build Your First Network](byfn.md)
+
 ## Module
 - [CA](ca.md)
 - [MSP](msp.md)
