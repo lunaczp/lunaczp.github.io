@@ -31,21 +31,21 @@ Fabric定位在企业级区块链，因而不同于普通的公开链，Fabric�
 ## 测试说明
 
 ### 基本概念
-- Channel
+- Channel  
 一个典型的Fabric网络，以Channel为单位，一个Channel是一个区块链，所有相关的业务方操作同一个区块链。同时一个Fabric网络可以同时支持多个Channel，互不影响。
-- Organization
+- Organization  
 Organization映射现实世界中的各个参与方，如公司，团体，组织等。一个典型的Fabric网络内，可以包含多个Organization。如果只有一个，则可以看作是一个企业内部的区块链。
-- Peer
+- Peer  
 区块链由节点（Peer）组成，等于比特网络内的单个参与方，Peer包含一个全网完整的账本。一个Organization包含一到多个Peer。同是有一个或多个Anchor Peer负责和其他组织交互。
-- Orderer
+- Orderer  
 一个典型的Fabric网络内，所有的交易都要经过一个Orderer服务进行排序，然后再交有Peer节点写入分布式账本。如此简化了比特币网络中的“一币多付”问题。
-- Chaincode
+- Chaincode  
 链码，可以看作是智能合约的载体，所有的业务逻辑在这里。目前可以用Go，和Nodejs编码。
-- Ledger
+- Ledger  
 账本，每个节点维护一个全网一致的账本
-- MSP
+- MSP  
 Membership Service Provider,所有参与到网络的节点，都要提供自己的身份证明，MSP是这一功能的抽象实现。不同的组织可以提供不同的实现方法。Fabric默认采用公钥认证来实现。
-- CA
+- CA  
 Certificate Authority，认证机构。Fabric默认提供CA来做账号签名和验证。可以使用CA来为MSP提供账号管理、签名验证。
 
 ### 测试示例
