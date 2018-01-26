@@ -36,8 +36,7 @@ Node，节点，有三种类型
 ### Client
 Client 代表普通用户和区块链交互。
 
-Client同时连接到Orderer和Peer。
-
+Client同时连接到Orderer和Peer。和Peer节点交互，提交tradition-invocation；和Orderer交互，提交transaction-proposal。
 Client可以选择任意Peer节点。
 
 
@@ -49,6 +48,11 @@ Peer节点可以同时承担endorser的角色，此时，它负责对一个trans
 而一个endorser角色，就是说这个Peer作为某个chaincode的endorser。当一个针对这个chaincode的transaction-invocation提交过来的时候，该Peer需要负责验证这个invocation是否符合chaincode设定的endorsement policy。并返回是否符合。
 
 这里，Peer的endorser角色，其实就是为某个chainocode把关，对所有想要提交的请求，都endorsing the chaincode's endorsement policy.
+
+注意，其实endorser在校验Client的invocation的时候，是会模拟执行对应的chaincode的，
+- 如果模拟失败，则返回失败。
+- 如果Client指定了anchor，而模拟产生的readset与之不一致，则返回失败
+- 如果成功，则返回给Client endorsement，包含了transaction和 readset，writeset。writeset包含状态变更。
 
 ### Orderer
 排队服务，所有transaction
@@ -100,13 +104,31 @@ client会根据endorsement policy来收集多个peer的endorsement。注意，�
 Orderer将一组交易（block）发送给peer，peer把block写入区块链，并对每个交易
 - 验证其是否满足对应到endorsement policy。
 - 根据policy配置，可选地执行MVCC校验，防止发生错误。
-- 通过验证的，标记为有效；否则标记无效。
+- 通过验证的，标记为有效，并根据writeset更新全局State；否则标记无效。
 
 注意，这里peer会把新的block写入区块链，而不管block内的交易是否有效。之所以这么设计感觉是权衡之后的选择：
 - 如果要针对每个交易校验，并撤回无效交易，那么就要通知Orderer，区块内的部分交易无效，Orderer需要剔除无效交易，然后重新组块。这样数据逆向流动，复杂度极大增高，是很难实现并维护的。
 - 或者一个block只包含一个交易，这样当peer认为无效的时候，直接丢掉即可。但这样，区块链的利用率将降低很多，而且系统性能会极大下降。
 
-最终的方案，就是由Orderer发送到peer的新块，peer无条件写入区块链（永久持久化），然后单独维护一个位图，来区分有效交易和无效交易。这样的代价就是区块链内会存在无效的交易。那么为了减少这种可能性，在Client提交交易之前就会验证好policy。那么当最后peer校验的时候，一般地，policy校验不会出问题。唯一可能让交易无效的就是MVCC校验出错，这样，能够在一定程度上减少无效区块在区块链中的占比。 当然随着交易并发的增加，不满足MVCC校验的交易会增多，从而还是会导致区块链的无效交易增多。
+最终的方案，就是由Orderer发送到peer的新块，peer无条件写入区块链（永久持久化），然后单独维护一个位图，来区分有效交易和无效交易。这样的代价就是区块链内会存在无效的交易。
+
+那么为了减少这种可能性，
+- 在Client提交交易之前就会验证好policy。
+- 在endorsement阶段，已经模拟运行过，没有问题，且包含了执行结果。
+
+那么当最后peer校验的时候，一般地，
+- policy校验不会出问题。
+- 也不再需要运行chaincode，因为结果在endorse阶段已经提供。
+- 唯一可能让交易无效的就是MVCC校验出错。
+
+这样，能够在一定程度上减少无效区块在区块链中的占比。 当然随着交易并发的增加，不满足MVCC校验的交易会增多，从而还是会导致区块链的无效交易增多。
+
+
+_备注_
+如上，chaincode的运行只出现在endorse阶段。在进入到orderer，到最终peer写入区块链，peer只是执行了policy检验和MVCC校验。如此剥离出了耗时的操作。把chaincode执行，排序，写入区块链操作隔离到三个不同类型的节点并行处理，很大程度地提高了系统吞吐率。
+- 不同chaincode可以指定不同endorser，这样，chaincode的endorsement可以并行处理
+- orderer只负责收集交易，生成区块，并广播给所有peer
+- peer并行写入区块链。
 
 ![transaction flow](img/trancation_flow.png)
 
