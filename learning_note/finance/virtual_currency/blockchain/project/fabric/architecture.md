@@ -1,9 +1,9 @@
 # Arthitecture
 
 优势：
-order和chaincode隔离
-扩展性：将耗时的chaincode从order主路径剥离。chaincode之间分别部署也带来扩展性
-共识算法的模块化，可配置（共识算法只要集中在orderer内）
+- order和chaincode隔离
+- 扩展性：将耗时的chaincode从order主路径剥离。chaincode之间分别部署也带来扩展性
+- 共识算法的模块化，可配置（共识算法只要集中在orderer内）
 
 # 系统架构
 
@@ -11,7 +11,7 @@ order和chaincode隔离
 
 ## 数据结构
 
-### 状态
+### State 状态
 分布式账本，维护的其实就是状态。Fabric底层存储模型就是一个KV的键值存储。交易改变数据，进入下一个状态。
 
 不同的Chaincode会有不同的数据，在底层都是KV存储。只有Chainocde自己能够修改属于自己的数据。但是所有chaincode都可以读取全局底层的KV。也就是说底层的KV数据读权限是对所有Chaincode开放的。
@@ -130,7 +130,7 @@ _备注_
 - orderer只负责收集交易，生成区块，并广播给所有peer
 - peer并行写入区块链。
 
-![transaction flow](img/trancation_flow.png)
+![transaction flow](img/transaction_flow.png)
 
 # Endorsement policies
 背书策略/证明策略
