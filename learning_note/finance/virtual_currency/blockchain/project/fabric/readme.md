@@ -11,6 +11,7 @@
 - [CA](ca.md)
 - [MSP](msp.md)
 - [Orderer](orderer.md)
+- [Channel](channel.md)
 
 ## Evaluate and Test
 - [evaluate](evaluate.md)
