@@ -1,6 +1,7 @@
 # Fabric
 
 - [Intro](intro.md)
+- [Arthitecture](architecture.md)
 - [Basic Learning and Testing](learn.md)
 - [Troubleshooting](troubleshooting.md)
 
