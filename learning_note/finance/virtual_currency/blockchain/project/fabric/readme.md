@@ -2,8 +2,6 @@
 
 - [Intro](intro.md)
 - [Arthitecture](architecture.md)
-- [Basic Learning and Testing](learn.md)
-- [Troubleshooting](troubleshooting.md)
 
 ## Scenario
 - [Build Your First Network](byfn.md)
@@ -14,5 +12,9 @@
 - [Orderer](orderer.md)
 - [Channel](channel.md)
 
-## Evaluate and Test
-- [evaluate](evaluate.md)
+## Test
+- [Basic Learning and Testing](learn.md)
+- [Troubleshooting](troubleshooting.md)
+
+## Evaluate
+- [Evaluate](evaluate.md)
