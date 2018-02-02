@@ -1,4 +1,4 @@
-# Private Network
+# Private Network-单节点网络
 建立一个自己的Ethereum区块链
 
 [Ref](https://omarmetwally.blog/2017/07/25/how-to-create-a-private-ethereum-network/)
