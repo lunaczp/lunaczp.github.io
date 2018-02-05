@@ -44,11 +44,11 @@ geth --datadir DIR console
 注意，在3节点的情况下（1个bootnode节点，3个peer节点），连接到每个peer，看到的`net.peerCount=2`，`admin.peers`也会显示其他2个节点的信息，而不包括自己。
 
 ## Ref
-[Connecting to the network](https://github.com/ethereum/go-ethereum/wiki/Connecting-to-the-network)
-[Setting up private network](https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster)
-[Private network](https://github.com/ethereum/go-ethereum/wiki/Private-network)
-[Blog create a private network](https://omarmetwally.blog/2017/07/25/how-to-create-a-private-ethereum-network/)
-[Blog create multi node network](https://omarmetwally.blog/2017/09/27/how-to-connect-3-ethereum-nodes-in-a-private-ethereum-network/)
+- [Connecting to the network](https://github.com/ethereum/go-ethereum/wiki/Connecting-to-the-network)
+- [Setting up private network](https://github.com/ethereum/go-ethereum/wiki/Setting-up-private-network-or-local-cluster)
+- [Private network](https://github.com/ethereum/go-ethereum/wiki/Private-network)
+- [Blog create a private network](https://omarmetwally.blog/2017/07/25/how-to-create-a-private-ethereum-network/)
+- [Blog create multi node network](https://omarmetwally.blog/2017/09/27/how-to-connect-3-ethereum-nodes-in-a-private-ethereum-network/)
 
 
 # 不使用bootnode建立private network
