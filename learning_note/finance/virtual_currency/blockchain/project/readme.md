@@ -7,4 +7,4 @@
 
 ## Permissioned Blockchin
 - [Fabric](fabric)
-- [Fisco](fabric)
+- [Fisco](fisco)
