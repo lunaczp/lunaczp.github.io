@@ -44,3 +44,8 @@ MPT底层是利用KV数据库来存储节点数据的。MPT内只保留节点的
 - Transactions Trie的`path`是`rpl(transcationIndex)`，`value`是交易信息。
 - Receipts Trie的`path`是`rpl(transcationIndex)`，`value`//todo
 - Storage Trie的`path`是通过合约内的变量构造的，存储的是变量的值。//todo detail
+
+## 更新
+综上，假如一个account的balance发生了变化，那么需要更新State Trie。`sha3(account) => newAccountValue`，此时，State Trie内，对应`sha3(account)`搜索路径上的所有节点都需要变更。
+其实是自下向上的，每一层都需要重新计算hash，导致每一层都会生成新的节点，一直到一个新的root node。  
+由于底层是KV存储，假设有N层，那么新生成了至少N个KV对。如此，底层的存储读写是很频繁的，数据增量也是很可观的。这个在未来也许会是个问题（写入速度，与存储空间）
