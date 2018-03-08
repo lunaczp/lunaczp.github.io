@@ -16,7 +16,7 @@
 	这个证书是自签名的（自己为自己背书）
 - B做为一个中间证书机构
 	- 生成一个私钥ca.key.pem
-	- 生成一个CSR（Certificate Signing Requeset） ca.csr.pem发给A，申请A为自己背书
+	- 生成一个CSR（Certificate Signing Request） ca.csr.pem发给A，申请A为自己背书
 	- A在验证了B确实是B后（打电话，让B提供资质证明，向政府机构确认），用自己的私钥为B的CSR签名，生成ca.cert.pem，返回给B
 - C作为一个普通机构
 	- 生成一个私钥ca.key.pem
