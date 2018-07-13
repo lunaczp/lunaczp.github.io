@@ -1,8 +1,8 @@
 # Merkle Patricia Tree(MPT)
 
 Ref:
-- [MPT](https://github.com/ethereum/wiki/wiki/Patricia-Tree)
-- [MPT](http://ethfans.org/toya/articles/588)
+- [MPT-Ethereum Wiki](https://github.com/ethereum/wiki/wiki/Patricia-Tree)
+- [MPT-Ethfans](http://ethfans.org/toya/articles/588)
 
 ## Basic
 
