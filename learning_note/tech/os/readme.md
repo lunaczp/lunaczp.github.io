@@ -1,6 +1,5 @@
 # OS
-
-- [OS Note From Github](https://github.com/lunaczp/learning/tree/master/category/os)
+- [My OS learning notes at Github](https://github.com/lunaczp/os)
 
 ## Doc
 - [x86 Instruction](doc/x86_instruction)
