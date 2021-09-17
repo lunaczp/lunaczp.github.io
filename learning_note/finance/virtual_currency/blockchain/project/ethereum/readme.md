@@ -1,7 +1,7 @@
 # Ethereum
 
 ## Theory
-- [Yellow Paper note](./yellow_page_note.md)
+- [Yellow Paper note](./yellow_paper_note.md)
 
 ## Specific
 - [Merkle Patricia Tree](./tree.md)
