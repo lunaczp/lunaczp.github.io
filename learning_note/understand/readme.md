@@ -1,3 +1,0 @@
-# Understand
-
-- [computer](computer)
