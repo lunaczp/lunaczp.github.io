@@ -12,21 +12,21 @@ function getWhiteList() {
     ];
 }
 
-function packByDepth($string, $depth) {
+function packByDepth($name, $path, $depth) {
     $r = "";
     while ($depth--) {
         $r .= "  ";
     }
-    $r .= "- [$string]($string)" ."\n";
+    $r .= "- [$name]($path)" ."\n";
     return $r;
 }
 
-function scan($dir, $depth) {
+function scan($dir, $relativePrefix, $depth) {
     $dirParts = explode("/", $dir);
     $dirName = end($dirParts);
 
     if (is_dir($dir)) {
-        echo packByDepth($dirName, $depth);
+        echo packByDepth($dirName, $relativePrefix, $depth);
     }
 
     if (is_file($dir)) {
@@ -34,7 +34,7 @@ function scan($dir, $depth) {
         if (substr($fileNameWithExt, -3) === '.md'
             && strtolower($fileNameWithExt) != "readme.md")
         {
-            echo packByDepth(substr($fileNameWithExt, 0, -3), $depth);
+            echo packByDepth(substr($fileNameWithExt, 0, -3), $relativePrefix, $depth);
         }
         return;
     }
@@ -46,8 +46,8 @@ function scan($dir, $depth) {
 
     foreach ($items as $item) {
         if (in_array($item, getWhiteList())) continue;
-        scan($dir . "/" . $item, $depth+1);
+        scan($dir . "/" . $item, $relativePrefix ."/" .$item, $depth+1);
     }
 }
 
-scan($dirPath, 0);
+scan($dirPath, '', 0);
