@@ -1,4 +1,4 @@
-- [lunaczp.github.io]()
+- [lunaczp.github.io](/)
   - [learning_note](/learning_note)
     - [finance](/learning_note/finance)
       - [monetary_theory](/learning_note/finance/monetary_theory)

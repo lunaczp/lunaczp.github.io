@@ -46,8 +46,8 @@ function scan($dir, $relativePrefix, $depth) {
 
     foreach ($items as $item) {
         if (in_array($item, getWhiteList())) continue;
-        scan($dir . "/" . $item, $relativePrefix ."/" .$item, $depth+1);
+        scan($dir . "/" . $item, rtrim($relativePrefix, "/")  ."/" .$item, $depth+1);
     }
 }
 
-scan($dirPath, '', 0);
+scan($dirPath, '/', 0);
