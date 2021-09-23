@@ -17,6 +17,7 @@ function packByDepth($name, $path, $depth) {
     while ($depth--) {
         $r .= "  ";
     }
+    $path = str_replace(" ", "\\ ", $path);
     $r .= "- [$name]($path)" ."\n";
     return $r;
 }
