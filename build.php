@@ -15,7 +15,7 @@ function getWhiteList() {
 function packByDepth($string, $depth) {
     $r = "";
     while ($depth--) {
-        $r .= " ";
+        $r .= "  ";
     }
     $r .= "- [$string]($string)" ."\n";
     return $r;
