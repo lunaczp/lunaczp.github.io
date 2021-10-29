@@ -31,5 +31,18 @@ cat servers.txt | while read line; do    printf "get somekey\r\n" |nc $line; don
 ```
 
 
+## demo
+```
+//获取session 数据
+$phpsessid=$argv[1];
+if (empty($phpsessid)) {
+    exit("need phpsessid");
+}
 
+
+$saveFile = "t";
+$x = "printf \"get get $phpsessid\r\n\" |nc 10.132.1.2 11211 >$saveFile && sed -i '1d;\$d' $saveFile";
+shell_exec($x);
+var_export(igbinary_unserialize(file_get_contents($saveFile)));
+```
 
