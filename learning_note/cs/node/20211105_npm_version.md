@@ -125,8 +125,10 @@ npm 6.13.4
 - vue-cli3
 - lerna 多包管理工具
 - npm不同版本的注意事项
-	- 包版本允许前缀的用法("npm:xxx")，npm6.9才支持
-	- lockfileVersion, npm7变为2
+	- 包版本允许前缀的用法("npm:xxx")，npm6.9才支持 
+		- [npm6.9](https://npm.community/t/release-npm-6-9-0/5911)
+		- [stackoverflow](https://stackoverflow.com/questions/17127054/how-do-i-install-a-package-with-npm-with-a-different-custom-module-name)
+	- lockfileVersion, npm7变为2 [npmjs docs](https://docs.npmjs.com/cli/v7/configuring-npm/package-lock-json#lockfileversion)
 - 其他打包依赖
 	- node-sass
 	- sass-loader
