@@ -1,1 +1,1 @@
-# [x86 Instruction](doc/x86_instruction)
+# [x86_Instruction](doc/x86_instruction)
