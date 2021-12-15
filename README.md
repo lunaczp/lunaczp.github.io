@@ -8,6 +8,8 @@
       - [fe](/learning_note/cs/fe)
         - [cookie](/learning_note/cs/fe/cookie)
           - [samesite](/learning_note/cs/fe/cookie/samesite.md)
+        - [misc](/learning_note/cs/fe/misc)
+          - [egg_proxy_file_upload](/learning_note/cs/fe/misc/egg_proxy_file_upload.md)
       - [java](/learning_note/cs/java)
       - [misc](/learning_note/cs/misc)
         - [oauth](/learning_note/cs/misc/oauth.md)
