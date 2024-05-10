@@ -10,6 +10,11 @@ if (isset($argv[2])) {
 }
 $fileExtSize = strlen($fileExt);
 
+$isBuildTitle = false;
+if (isset($argv[3])) {
+    $isBuildTitle = $argv[3] === "true";
+}
+
 $wantedFiles = [];
 
 function findWantedFiles(&$wantedFiles, $dir) {
@@ -63,8 +68,19 @@ function packByDepth($name, $path, $depth) {
     return $r;
 }
 
+function buildFileTitle($file) {
+    #read first line of file as title, strip # and space
+    $handle = fopen($file, "r");
+    $title = fgets($handle);
+    fclose($handle);
+    $title = trim($title);
+    $title = ltrim($title, "#");
+    $title = trim($title);
+    return $title;
+}
+
 function scan($dir, $relativePrefix, $depth) {
-    global $fileExtSize, $fileExt;
+    global $fileExtSize, $fileExt, $isBuildTitle;
 
     $dirParts = explode("/", $dir);
     $dirName = end($dirParts);
@@ -79,7 +95,14 @@ function scan($dir, $relativePrefix, $depth) {
         $isWanted = substr($fileNameWithExt, -$fileExtSize) === $fileExt;
         if ($isWanted && strtolower($fileName) != "readme")
         {
-            echo packByDepth($fileName, $relativePrefix, $depth);
+            $title = $fileName;
+            if ($isBuildTitle) {
+                $title = buildFileTitle($dir);
+                if (empty($title)) {
+                    $title = $fileName;
+                }
+            }
+            echo packByDepth($title, $relativePrefix, $depth);
         }
         return;
     }
