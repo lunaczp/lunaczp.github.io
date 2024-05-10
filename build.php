@@ -10,6 +10,38 @@ if (isset($argv[2])) {
 }
 $fileExtSize = strlen($fileExt);
 
+$wantedFiles = [];
+
+function findWantedFiles(&$wantedFiles, $dir) {
+    global $fileExtSize, $fileExt;
+    $items = scandir($dir);
+    foreach ($items as $item) {
+        if (in_array($item, getWhiteList())) continue;
+        if (is_dir($dir . "/" . $item)) {
+            findWantedFiles($wantedFiles, $dir . "/" . $item);
+        }
+        if (is_file($dir . "/" . $item)) {
+            $fileNameWithExt = $item;
+            $fileName = substr($fileNameWithExt, 0, -$fileExtSize);
+            $isWanted = substr($fileNameWithExt, -$fileExtSize) === $fileExt;
+            if ($isWanted && strtolower($fileName) != "readme")
+            {
+                $wantedFiles[] = $dir . "/" . $item;
+            }
+        }
+    }
+}
+
+function isDirContainsWantedFiles($dir) {
+    global $wantedFiles;
+    foreach ($wantedFiles as $file) {
+        if (strpos($file, $dir) === 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function getWhiteList() {
     return [
         '.',
@@ -37,7 +69,7 @@ function scan($dir, $relativePrefix, $depth) {
     $dirParts = explode("/", $dir);
     $dirName = end($dirParts);
 
-    if (is_dir($dir)) {
+    if (is_dir($dir) && isDirContainsWantedFiles($dir)) {
         echo packByDepth($dirName, $relativePrefix, $depth);
     }
 
@@ -47,7 +79,7 @@ function scan($dir, $relativePrefix, $depth) {
         $isWanted = substr($fileNameWithExt, -$fileExtSize) === $fileExt;
         if ($isWanted && strtolower($fileName) != "readme")
         {
-            echo packByDepth(substr($fileNameWithExt, 0, -$fileExtSize), $relativePrefix, $depth);
+            echo packByDepth($fileName, $relativePrefix, $depth);
         }
         return;
     }
@@ -63,4 +95,5 @@ function scan($dir, $relativePrefix, $depth) {
     }
 }
 
+findWantedFiles($wantedFiles, $dirPath);
 scan($dirPath, '/', 0);
