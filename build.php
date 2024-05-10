@@ -1,5 +1,14 @@
 <?php
 $dirPath = __DIR__;
+if (isset($argv[1])) {
+    $dirPath = $argv[1];
+}
+
+$fileExt = ".md";
+if (isset($argv[2])) {
+    $fileExt = $argv[2];
+}
+$fileExtSize = strlen($fileExt);
 
 function getWhiteList() {
     return [
@@ -23,6 +32,8 @@ function packByDepth($name, $path, $depth) {
 }
 
 function scan($dir, $relativePrefix, $depth) {
+    global $fileExtSize, $fileExt;
+
     $dirParts = explode("/", $dir);
     $dirName = end($dirParts);
 
@@ -32,10 +43,11 @@ function scan($dir, $relativePrefix, $depth) {
 
     if (is_file($dir)) {
         $fileNameWithExt = $dirName;
-        if (substr($fileNameWithExt, -3) === '.md'
-            && strtolower($fileNameWithExt) != "readme.md")
+        $fileName = substr($fileNameWithExt, 0, -$fileExtSize);
+        $isWanted = substr($fileNameWithExt, -$fileExtSize) === $fileExt;
+        if ($isWanted && strtolower($fileName) != "readme")
         {
-            echo packByDepth(substr($fileNameWithExt, 0, -3), $relativePrefix, $depth);
+            echo packByDepth(substr($fileNameWithExt, 0, -$fileExtSize), $relativePrefix, $depth);
         }
         return;
     }
