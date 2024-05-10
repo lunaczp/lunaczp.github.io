@@ -75,6 +75,10 @@ function buildFileTitle($file) {
     fclose($handle);
     $title = trim($title);
     $title = ltrim($title, "#");
+    #if is a link link [xyz](abc) then use xyz as title
+    if (strpos($title, "[") > 0 && strpos($title, "]") > 0) {
+        $title = substr($title, strpos($title, "[") + 1, strpos($title, "]") - strpos($title, "[") - 1);
+    }
     $title = trim($title);
     return $title;
 }
