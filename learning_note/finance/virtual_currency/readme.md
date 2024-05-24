@@ -1,3 +1,0 @@
-# Virtual Currency
-
-- [Blockchain](blockchain)
