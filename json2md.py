@@ -10,7 +10,7 @@ class Json2Md(object):
             return
         
         link = f"[{node['title']}](https://www.notion.so/lunaczp/{node['id'].replace('-', '')})"
-        print(" " * level, "-", link)
+        print("  " * level, "-", link)
 
         if node.get("children") is None:
             return
