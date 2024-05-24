@@ -1,1 +1,1 @@
-[>>> _My Notes has moved to Notion_ <<<](https://lunaczp.notion.site/Zhang-Peng-s-Wiki-6fb016ac39c74a4aa2c16c71b4f78945?pvs=4)
+[_My Notes has moved to Notion_](https://lunaczp.notion.site/Zhang-Peng-s-Wiki-6fb016ac39c74a4aa2c16c71b4f78945?pvs=4)
