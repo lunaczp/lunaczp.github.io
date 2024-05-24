@@ -1,1 +1,1 @@
-[_My Notes has moved_ ](https://zhangpeng.dev/)
+[_My Notes has moved here_ ](https://zhangpeng.dev/)
