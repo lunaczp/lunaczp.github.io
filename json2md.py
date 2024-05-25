@@ -10,7 +10,7 @@ class Json2Md(object):
             return
         
         if node["type"] == "child_page":
-            link = f"[{node['title']}](https://www.notion.so/lunaczp/{node['id'].replace('-', '')})"
+            link = f"[{node['title']}](https://lunaczp.notion.site/{node['id'].replace('-', '')})"
             print("  " * level, "-", link)
             nextLevel = level + 1
         else:
