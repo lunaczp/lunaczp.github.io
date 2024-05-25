@@ -9,8 +9,9 @@ class Json2Md(object):
         if node is None:
             return
         
-        link = f"[{node['title']}](https://www.notion.so/lunaczp/{node['id'].replace('-', '')})"
-        print("  " * level, "-", link)
+        if node["type"] == "child_page":
+            link = f"[{node['title']}](https://www.notion.so/lunaczp/{node['id'].replace('-', '')})"
+            print("  " * level, "-", link)
 
         if node.get("children") is None:
             return

@@ -6,9 +6,10 @@ import requests
 
 
 class Node(object):
-    def __init__(self, id, title):
+    def __init__(self, id, title, type):
         self.id = id
         self.title = title
+        self.type = type
         self.children = []
 
     def add_child(self, obj):
@@ -18,6 +19,7 @@ class Node(object):
         return {
             "id": self.id,
             "title": self.title,
+            "type": self.type,
             "children": [child.to_dict() for child in self.children],
         }
 
@@ -27,17 +29,20 @@ class NotionBuilder(object):
         self.secret = secret
         self.pageCount = 0
 
-    def buildNode(self, pageId, title):
+    def buildNode(self, pageId, title, type ='child_page', has_children=True):
         self.pageCount += 1
         print(f"Building, count: {self.pageCount}, {title}")
 
-        node = Node(pageId, title)
+        node = Node(pageId, title, type)
+        if not has_children:
+            return node
+
         pages = self.getSubPages(pageId)
         if pages is None or len(pages) == 0:
             return node
 
         for page in pages:
-            child = self.buildNode(page["id"], page["title"])
+            child = self.buildNode(page["id"], page["title"], page['type'], page['has_children'])
             node.add_child(child)
         return node
 
@@ -65,9 +70,28 @@ class NotionBuilder(object):
                         "id": block["id"],
                         "title": block["child_page"]["title"],
                         "has_children": block["has_children"],
+                        "type": "child_page",
                     }
                 )
-                #print(f"Found subpage: {block['child_page']['title']}, {block['id']}")
+                # print(f"Found subpage: {block['child_page']['title']}, {block['id']}")
+            elif block["type"] == "column_list":
+                pages.append(
+                    {
+                        "id": block["id"],
+                        "title": "",
+                        "has_children": block["has_children"],
+                        "type": "column_list",
+                    }
+                )
+            elif block["type"] == "column":
+                pages.append(
+                    {
+                        "id": block["id"],
+                        "title": "",
+                        "has_children": block["has_children"],
+                        "type": "column",
+                    }
+                )
 
         return pages
 
