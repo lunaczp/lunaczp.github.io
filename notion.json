@@ -9,6 +9,79 @@
             "type": "child_page",
             "children": [
                 {
+                    "id": "61919bf1-238f-4248-a1fc-ebcb96a8239d",
+                    "title": "AI Basic",
+                    "type": "child_page",
+                    "children": [
+                        {
+                            "id": "98698fc6-e926-444d-9a9b-bde0d622b5ac",
+                            "title": "AI \u53d1\u5c55\u53f2\uff08by GPT\uff09",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "774918ba-ae65-4763-8822-a54706ba70ac",
+                            "title": "AI \u73b0\u72b6&\u95ee\u9898&\u672a\u6765",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "bb1986a1-42b6-4dca-bc5d-4383c450cfa3",
+                            "title": "AGI \u8fdb\u5c55&\u95ee\u9898&\u672a\u6765\u65b9\u5411",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "7d1dcbe5-ef1c-45ff-8e80-52ae3bbb4e7a",
+                            "title": "AGI \u5b9e\u73b0\u65b9\u6848",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "d0cf73ef-742b-4f7a-99d6-da8757ae3c08",
+                            "title": "GPT\u4ecb\u7ecd\uff08by GPT\uff09",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "e5e74027-093b-47bc-8001-3817668affd7",
+                            "title": "Transformer\u4ecb\u7ecd\uff08by GPT\uff09",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "fc143a73-dee3-4f75-832b-e497de344a8b",
+                            "title": "RNN\u4ecb\u7ecd\uff08by GPT\uff09",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "42587062-03ed-4aaf-9f8c-51d9926c5eb1",
+                            "title": "CNN\u4ecb\u7ecd\uff08by GPT\uff09",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "a1d0ac5e-cf46-4cbb-9fe2-e1a80a44df9f",
+                            "title": " CNN vs RNN vs Transformer",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "355acffc-0b84-4289-a14f-0a24e8cb1ad7",
+                            "title": "\u673a\u5668\u5b66\u4e60\u548c\u6df1\u5ea6\u5b66\u4e60\u7684\u533a\u522b - ZOMI\u9171\u9171 - \u535a\u5ba2\u56ed",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "e18abec9-f791-44c5-85a3-8e203b1f2b24",
+                            "title": "\u4e66\u7c4d\u63a8\u8350\uff08by GPT\uff09",
+                            "type": "child_page",
+                            "children": []
+                        }
+                    ]
+                },
+                {
                     "id": "9042740b-fbb3-4ae4-b720-9ebff3417dde",
                     "title": "My AI",
                     "type": "child_page",
@@ -117,7 +190,34 @@
                             "id": "bc5e732a-aa98-4f1b-a359-dd84b023c01d",
                             "title": "Quantize",
                             "type": "child_page",
-                            "children": []
+                            "children": [
+                                {
+                                    "id": "1524ee51-cf32-406a-9f35-b553ea92c44c",
+                                    "title": "LoRA",
+                                    "type": "child_page",
+                                    "children": [
+                                        {
+                                            "id": "9a255881-98a8-436d-a495-28c7a677fae6",
+                                            "title": "LoRA vs QLoRA",
+                                            "type": "child_page",
+                                            "children": []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "id": "f1d8370d-9eb1-4a9e-b734-8e0d2c009c17",
+                            "title": "Datasets",
+                            "type": "child_page",
+                            "children": [
+                                {
+                                    "id": "eea7cb4e-7193-4742-b5cf-4eec5e0c6318",
+                                    "title": "\u6570\u636e\u96c6\u751f\u6210",
+                                    "type": "child_page",
+                                    "children": []
+                                }
+                            ]
                         },
                         {
                             "id": "4dfc6149-0d4a-415e-864a-3dc54493ee52",
@@ -134,73 +234,6 @@
                         {
                             "id": "53fe204c-50f8-4377-95f6-005599cab5e7",
                             "title": "2023.11.13 \u6211\u7684 AI \u5c0f\u7ec4\u5206\u4eab",
-                            "type": "child_page",
-                            "children": []
-                        }
-                    ]
-                },
-                {
-                    "id": "61919bf1-238f-4248-a1fc-ebcb96a8239d",
-                    "title": "AI Basic",
-                    "type": "child_page",
-                    "children": [
-                        {
-                            "id": "98698fc6-e926-444d-9a9b-bde0d622b5ac",
-                            "title": "AI \u53d1\u5c55\u53f2\uff08by GPT\uff09",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "774918ba-ae65-4763-8822-a54706ba70ac",
-                            "title": "AI \u73b0\u72b6&\u95ee\u9898&\u672a\u6765",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "bb1986a1-42b6-4dca-bc5d-4383c450cfa3",
-                            "title": "AGI \u8fdb\u5c55&\u95ee\u9898&\u672a\u6765\u65b9\u5411",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "7d1dcbe5-ef1c-45ff-8e80-52ae3bbb4e7a",
-                            "title": "AGI \u5b9e\u73b0\u65b9\u6848",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "d0cf73ef-742b-4f7a-99d6-da8757ae3c08",
-                            "title": "GPT\u4ecb\u7ecd\uff08by GPT\uff09",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "e5e74027-093b-47bc-8001-3817668affd7",
-                            "title": "Transformer\u4ecb\u7ecd\uff08by GPT\uff09",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "fc143a73-dee3-4f75-832b-e497de344a8b",
-                            "title": "RNN\u4ecb\u7ecd\uff08by GPT\uff09",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "42587062-03ed-4aaf-9f8c-51d9926c5eb1",
-                            "title": "CNN\u4ecb\u7ecd\uff08by GPT\uff09",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "355acffc-0b84-4289-a14f-0a24e8cb1ad7",
-                            "title": "\u673a\u5668\u5b66\u4e60\u548c\u6df1\u5ea6\u5b66\u4e60\u7684\u533a\u522b - ZOMI\u9171\u9171 - \u535a\u5ba2\u56ed",
-                            "type": "child_page",
-                            "children": []
-                        },
-                        {
-                            "id": "e18abec9-f791-44c5-85a3-8e203b1f2b24",
-                            "title": "\u4e66\u7c4d\u63a8\u8350\uff08by GPT\uff09",
                             "type": "child_page",
                             "children": []
                         }
@@ -496,6 +529,18 @@
                     "type": "child_page",
                     "children": [
                         {
+                            "id": "1490a7ca-861c-4b3b-86e7-8c315698e4b0",
+                            "title": "2016-12-24 - mac\u4e0b\u6e90\u7801\u8c03\u8bd5Mongo",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
+                            "id": "be780d47-0d9b-4238-be25-0b633e372b7c",
+                            "title": "2017-07-21 signal\u4e0esocket",
+                            "type": "child_page",
+                            "children": []
+                        },
+                        {
                             "id": "a1973d72-1d94-4a9d-b564-877dadad42f6",
                             "title": "\u5173\u4e8ePHP\u7684session\u5b58\u50a8",
                             "type": "child_page",
@@ -690,14 +735,7 @@
                                             "id": "e91ef6ad-d777-41b4-98d4-ac4f01baa9ef",
                                             "title": "TiDB",
                                             "type": "child_page",
-                                            "children": [
-                                                {
-                                                    "id": "a6e8f3cf-2e22-4922-9e3e-daaba40ff984",
-                                                    "title": "2021-09-14 5000w\u8868\u52a0\u7d22\u5f15",
-                                                    "type": "child_page",
-                                                    "children": []
-                                                }
-                                            ]
+                                            "children": []
                                         }
                                     ]
                                 },
@@ -708,16 +746,58 @@
                                     "children": []
                                 },
                                 {
-                                    "id": "6ffc1ee4-8ebe-4d7d-b085-7a8b4600a571",
-                                    "title": "free_buckets",
-                                    "type": "child_page",
-                                    "children": []
-                                },
-                                {
                                     "id": "1df62846-4f1a-44d3-889c-78852e05d067",
                                     "title": "MySQL",
                                     "type": "child_page",
                                     "children": [
+                                        {
+                                            "id": "b539655a-a566-49ea-9b89-7ae1431905d9",
+                                            "title": "2017-11-21 \u4e3b\u4ece\u5ef6\u8fdf",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "d0408df0-ac50-4a83-b104-fc89a62ffee6",
+                                            "title": "2017-12-06 binlog offset \u622a\u65ad",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "1093154e-6eed-4c31-b888-6f59c6a3bd5c",
+                                            "title": "2017-11-07 mysql client\u7684\u94fe\u63a5\u5efa\u7acb",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "e2d7a5f4-facd-4dc6-b8a6-a5662936152d",
+                                            "title": "2017-12-07 \u4e3b\u4ece\u534f\u8bae\u5206\u6790",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "c40564bc-bd56-4e16-8853-e562867300fb",
+                                            "title": "2017-12-12 binlog event\u7684\u5207\u5272",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "b9ebe471-a50c-44bc-97ea-221efead0dea",
+                                            "title": "2017-12-19 \u4ece\u5e93\u5ef6\u65f6",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "c3c6b5c0-2d92-4a76-b1c1-f675432e2cea",
+                                            "title": "2017-12-19 seconds_behind_master",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
+                                        {
+                                            "id": "63061c38-6832-4493-a49c-94a85f35823c",
+                                            "title": "2018-04-12 binlog event\u62c6\u5305\u590d\u76d8",
+                                            "type": "child_page",
+                                            "children": []
+                                        },
                                         {
                                             "id": "c55f60bf-b9e4-45cf-9120-226881bd0598",
                                             "title": "Binlog File Analyze",
@@ -738,6 +818,12 @@
                                             "children": []
                                         }
                                     ]
+                                },
+                                {
+                                    "id": "cd35c27b-78ea-4454-8b3b-3633a51b9bba",
+                                    "title": "Mongo",
+                                    "type": "child_page",
+                                    "children": []
                                 }
                             ]
                         }
@@ -1025,6 +1111,25 @@
                 {
                     "id": "dcaebe0e-8b7c-4109-a71f-dee5a6350bff",
                     "title": "OAuth 2",
+                    "type": "child_page",
+                    "children": []
+                }
+            ]
+        },
+        {
+            "id": "25397150-7f8a-4f8f-b933-e7d0b50564b8",
+            "title": "Reading Notes",
+            "type": "child_page",
+            "children": [
+                {
+                    "id": "b0a159e0-0a80-4501-bc46-faea59e68553",
+                    "title": "\u5a31\u4e50\u81f3\u6b7b",
+                    "type": "child_page",
+                    "children": []
+                },
+                {
+                    "id": "63cf53c6-a46a-4bc4-b205-ae74b2a7094a",
+                    "title": "\u7a77\u7238\u7238\uff0c\u5bcc\u7238\u7238",
                     "type": "child_page",
                     "children": []
                 }

@@ -110,4 +110,5 @@ if __name__ == "__main__":
 
     b = NotionBuilder(secret)
     node = b.buildNode(pageId, title)
-    print(json.dumps(node.to_dict()))
+    with open('notion.json', 'w') as f:
+        json.dump(node.to_dict(), f)
