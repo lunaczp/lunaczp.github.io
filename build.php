@@ -1,4 +1,8 @@
 <?php
+/**
+ * php build.php dir  .lux.md true > output.md
+ */
+
 $dirPath = __DIR__;
 if (isset($argv[1])) {
     $dirPath = $argv[1];

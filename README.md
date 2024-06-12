@@ -10,6 +10,7 @@
        - [RNN介绍（by GPT）](https://lunaczp.notion.site/fc143a73dee34f75832be497de344a8b)
        - [CNN介绍（by GPT）](https://lunaczp.notion.site/4258706203ed4aaf9f8c51d9926c5eb1)
        - [ CNN vs RNN vs Transformer](https://lunaczp.notion.site/a1d0ac5ecf464cbb9fe2e1a80a44df9f)
+       - [Seq2Seq模型发展历史](https://lunaczp.notion.site/f46b400725b9453ab282eccd3fec79d4)
        - [机器学习和深度学习的区别 - ZOMI酱酱 - 博客园](https://lunaczp.notion.site/355acffc0b844289a14f0a24e8cb1ad7)
        - [书籍推荐（by GPT）](https://lunaczp.notion.site/e18abec9f79144c585a38e203b1f2b24)
      - [My AI](https://lunaczp.notion.site/9042740bfbb34ae4b7209ebff3417dde)
@@ -173,3 +174,4 @@
    - [Reading Notes](https://lunaczp.notion.site/253971507f8a4f8fb933e7d0b50564b8)
      - [娱乐至死](https://lunaczp.notion.site/b0a159e00a804501bc46faea59e68553)
      - [穷爸爸，富爸爸](https://lunaczp.notion.site/63cf53c6a46a4bc4b205ae74b2a7094a)
+     - [千脑智能](https://lunaczp.notion.site/65b03366dc2a4a3781a425588b96d328)
