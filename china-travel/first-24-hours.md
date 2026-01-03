@@ -216,10 +216,3 @@ Once the first 24 hours pass, things get easier.
 
 ---
 
-## What Comes Next
-
-After this guide:
-- Each section is expanded into its own survival scenario
-- More detailed step-by-step instructions are provided
-
-If you survived Day One, you’re doing fine.
